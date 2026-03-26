@@ -70,7 +70,7 @@
 
     <!-- Pagination -->
     <div class="mt-14">
-        {{ $authors->links() }}
+        {{ $authors->links('vendor.pagination.custom') }}
     </div>
 
 </div>
