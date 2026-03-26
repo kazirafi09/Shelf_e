@@ -6,12 +6,19 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
-use App\Models\Product;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\HeroSlideController;
+use App\Models\Quote;
+
+Route::get('/random-quote', function () {
+    return response()->json(
+        Quote::inRandomOrder()->first()
+    );
+});
+// Put these inside your admin Route::group if you have one!
 
 /*
 |--------------------------------------------------------------------------
@@ -70,24 +77,34 @@ Route::middleware('auth')->group(function () {
 | Admin Routes (PROTECTED)
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    
-    // Order routes
-    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-    Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-    Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-    Route::get('/orders/{id}/invoice', [AdminOrderController::class, 'invoice'])->name('admin.orders.invoice');
-    
-    // Book Inventory routes
-    Route::get('/books', [AdminBookController::class, 'index'])->name('admin.books.index');
-    Route::get('/books/create', [AdminBookController::class, 'create'])->name('admin.books.create');
-    Route::post('/books/create', [AdminBookController::class, 'store'])->name('admin.books.store');
-    Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('admin.books.destroy');
-    Route::get('/books/{id}/edit', [AdminBookController::class, 'edit'])->name('admin.books.edit');
-    Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('admin.books.update');
-    
-    // Note: The public cart routes were removed from here!
-});
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (PROTECTED)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')
+    ->name('admin.') // <--- THIS IS THE FIX
+    ->middleware(['auth', IsAdmin::class])
+    ->group(function () {
+        
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        
+        // This now correctly generates 'admin.hero-slides.index', etc.
+        Route::resource('hero-slides', HeroSlideController::class);
+        
+        // Order routes (Cleaned up names)
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+        Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{id}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
+        
+        // Book Inventory routes (Cleaned up names)
+        Route::get('/books', [AdminBookController::class, 'index'])->name('books.index');
+        Route::get('/books/create', [AdminBookController::class, 'create'])->name('books.create');
+        Route::post('/books/create', [AdminBookController::class, 'store'])->name('books.store');
+        Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
+        Route::get('/books/{id}/edit', [AdminBookController::class, 'edit'])->name('books.edit');
+        Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
+    });
 
 require __DIR__.'/auth.php';

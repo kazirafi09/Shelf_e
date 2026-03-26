@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Product; // Make sure to import your Product model!
 use Illuminate\Support\Str; // We need this to generate the URL slug
 use Illuminate\Support\Facades\Storage;
-use App\Models\Category;
 use App\Models\Book;
+use App\Models\Category;
+
 
 class AdminBookController extends Controller
 {
@@ -68,7 +69,7 @@ class AdminBookController extends Controller
     public function index(Request $request)
     {
         // Start the database query
-        $query = Book::query();
+        $query = Product::query();
 
         // Check if a category was clicked in the UI
         if ($request->has('category') && $request->category != '') {
@@ -79,12 +80,12 @@ class AdminBookController extends Controller
         }
 
         // Get the results (you can chain ->paginate(12) here instead of get())
-        $books = $query->get(); 
+        $books = $query->latest()->paginate(10); 
         
         // Pass everything to the view
         $globalCategories = Category::all(); 
 
-        return view('your.view.name', compact('books', 'globalCategories'));
+        return view('admin.books.index', compact('books', 'globalCategories'));
     }
 
     // (Your existing create and store methods should still be here!)

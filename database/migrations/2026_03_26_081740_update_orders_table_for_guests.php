@@ -9,17 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            // Make user_id nullable so guests can place orders
-            $table->unsignedBigInteger('user_id')->nullable()->change();
             
-            // Add shipping info columns if you don't have them already
-            $table->string('name')->after('user_id');
-            $table->string('email')->after('name');
-            $table->string('phone')->after('email');
-            $table->text('shipping_address')->after('phone');
+            // Only add 'name' if it doesn't exist yet
+            if (!Schema::hasColumn('orders', 'name')) {
+                $table->string('name')->nullable()->after('user_id');
+            }
+            
+            // Do the same for your other columns
+            if (!Schema::hasColumn('orders', 'email')) {
+                $table->string('email')->nullable();
+            }
         });
     }
 

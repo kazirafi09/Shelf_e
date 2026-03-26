@@ -5,19 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\HeroSlide; // Add this at the top
+use App\Models\Quote;
 
 class CatalogController extends Controller
 {
+    
     // 1. Load the Homepage
     public function home()
     {
         $topBooks = Product::orderBy('rating', 'desc')->take(5)->get();
         $popularAuthors = Product::select('author')->distinct()->inRandomOrder()->take(4)->get();
-        
-        // FIX 1: Fetch and pass the categories to the home view for the Quick Browse buttons
         $globalCategories = Category::all();
+        $quote = Quote::inRandomOrder()->first();
+        // Fetch the dynamic slides (ordered by your preference)
+        $heroSlides = HeroSlide::orderBy('order', 'asc')->get();
         
-        return view('home', compact('topBooks', 'popularAuthors', 'globalCategories'));
+        return view('home', compact('quote', 'topBooks', 'popularAuthors', 'globalCategories', 'heroSlides'));
     }
 
     // 2. Load Categories with Search & Filters
@@ -89,7 +93,8 @@ class CatalogController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        $products = $query->paginate(10)->withQueryString(); 
+        // Fetch all matching records instead of paginating them
+        $products = $query->get();
         $genres = Category::all();
         $authors = Product::select('author')->distinct()->whereNotNull('author')->where('author', '!=', '')->orderBy('author')->pluck('author');
         

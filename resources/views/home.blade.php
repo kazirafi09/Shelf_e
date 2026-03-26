@@ -2,152 +2,120 @@
 
 @section('content')
 <div class="container px-4 py-6 mx-auto md:py-8 max-w-7xl" x-data="{ mounted: false }" x-init="setTimeout(() => mounted = true, 100)">
-    
-    {{-- FIXED: Removed the redundant 'container px-4 max-w-7xl' here to prevent double padding --}}
-    <div class="w-full" 
+    @if($quote)
+        <div class="mt-8 italic text-center text-gray-600">
+            "<span id="quote-text">{{ $quote->quote }}</span>"
+            <br>
+            <span id="quote-author" class="text-sm">— {{ $quote->author }}</span>
+        </div>
+    @endif
+    <div class="relative w-full py-16 flex flex-col items-center justify-center overflow-hidden min-h-[600px]" 
+        style="perspective: 1500px; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);"
         x-data="{ 
-            mounted: false, 
-            activeSlide: 1, 
-            totalSlides: 3,
+            active: 2, 
+            prevActive: 2, /* NEW: Tracks the previous slide */
+            
+            slides: {{ isset($heroSlides) && $heroSlides->count() > 0 ? $heroSlides->toJson() : json_encode([
+                ['image_path' => 'dummy1.jpg', 'title' => 'Strategy & Planning'],
+                ['image_path' => 'dummy2.jpg', 'title' => 'Design & Development'],
+                ['image_path' => 'dummy3.jpg', 'title' => 'Launch & Growth'],
+                ['image_path' => 'dummy4.jpg', 'title' => 'Ongoing Support'],
+                ['image_path' => 'dummy5.jpg', 'title' => 'Brand Identity']
+            ]) }},
             autoPlayInterval: null,
-            startAutoPlay() {
-                this.stopAutoPlay(); 
-                this.autoPlayInterval = setInterval(() => {
-                    this.activeSlide = this.activeSlide === this.totalSlides ? 1 : this.activeSlide + 1;
-                }, 6000);
+            touchStartX: 0,
+            touchEndX: 0,
+            
+            // Dynamically calculates distance from a specific active index
+            getOffset(index, activeIndex) {
+                let offset = index - activeIndex;
+                let total = this.slides.length;
+                if (offset > Math.floor(total / 2)) offset -= total;
+                if (offset < -Math.floor(total / 2)) offset += total;
+                return offset;
             },
-            stopAutoPlay() {
-                clearInterval(this.autoPlayInterval);
+
+            // NEW: Detects if a card is teleporting from one end to the other
+            isWrapping(index) {
+                let oldOffset = this.getOffset(index, this.prevActive);
+                let newOffset = this.getOffset(index, this.active);
+                return Math.abs(newOffset - oldOffset) > 2;
+            },
+            
+            // NEW: Centralized navigation to track previous state
+            goTo(index) {
+                this.prevActive = this.active;
+                this.active = index;
+            },
+            
+            next() { this.goTo((this.active + 1) % this.slides.length); },
+            prev() { this.goTo((this.active - 1 + this.slides.length) % this.slides.length); },
+            
+            startAutoPlay() {
+                this.stopAutoPlay();
+                this.autoPlayInterval = setInterval(() => { this.next(); }, 3500);
+            },
+            stopAutoPlay() { clearInterval(this.autoPlayInterval); },
+
+            handleSwipe() {
+                if (this.touchEndX === 0) {
+                    this.startAutoPlay();
+                    return; 
+                }
+                let distance = this.touchStartX - this.touchEndX;
+                if (distance > 50) this.next(); 
+                if (distance < -50) this.prev();
+                
+                this.touchStartX = 0;
+                this.touchEndX = 0;
+                this.startAutoPlay();
             }
         }" 
-        x-init="setTimeout(() => mounted = true, 50); startAutoPlay()"
-        @mouseenter="stopAutoPlay()" 
+        x-init="startAutoPlay()"
+        @mouseenter="stopAutoPlay()"
         @mouseleave="startAutoPlay()">
-        
-        <div class="relative flex flex-col items-center justify-between overflow-hidden transition-all duration-700 ease-in-out transform shadow-xl rounded-3xl md:flex-row group min-h-[400px] md:min-h-[480px] lg:min-h-[560px]"
-            :class="{
-                'bg-cyan-500': activeSlide === 1,
-                'bg-indigo-600': activeSlide === 2,
-                'bg-rose-600': activeSlide === 3,
-                'opacity-100 translate-y-0': mounted,
-                'opacity-0 translate-y-8': !mounted
-            }">
+
+
+        {{-- The Curved Track --}}
+        <div class="relative flex justify-center items-center w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing select-none" 
+            style="transform-style: preserve-3d;"
+            @touchstart="touchStartX = $event.touches[0].clientX; stopAutoPlay()"
+            @touchmove="touchEndX = $event.touches[0].clientX"
+            @touchend="handleSwipe()"
+            @mousedown="touchStartX = $event.clientX; stopAutoPlay()"
+            @mousemove="if($event.buttons === 1) touchEndX = $event.clientX"
+            @mouseup="handleSwipe()"
+            @mouseleave="handleSwipe()">
             
-            <div class="absolute top-0 right-0 z-0 w-full h-full pointer-events-none bg-gradient-to-bl from-white/10 to-transparent"></div>
-            <div class="absolute z-0 w-64 h-64 transition-transform duration-700 transform rounded-full bg-white/10 blur-3xl -top-10 -right-10 group-hover:scale-110"></div>
-
-            <div class="relative z-10 w-full p-8 md:p-12 lg:p-16">
-
-                <div x-show="activeSlide === 1" 
-                    x-transition:enter="transition ease-out duration-1000"
-                    x-transition:enter-start="opacity-0 transform translate-x-12"
-                    x-transition:enter-end="opacity-100 transform translate-x-0"
-                    x-transition:leave="transition ease-in duration-800 absolute inset-0"
-                    x-transition:leave-start="opacity-100 transform translate-x-0"
-                    x-transition:leave-end="opacity-0 transform -translate-x-12"
-                    class="flex flex-col items-center justify-between md:flex-row">
+            <template x-for="(slide, index) in slides" :key="index">
+                {{-- THE FIX: Notice the transition-duration is set dynamically to 0ms if it's wrapping! --}}
+                <div class="absolute flex flex-col items-center transition-all ease-out"
+                    :style="`
+                        transition-duration: ${isWrapping(index) ? '0ms' : '700ms'};
+                        transform: translateX(${getOffset(index, active) * (window.innerWidth < 768 ? 200 : 320)}px) 
+                                scale(${1 - Math.abs(getOffset(index, active)) * 0.15}) 
+                                rotateY(${getOffset(index, active) * -20}deg);
+                        z-index: ${50 - Math.abs(getOffset(index, active))};
+                        opacity: ${Math.abs(getOffset(index, active)) >= 3 ? 0 : 1};
+                        pointer-events: ${Math.abs(getOffset(index, active)) === 0 ? 'auto' : 'none'};
+                    `">
                     
-                    <div class="text-center md:text-left md:w-1/2">
-                        <h1 class="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl drop-shadow-sm">
-                            Best Place To Find<br class="hidden md:block"> Your Favorite Books
-                        </h1>
-                        <p class="max-w-md mx-auto mb-8 text-base font-medium leading-relaxed md:text-lg text-cyan-50 md:mx-0">
-                            Explore our latest releases and must-read books: your next favorite story awaits!
-                        </p>
-                        <div class="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
-                            <a href="/categories" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-cyan-900 uppercase tracking-wider transition-all duration-300 bg-white rounded-full shadow-lg hover:bg-orange-500 hover:text-white hover:shadow-orange-500/30 hover:-translate-y-1 active:translate-y-0">
-                                Shop New Arrivals 
-                                <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                            </a>
-                        </div>
+                    {{-- The Image Card --}}
+                    <div class="w-[260px] h-[340px] md:w-[320px] md:h-[420px] transition-shadow duration-300 bg-center bg-cover border border-gray-100 shadow-xl cursor-pointer rounded-none hover:shadow-2xl"
+                        @click="goTo(index)"
+                        :style="`background-image: url('${slide.image_path.includes('dummy') ? 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=800' : '/storage/' + slide.image_path}');`">
                     </div>
                     
-                    <div class="flex justify-center w-full mt-12 md:w-1/2 md:mt-0 md:justify-end">
-                        <div class="relative flex items-center justify-center w-48 h-64 border-4 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm sm:w-56 sm:h-72 md:w-64 md:h-80 lg:w-72 lg:h-96 shadow-[0_20px_50px_rgba(0,0,0,0.2)] group-hover:border-white/40 transition-colors duration-500 overflow-hidden">
-                            <div class="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 to-transparent"></div>
-                            <span class="text-sm font-medium tracking-widest uppercase text-white/70">Featured Book</span>
-                        </div>
+                    {{-- The Text Below the Image --}}
+                    <div class="mt-6 text-center transition-opacity duration-500" 
+                        :class="Math.abs(getOffset(index, active)) > 1 ? 'opacity-0' : 'opacity-100'">
+                        <span class="text-sm font-black text-orange-500" x-text="slide.tag"></span>
+                        <h3 class="mt-1 text-xl font-bold text-gray-900" x-text="slide.title"></h3>
                     </div>
+
                 </div>
+            </template>
 
-                <div x-show="activeSlide === 2" 
-                    style="display: none;"
-                    x-transition:enter="transition ease-out duration-1000"
-                    x-transition:enter-start="opacity-0 transform translate-x-12"
-                    x-transition:enter-end="opacity-100 transform translate-x-0"
-                    x-transition:leave="transition ease-in duration-800 absolute inset-0"
-                    x-transition:leave-start="opacity-100 transform translate-x-0"
-                    x-transition:leave-end="opacity-0 transform -translate-x-12"
-                    class="flex flex-col items-center justify-between md:flex-row">
-                    
-                    <div class="text-center md:text-left md:w-1/2">
-                        <h1 class="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl drop-shadow-sm">
-                            Bestsellers<br class="hidden md:block"> This Week
-                        </h1>
-                        <p class="max-w-md mx-auto mb-8 text-base font-medium leading-relaxed text-indigo-100 md:text-lg md:mx-0">
-                            Dive into the books everyone is talking about. Handpicked favorites rated by readers.
-                        </p>
-                        <div class="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
-                            <a href="/categories" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-indigo-900 uppercase tracking-wider transition-all duration-300 bg-white rounded-full shadow-lg hover:bg-orange-500 hover:text-white hover:shadow-orange-500/30 hover:-translate-y-1 active:translate-y-0">
-                                Explore Top Picks
-                                <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-center w-full mt-12 md:w-1/2 md:mt-0 md:justify-end">
-                        <div class="relative flex items-center justify-center w-48 h-64 border-4 border-white/20 rounded-xl bg-white/10 backdrop-blur-sm sm:w-56 sm:h-72 md:w-64 md:h-80 lg:w-72 lg:h-96 shadow-[0_20px_50px_rgba(0,0,0,0.2)] group-hover:border-white/40 transition-colors duration-500 overflow-hidden">
-                            <div class="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 to-transparent"></div>
-                            <span class="text-sm font-medium tracking-widest uppercase text-white/70">Top Rated</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div x-show="activeSlide === 3" 
-                    style="display: none;"
-                    x-transition:enter="transition ease-out duration-1000"
-                    x-transition:enter-start="opacity-0 transform translate-x-12"
-                    x-transition:enter-end="opacity-100 transform translate-x-0"
-                    x-transition:leave="transition ease-in duration-800 absolute inset-0"
-                    x-transition:leave-start="opacity-100 transform translate-x-0"
-                    x-transition:leave-end="opacity-0 transform -translate-x-12"
-                    class="flex flex-col items-center justify-between md:flex-row">
-                    
-                    <div class="text-center md:text-left md:w-1/2">
-                        <div class="inline-flex items-center px-4 py-1.5 mb-4 text-xs font-bold text-rose-600 uppercase tracking-wider bg-white rounded-full shadow-inner">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
-                            Limited Time Offer
-                        </div>
-                        <h1 class="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl drop-shadow-sm">
-                            Clearance<br class="hidden md:block"> Book Sale
-                        </h1>
-                        <p class="max-w-md mx-auto mb-8 text-base font-medium leading-relaxed md:text-lg text-rose-100 md:mx-0">
-                            Up to 50% off select titles. Grab your next read before they're gone!
-                        </p>
-                        <div class="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
-                            <a href="/categories" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-rose-900 uppercase tracking-wider transition-all duration-300 bg-white rounded-full shadow-lg hover:bg-orange-500 hover:text-white hover:shadow-orange-500/30 hover:-translate-y-1 active:translate-y-0">
-                                Shop The Sale
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-center w-full mt-12 md:w-1/2 md:mt-0 md:justify-end">
-                        <div class="relative flex items-center justify-center w-48 h-64 border-4 border-rose-300/30 rounded-xl bg-white/10 backdrop-blur-sm sm:w-56 sm:h-72 md:w-64 md:h-80 lg:w-72 lg:h-96 shadow-[0_20px_50px_rgba(0,0,0,0.2)] group-hover:border-rose-300/50 transition-colors duration-500 overflow-hidden">
-                            <div class="absolute inset-0 z-10 bg-gradient-to-tr from-black/20 to-transparent"></div>
-                            <span class="text-sm font-medium tracking-widest uppercase text-rose-100/80">Huge Deals</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex space-x-2.5 pointer-events-auto">
-                <template x-for="index in totalSlides" :key="index">
-                    <button @click="stopAutoPlay(); activeSlide = index; startAutoPlay()" 
-                            class="w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none"
-                            :class="activeSlide === index ? 'bg-white scale-125 shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'bg-white/40 hover:bg-white'"></button>
-                </template>
-            </div>
         </div>
     </div>
 
@@ -275,15 +243,19 @@
                     <p class="mb-3 text-xs font-medium text-gray-500 truncate">{{ $book->author }}</p>
                 </a>
                 
-                <div class="z-10 flex flex-col justify-between pt-3 mt-auto border-t border-gray-100 h-[88px]">
-                    <p class="text-lg font-extrabold text-gray-900 transition-transform duration-300 transform group-hover:-translate-y-1">৳ {{ number_format($book->price, 0) }}</p>
-                    
+                <div class="z-10 flex flex-col justify-center pt-3 mt-auto border-t border-gray-100 h-[88px]">
+    
+                    <p class="text-lg font-extrabold text-gray-900 transition-all duration-300 ease-out transform group-hover:-translate-y-8 group-hover:opacity-0">
+                        ৳ {{ number_format($book->price, 0) }}
+                    </p>
+                                    
                     <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
                         @csrf
                         <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-orange-500 shadow-md rounded-lg hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                             Add to Cart
                         </button>
                     </form>
+
                 </div>
             </div>
             @endforeach
@@ -296,3 +268,16 @@
 
 </div>
 @endsection
+
+<script>
+    function fetchQuote() {
+        fetch('/random-quote')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('quote-text').innerText = data.quote;
+                document.getElementById('quote-author').innerText = "— " + data.author;
+            });
+    }
+
+    setInterval(fetchQuote, 15000); // 15 seconds
+</script>

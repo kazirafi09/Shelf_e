@@ -17,17 +17,19 @@
         @endif
     </div>
 
-    <div class="flex items-center justify-between mb-8">
-        {{-- The H1 now easily uses the variable we built in the controller --}}
+    <div class="mb-8">
+        {{-- Clean header without inline buttons --}}
         <h1 class="text-3xl font-bold text-gray-900">
-            {{ $pageTitle }}
+            {{ $pageTitle ?? 'All Books' }}
         </h1>
-        
-        <button @click="mobileFiltersOpen = true" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md lg:hidden hover:bg-gray-50">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-            Filters
-        </button>
     </div>
+
+    {{-- NEW: Floating Mobile Filter Button --}}
+    <button @click="mobileFiltersOpen = true" 
+            class="fixed z-40 flex items-center px-6 py-3.5 text-sm font-bold text-white transition-transform transform -translate-x-1/2 bg-gray-900 rounded-full shadow-2xl bottom-8 left-1/2 lg:hidden active:scale-95">
+        <svg class="w-5 h-5 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        Filters
+    </button>
 
     <div class="flex items-center justify-between mb-8">      
         <button @click="mobileFiltersOpen = true" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md lg:hidden hover:bg-gray-50">
@@ -43,8 +45,8 @@
              @click="mobileFiltersOpen = false"
              class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" style="display: none;"></div>
 
-        <aside class="fixed inset-y-0 left-0 z-50 w-3/4 h-full max-w-sm p-6 pb-24 overflow-y-auto transition-transform duration-300 ease-in-out transform bg-white shadow-2xl lg:static lg:translate-x-0 lg:w-64 lg:p-0 lg:bg-transparent lg:shadow-none lg:overflow-visible shrink-0"
-               :class="mobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'">
+        <aside class="fixed inset-y-0 left-0 z-50 w-3/4 h-full max-w-sm p-6 pb-24 overflow-y-auto transition-transform duration-300 ease-in-out transform bg-white shadow-2xl lg:sticky lg:top-36 lg:translate-x-0 lg:w-72 lg:p-6 lg:rounded-2xl lg:border lg:border-gray-100 lg:shadow-sm lg:max-h-[calc(100vh-10rem)] shrink-0 custom-scrollbar"
+            :class="mobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'">
             
             <div class="flex items-center justify-between mb-6 lg:hidden">
                 <h2 class="text-xl font-bold text-gray-900">Filters</h2>
@@ -143,8 +145,8 @@
 
         <div class="flex-1">
             <div class="flex items-center justify-between p-4 mb-6 bg-white border border-gray-200 rounded-lg">
-                <div class="text-sm text-gray-500">
-                    Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results
+                <div class="text-sm font-medium text-gray-500">
+                    Showing all <span class="font-bold text-gray-900">{{ $products->count() }}</span> results
                 </div>
             </div>
 
@@ -175,9 +177,14 @@
                         
                         <div class="pt-2 mt-auto">
                             <p class="mb-3 text-lg font-bold text-gray-900">৳ {{ number_format($product->price, 0) }}</p>
-                            <button class="w-full py-2 font-medium text-white transition bg-orange-500 rounded-md hover:bg-orange-600">
-                                Add to Cart
-                            </button>
+                            
+                            {{-- THE FIX: Wrap the button in a secure POST form --}}
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit" class="w-full py-2 font-bold text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 active:scale-[0.98]">
+                                    Add to Cart
+                                </button>
+                            </form>
                         </div>
                     </div>
                 @empty
