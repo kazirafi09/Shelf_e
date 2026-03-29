@@ -72,6 +72,12 @@
             </div>
 
             <div class="sm:col-span-2">
+                <label class="block text-sm font-bold text-gray-700">Synopsis</label>
+                <textarea name="synopsis" rows="4" 
+                          class="block w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm bg-gray-50/50">{{ old('synopsis', $book->synopsis) }}</textarea>
+            </div>
+
+            <div class="sm:col-span-2">
                 <label class="block mb-2 text-sm font-bold text-gray-700">Cover Image</label>
                 
                 <div class="flex items-start p-4 space-x-6 border rounded-xl bg-gray-50/30">

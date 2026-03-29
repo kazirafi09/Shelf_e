@@ -60,21 +60,63 @@
             </div>
 
             <div class="md:col-span-2">
-                <label for="description" class="block mb-1 text-sm font-bold text-gray-900">Description / Synopsis</label>
+                <label for="description" class="block mb-1 text-sm font-bold text-gray-900">Description</label>
                 <textarea id="description" name="description" rows="4" placeholder="Write a short summary of the book..." required
                     class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500"></textarea>
             </div>
 
             <div class="md:col-span-2">
-                <label for="image" class="block mb-1 text-sm font-bold text-gray-900">Cover Image</label>
-                <div class="relative flex items-center justify-center w-full px-6 py-10 transition-colors border-2 border-gray-300 border-dashed cursor-pointer rounded-xl bg-gray-50 hover:bg-gray-100 group">
-                    <input type="file" id="image" name="image" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div class="text-center">
-                        <svg class="w-12 h-12 mx-auto text-gray-400 transition-colors group-hover:text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <p class="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
-                        <p class="text-xs text-gray-500">PNG, JPG, WEBP up to 2MB</p>
+                <label for="synopsis" class="block mb-1 text-sm font-bold text-gray-900">Synopsis</label>
+                <textarea id="synopsis" name="synopsis" rows="4" placeholder="Write a brief synopsis of the book..." class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500"></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="block mb-2 text-sm font-bold text-gray-900">Cover Image</label>
+                
+                <div x-data="{ 
+                        imageUrl: null,
+                        isDragging: false,
+                        fileChosen(event) {
+                            this.processFile(event.target.files[0]);
+                        },
+                        handleDrop(event) {
+                            this.isDragging = false;
+                            const file = event.dataTransfer.files[0];
+                            this.processFile(file);
+                            
+                            // Sync the dropped file back to the hidden HTML input so the form submits it
+                            this.$refs.fileInput.files = event.dataTransfer.files;
+                        },
+                        processFile(file) {
+                            if (!file || !file.type.match('image.*')) return;
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = e => this.imageUrl = e.target.result;
+                        }
+                    }"
+                    @dragover.prevent="isDragging = true"
+                    @dragleave.prevent="isDragging = false"
+                    @drop.prevent="handleDrop($event)"
+                    :class="isDragging ? 'border-cyan-500 bg-cyan-50' : 'border-gray-300 bg-white'"
+                    class="relative flex flex-col items-center justify-center w-full p-6 overflow-hidden transition-colors border-2 border-dashed rounded-xl h-52 group hover:bg-gray-50">
+
+                    <input x-ref="fileInput" type="file" name="image" @change="fileChosen" accept="image/png, image/jpeg, image/webp" class="absolute inset-0 z-50 w-full h-full opacity-0 cursor-pointer">
+
+                    <div x-show="!imageUrl" class="text-center text-gray-500 transition-transform pointer-events-none group-hover:scale-105">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="text-sm font-medium text-gray-700"><span class="text-cyan-600">Click to upload</span> or drag and drop</p>
+                        <p class="mt-1 text-xs text-gray-400">PNG, JPG, WEBP up to 2MB</p>
                     </div>
+
+                    <div x-show="imageUrl" style="display: none;" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-gray-50">
+                        <img :src="imageUrl" class="object-contain w-full h-full rounded-lg shadow-sm">
+                        <div class="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100 rounded-xl">
+                            <span class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-black/60">Click or Drop to change</span>
+                        </div>
+                    </div>
+
                 </div>
+                @error('image') <span class="block mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
         </div>

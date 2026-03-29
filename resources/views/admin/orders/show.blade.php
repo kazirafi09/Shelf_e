@@ -14,7 +14,21 @@
         <a href="{{ route('admin.orders.index') }}" class="text-sm font-bold text-gray-400 transition hover:text-cyan-600">
             &larr; Back to Order List
         </a>
-        <div class="flex gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            
+            <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="flex items-center gap-2 pr-4 mr-4 border-r border-gray-200">
+                @csrf
+                @method('PATCH')
+                <label for="status" class="text-xs font-bold tracking-wider text-gray-500 uppercase">Status:</label>
+                <select name="status" onchange="this.form.submit()" class="px-3 py-2 text-sm font-bold text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Processing</option>
+                    <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                    <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                    <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                </select>
+            </form>
+
             <a href="{{ route('admin.orders.invoice', $order->id) }}" 
                class="inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white transition bg-gray-900 rounded-xl hover:bg-black shadow-lg shadow-gray-900/10 active:scale-95">
                 <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
@@ -86,7 +100,15 @@
                         <p class="mb-1 text-[10px] font-black tracking-widest text-gray-400 uppercase">Full Name</p>
                         <p class="text-sm font-bold text-gray-900">{{ $order->name }}</p>
                     </div>
+                    
                     <div>
+                        <p class="mb-1 text-[10px] font-black tracking-widest text-gray-400 uppercase">Email Address</p>
+                        <p class="text-sm font-bold text-gray-900">
+                            <a href="mailto:{{ $order->email }}" class="hover:text-cyan-600 hover:underline">{{ $order->email ?? 'No email provided' }}</a>
+                        </p>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-50">
                         <p class="mb-1 text-[10px] font-black tracking-widest text-gray-400 uppercase">Contact Number</p>
                         <p class="text-sm font-bold text-cyan-600">{{ $order->phone }}</p>
                     </div>

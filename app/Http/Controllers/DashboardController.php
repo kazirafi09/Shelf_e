@@ -15,7 +15,9 @@ class DashboardController extends Controller
         if (!$user) {
             abort(403, 'Unauthorized');
         }
-
+        $orders = Order::where('user_id', auth()->id())
+                       ->latest()
+                       ->get();
         // Fetch the 5 most recent orders for THIS specific user
         // Added with('items.product') to prevent N+1 queries on the dashboard!
         $recentOrders = Order::where('user_id', $user->id)
@@ -27,6 +29,6 @@ class DashboardController extends Controller
         // Get a total count of their orders
         $totalOrders = Order::where('user_id', $user->id)->count();
 
-        return view('dashboard', compact('user', 'recentOrders', 'totalOrders'));
+        return view('dashboard', compact('user', 'recentOrders', 'totalOrders', 'orders'));
     }
 }

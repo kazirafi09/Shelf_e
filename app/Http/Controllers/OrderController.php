@@ -11,6 +11,31 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
+    // Add this method to OrderController
+    public function show($id)
+    {
+        // Eager load items and products
+        $order = Order::with('items.product')->findOrFail($id);
+
+        // Strict IDOR protection: only the owner can view this
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access. You can only view your own orders.');
+        }
+
+        return view('orders.show', compact('order'));
+    }
+    public function confirmation($id)
+    {
+        // Eager load the items and associated products to prevent N+1 queries
+        $order = \App\Models\Order::with('items.product')->findOrFail($id);
+
+        // Security check: Ensure the user can only view their own order
+        if (auth()->check() && $order->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized access to this order.');
+        }
+
+        return view('checkout.confirmation', compact('order'));
+    }
     public function store(Request $request)
     {
         $cart = session()->get('cart', []);
@@ -19,9 +44,9 @@ class OrderController extends Controller
             return redirect('/categories')->with('error', 'Your cart is empty!');
         }
 
-        // FIX 1.6: Better validation rules to prevent excessively large string inputs
         $validatedData = $request->validate([
             'name' => 'nullable|string|max:255',
+            'email' => 'required|email|max:255',
             'phone' => 'required|string|min:10|max:20',
             'address' => 'required|string|max:500',
             'division' => 'required|string|max:100',
@@ -31,21 +56,21 @@ class OrderController extends Controller
             'payment' => 'required|string',
         ]);
 
-        // Optimized subtotal calculation
         $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
         $shipping = ($request->delivery === 'express') ? 150 : 60;
         $total = $subtotal + $shipping;
 
-        // FIX 1.6: Strip all non-numeric characters to prevent injection/formatting errors
         $cleanPhone = preg_replace('/[^0-9]/', '', $validatedData['phone']);
         $standardizedPhone = '+880' . ltrim($cleanPhone, '0');
 
-        // Use a Transaction to ensure everything saves or nothing saves
-        DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone) {
+        // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
+        $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone) {
             
-            $order = Order::create([
+            // Inside the transaction, we create the order
+            $newOrder = Order::create([
                 'user_id' => auth()->id(),
                 'name' => $validatedData['name'] ?? (auth()->check() ? auth()->user()->name : 'Guest'),
+                'email' => $validatedData['email'],
                 'phone' => $standardizedPhone, 
                 'address' => $validatedData['address'],
                 'division' => $validatedData['division'],
@@ -59,10 +84,9 @@ class OrderController extends Controller
                 'status' => 'pending',
             ]);
 
-            // FIX 3.1: Bulk Insert Order Items (1 query instead of N queries)
-            $orderItems = collect($cart)->map(function ($item, $id) use ($order) {
+            $orderItems = collect($cart)->map(function ($item, $id) use ($newOrder) {
                 return [
-                    'order_id' => $order->id,
+                    'order_id' => $newOrder->id,
                     'product_id' => $id,
                     'quantity' => $item['quantity'],
                     'price' => $item['price'],
@@ -73,8 +97,6 @@ class OrderController extends Controller
             
             OrderItem::insert($orderItems);
 
-            // FIX 3.1: Bulk Update Stock Quantities using parameterized CASE statement
-            // This is the fastest, safest way to update multiple rows in a single database hit
             $cases = [];
             $params = [];
             $ids = [];
@@ -91,10 +113,15 @@ class OrderController extends Controller
             $casesSql = implode(' ', $cases);
             
             DB::update("UPDATE products SET stock_quantity = CASE {$casesSql} ELSE stock_quantity END WHERE id IN ({$idsPlaceholders})", $params);
+            
+            // NOTICE THIS LINE: We must return the newly created order out of the transaction
+            return $newOrder;
         });
 
+        // Now $order exists outside the transaction!
         session()->forget('cart');
 
-        return redirect('/')->with('success', 'Order placed successfully! Check your dashboard for updates.');
+        return redirect()->route('order.confirmation', $order->id)
+                         ->with('success', 'Your order has been placed successfully!');
     }
 }

@@ -70,50 +70,43 @@
                 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left whitespace-nowrap min-w-[600px]">
+    
                         <thead class="bg-gray-50/80">
                             <tr>
-                                <th class="px-5 py-4 text-xs font-bold tracking-wider text-gray-500 uppercase md:px-6">Order ID</th>
-                                <th class="px-5 py-4 text-xs font-bold tracking-wider text-gray-500 uppercase md:px-6">Date</th>
-                                <th class="px-5 py-4 text-xs font-bold tracking-wider text-gray-500 uppercase md:px-6">Total</th>
-                                <th class="px-5 py-4 text-xs font-bold tracking-wider text-gray-500 uppercase md:px-6">Status</th>
+                                <th class="px-6 py-4 text-sm font-bold text-gray-900">Order ID</th>
+                                <th class="px-6 py-4 text-sm font-bold text-gray-900">Date</th>
+                                <th class="px-6 py-4 text-sm font-bold text-gray-900">Total</th>
+                                <th class="px-6 py-4 text-sm font-bold text-gray-900">Status</th>
+                                <th class="px-6 py-4 text-sm font-bold text-right text-gray-900">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-100">
-                            @forelse($recentOrders ?? [] as $order)
-                                <tr class="transition-colors duration-200 cursor-pointer hover:bg-cyan-50/30 group">
-                                    <td class="px-5 py-4 text-sm font-bold text-gray-900 transition-colors md:px-6 group-hover:text-cyan-700">
-                                        #{{ $order->id }}
+
+                        <tbody class="divide-y divide-gray-100">
+                            @forelse($orders as $order)
+                                <tr onclick="window.location='{{ route('order.show', $order->id) }}'" class="transition-colors cursor-pointer hover:bg-gray-50 group">
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                        #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
                                     </td>
-                                    <td class="px-5 py-4 text-sm font-medium text-gray-500 md:px-6">{{ $order->created_at->format('M d, Y') }}</td>
-                                    <td class="px-5 py-4 text-sm font-bold text-gray-900 md:px-6">৳ {{ number_format($order->total_amount, 0) }}</td>
-                                    <td class="px-5 py-4 md:px-6">
-                                        @if($order->status == 'pending')
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-bold text-yellow-800 bg-yellow-100 rounded-full ring-1 ring-inset ring-yellow-600/20">Pending</span>
-                                        @elseif($order->status == 'shipped')
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-bold text-blue-800 bg-blue-100 rounded-full ring-1 ring-inset ring-blue-600/20">Shipped</span>
-                                        @elseif($order->status == 'completed')
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-bold text-green-800 bg-green-100 rounded-full ring-1 ring-inset ring-green-600/20">Completed</span>
-                                        @else
-                                            <span class="inline-flex items-center px-3 py-1 text-xs font-bold text-gray-800 bg-gray-100 rounded-full ring-1 ring-inset ring-gray-600/20">{{ ucfirst($order->status) }}</span>
-                                        @endif
-                                        
-                                        <span class="inline-block ml-2 transition-all duration-300 transform -translate-x-2 opacity-0 text-cyan-500 group-hover:opacity-100 group-hover:translate-x-0">&rarr;</span>
+                                    <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                                        {{ $order->created_at->format('M j, Y') }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                                        ৳{{ number_format($order->total_amount, 2) }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm whitespace-nowrap">
+                                        <span class="px-3 py-1 text-xs font-bold text-orange-700 uppercase bg-orange-100 rounded-full">
+                                            {{ $order->status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
+                                        <a href="{{ route('order.show', $order->id) }}" class="font-bold text-cyan-600 group-hover:text-cyan-800">View Details &rarr;</a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-5 py-16 text-center md:px-6">
-                                        <div class="flex flex-col items-center justify-center">
-                                            <div class="p-4 mb-4 text-gray-200 rounded-full bg-gray-50">
-                                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                                            </div>
-                                            <p class="text-base font-medium text-gray-500">You haven't placed any orders yet.</p>
-                                            <div class="mt-6">
-                                                <a href="/categories" class="inline-flex items-center px-6 py-3 text-sm font-bold text-white uppercase tracking-wider transition-all duration-300 bg-orange-500 rounded-lg shadow-sm hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5">
-                                                    Start Shopping
-                                                </a>
-                                            </div>
-                                        </div>
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                        You haven't placed any orders yet. <br>
+                                        <a href="{{ route('home') }}" class="inline-block mt-2 font-bold text-cyan-600 hover:underline">Browse Books</a>
                                     </td>
                                 </tr>
                             @endforelse

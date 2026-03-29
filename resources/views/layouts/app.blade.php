@@ -169,7 +169,7 @@
     
             <a href="/categories?min_rating=4" class="flex items-center py-4 transition-colors hover:text-orange-500">Bestsellers</a>
             
-            <a href="#contact" class="flex items-center py-4 transition-colors hover:text-orange-500">Contact</a>
+            <a href="/contact" class="flex items-center py-4 transition-colors hover:text-orange-500">Contact</a>
             
             <a href="#newsletter" class="flex items-center py-4 transition-colors hover:text-orange-500">Newsletter</a>
         </nav>
@@ -201,7 +201,7 @@
 
                 <a href="/authors" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Authors</a>
                 <a href="/categories?min_rating=4" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Bestsellers</a>
-                <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Contact</a>
+                <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Contact</a>
                 <a href="#newsletter" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Newsletter</a>
                 
                 @auth
@@ -257,8 +257,9 @@
             <div class="container relative z-10 px-4 mx-auto text-center">
                 <h2 class="mb-3 text-3xl font-extrabold tracking-tight text-white">Get your first discount!</h2>
                 <p class="mb-8 font-medium text-cyan-100">Subscribe to our newsletter and get a 15% discount code</p>
-                <form class="flex max-w-md p-1.5 mx-auto bg-white/20 backdrop-blur-md rounded-full border border-white/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-cyan-500/30 transition-all duration-500">
-                    <input type="email" placeholder="Enter your email address" class="flex-1 px-5 text-white transition-colors bg-transparent border-none placeholder-cyan-100 focus:ring-0 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400">
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex max-w-md p-1.5 mx-auto bg-white/20 backdrop-blur-md rounded-full border border-white/30 focus-within:bg-white focus-within:ring-4 focus-within:ring-cyan-500/30 transition-all duration-500">
+                    @csrf
+                    <input type="email" name="email" placeholder="Your email address" required class="flex-1 px-5 text-white transition-colors bg-transparent border-none placeholder-cyan-100 focus:ring-0 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400">
                     <button type="submit" class="px-8 py-3 text-sm font-bold text-white uppercase tracking-wider transition-all duration-300 bg-orange-500 rounded-full hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                         Subscribe
                     </button>

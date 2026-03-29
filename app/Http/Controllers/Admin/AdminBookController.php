@@ -14,26 +14,44 @@ use Illuminate\Validation\ValidationException; // Add this import
 class AdminBookController extends Controller
 {
     // 1. Show the Books List
+    // 1. Show the Books List
     public function index(Request $request)
     {
         $query = Product::query();
 
-        if ($request->has('category') && $request->category != '') {
+        // Keep your existing Category Filter
+        if ($request->filled('category')) {
             $query->whereHas('category', function($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
 
-        $books = $query->latest()->paginate(10); 
+        // NEW: Add the Keyword Search logic (Fixes D-003)
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('author', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('slug', 'LIKE', "%{$searchTerm}%"); // Bonus: search by slug too
+            });
+        }
+
+        // Add withQueryString() so pagination links remember the search term
+        $books = $query->latest()->paginate(10)->withQueryString(); 
+        
         $globalCategories = Category::all(); 
 
         return view('admin.books.index', compact('books', 'globalCategories'));
     }
 
     // 2. Shows the "Add New Book" form
+    // 2. Shows the "Add New Book" form
     public function create()
     {
-        return view('admin.books.create');
+        // FIX: Fetch the categories so the Blade view doesn't crash
+        $categories = Category::orderBy('name')->get();
+        
+        return view('admin.books.create', compact('categories'));
     }
 
     // 3. Handles the form submission (CREATE)
@@ -49,6 +67,7 @@ class AdminBookController extends Controller
             // FIX A-3: Expect 'stock_quantity' instead of 'stock' to match your update() method and DB
             'stock_quantity' => 'required|integer|min:0', 
             'description' => 'required|string',
+            'synopsis'    => 'nullable|string',
             'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100', 
         ]);
 
@@ -73,9 +92,11 @@ class AdminBookController extends Controller
             'price'          => $validated['price'],
             // FIX A-3: Actually use the validated category_id from the form
             'category_id'    => $validated['category_id'], 
+
             // FIX A-3: Use the correct column name
             'stock_quantity' => $validated['stock_quantity'], 
             'description'    => $validated['description'],
+            'synopsis'       => $validated['synopsis'] ?? null,
             // Match the column name from your update method (usually image_path, not image)
             'image_path'     => $imagePath, 
             'rating'         => 0, 
@@ -105,6 +126,7 @@ class AdminBookController extends Controller
             'price' => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
+            'synopsis'    => 'nullable|string',
             // Added dimensions validation here too
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100', 
         ]);
@@ -116,6 +138,7 @@ class AdminBookController extends Controller
             'price' => $request->price,
             'stock_quantity' => $request->stock_quantity,
             'description' => $request->description,
+            'synopsis'       => $request->synopsis,
         ];
 
         if ($book->title !== $request->title) {

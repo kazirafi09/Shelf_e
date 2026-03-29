@@ -32,6 +32,10 @@
                         <input type="text" name="name" value="{{ old('name', auth()->user()->name ?? '') }}" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
                     <div>
+                        <label class="block mb-1 text-sm font-medium text-gray-700">Email Address (For Order Updates)</label>
+                        <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="guest@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                    </div>
+                    <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Detailed Address</label>
                         <input type="text" name="address" value="{{ old('address') }}" placeholder="House #, Street, Apartment..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
