@@ -15,6 +15,7 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
+     * Removed 'role' to prevent privilege escalation attacks.
      *
      * @var list<string>
      */
@@ -22,13 +23,22 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
     ];
 
     public function isAdmin()
     {
         return $this->role === 'admin';
     }
+
+    /**
+     * Helper method to safely assign roles programmatically.
+     */
+    public function assignRole(string $role)
+    {
+        $this->role = $role;
+        $this->save();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

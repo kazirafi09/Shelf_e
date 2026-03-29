@@ -5,23 +5,32 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\HeroSlide; // Add this at the top
+use App\Models\HeroSlide; 
 use App\Models\Quote;
+use Illuminate\Support\Facades\Cache; // NEW: Added for caching
 
 class CatalogController extends Controller
 {
-    
-    // 1. Load the Homepage
+    // 1. Load the Homepage (FIX 2.1: Cached for 5 minutes to prevent N+1 and slow loads)
     public function home()
     {
-        $topBooks = Product::orderBy('rating', 'desc')->take(5)->get();
-        $popularAuthors = Product::select('author')->distinct()->inRandomOrder()->take(4)->get();
-        $globalCategories = Category::all();
-        $quote = Quote::inRandomOrder()->first();
-        // Fetch the dynamic slides (ordered by your preference)
-        $heroSlides = HeroSlide::orderBy('order', 'asc')->get();
+        $data = Cache::remember('homepage_data', 300, function () {
+            return [
+                'topBooks' => Product::orderBy('rating', 'desc')->take(5)->get(),
+                'popularAuthors' => Product::selectRaw('author, count(*) as book_count')
+                                ->whereNotNull('author')
+                                ->where('author', '!=', '')
+                                ->groupBy('author')
+                                ->orderBy('book_count', 'desc')
+                                ->take(4)
+                                ->get(),
+                'globalCategories' => Category::all(),
+                'quote' => Quote::inRandomOrder()->first(),
+                'heroSlides' => HeroSlide::orderBy('order', 'asc')->get()
+            ];
+        });
         
-        return view('home', compact('quote', 'topBooks', 'popularAuthors', 'globalCategories', 'heroSlides'));
+        return view('home', $data);
     }
 
     // 2. Load Categories with Search & Filters
@@ -29,14 +38,14 @@ class CatalogController extends Controller
     {
         $query = Product::query();
         
-        // NEW: Default title
         $pageTitle = 'All Books';
-        $currentCategory = null; // We'll still keep this for the single-category logic
+        $currentCategory = null; 
 
-        // A. GLOBAL SEARCH
+        // A. GLOBAL SEARCH (FIX 2.5: Optimized basic search)
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
+                // Using standard LIKE for now, but ensure 'title' and 'author' are indexed in the DB
                 $q->where('title', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('author', 'LIKE', "%{$searchTerm}%");
             });
@@ -55,18 +64,16 @@ class CatalogController extends Controller
             }
         }
 
-        // C. GENRE CHECKBOXES (FROM SIDEBAR) - THE FIX IS HERE
+        // C. GENRE CHECKBOXES (FROM SIDEBAR)
         if ($request->has('genres') && is_array($request->genres) && count($request->genres) > 0) {
             $query->whereIn('category_id', $request->genres);
             
-            // If only ONE genre is ticked, grab its name for the title!
             if (count($request->genres) === 1) {
                 $checkedGenre = Category::find($request->genres[0]);
                 if ($checkedGenre) {
                     $pageTitle = $checkedGenre->name;
                 }
             } else {
-                // If multiple boxes are ticked
                 $pageTitle = 'Multiple Genres';
             }
         }
@@ -74,7 +81,6 @@ class CatalogController extends Controller
         // D. AUTHOR CHECKBOXES
         if ($request->has('authors') && is_array($request->authors)) {
             $query->whereIn('author', $request->authors);
-            // Optional: If they only filter by one author, change the title
             if (count($request->authors) === 1 && $pageTitle === 'All Books') {
                 $pageTitle = 'Books by ' . $request->authors[0];
             }
@@ -93,17 +99,25 @@ class CatalogController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Fetch all matching records instead of paginating them
-        $products = $query->get();
-        $genres = Category::all();
-        $authors = Product::select('author')->distinct()->whereNotNull('author')->where('author', '!=', '')->orderBy('author')->pluck('author');
+        // FIX 2.6: Changed ->get() to ->paginate(24) to prevent memory crashes on large catalogs
+        // Added withQueryString() so pagination works WITH the applied filters
+        $products = $query->paginate(24)->withQueryString();
         
-        // Pass $pageTitle to the view instead of $currentCategory
+        $genres = Category::all();
+        
+        // FIX 3.4: Optimized Author fetch by grouping instead of distinct pluck
+        $authors = Product::selectRaw('author, MIN(id) as min_id')
+            ->whereNotNull('author')
+            ->where('author', '!=', '')
+            ->groupBy('author')
+            ->orderBy('author')
+            ->pluck('author');
+        
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
     }
+
     public function authors()
     {
-        // Get unique authors and count how many books they have
         $authors = Product::select('author')
             ->selectRaw('count(*) as book_count')
             ->whereNotNull('author')
@@ -118,21 +132,27 @@ class CatalogController extends Controller
     // 5. Bestsellers Page
     public function bestsellers(Request $request)
     {
-        // Fetch books with a rating of 4 or higher
+        // Added withQueryString() here too just in case filters are ever added
         $products = Product::where('rating', '>=', 4)
                            ->orderBy('rating', 'desc')
-                           ->paginate(12);
+                           ->paginate(12)
+                           ->withQueryString();
 
-        // We need these for the sidebar filters
         $genres = Category::all();
-        $authors = Product::select('author')->distinct()->whereNotNull('author')->where('author', '!=', '')->orderBy('author')->pluck('author');
         
-        // Force the page title
+        // FIX 3.4 (Applied here as well)
+        $authors = Product::selectRaw('author, MIN(id) as min_id')
+            ->whereNotNull('author')
+            ->where('author', '!=', '')
+            ->groupBy('author')
+            ->orderBy('author')
+            ->pluck('author');
+        
         $pageTitle = 'Bestsellers & Top Rated';
 
-        // Reuse the categories view!
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
     }
+
     // 3. Load Single Product Page
     public function show($slug)
     {

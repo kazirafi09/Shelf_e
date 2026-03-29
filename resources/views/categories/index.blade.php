@@ -193,7 +193,9 @@
                     </div>
                 @endforelse
             </div>
-            
+            <div class="mt-14">
+                {{ $products->links('vendor.pagination.custom') }}
+            </div>
         </div>
     </div>
 </div>

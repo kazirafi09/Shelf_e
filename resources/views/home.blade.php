@@ -2,18 +2,36 @@
 
 @section('content')
 <div class="container px-4 py-6 mx-auto md:py-8 max-w-7xl" x-data="{ mounted: false }" x-init="setTimeout(() => mounted = true, 100)">
+    
+    {{-- FIX 1.4 & 3.6: Refactored Quote into an Alpine component with safe JSON encoding --}}
     @if($quote)
-        <div class="mt-8 italic text-center text-gray-600">
-            "<span id="quote-text">{{ $quote->quote }}</span>"
+        <div class="mt-8 italic text-center text-gray-600"
+             x-data="{ 
+                 quoteText: {{ Js::from($quote->quote) }},
+                 quoteAuthor: {{ Js::from($quote->author) }},
+                 startQuoteRefresh() {
+                     setInterval(() => {
+                         fetch('/random-quote')
+                             .then(response => response.json())
+                             .then(data => {
+                                 this.quoteText = data.quote;
+                                 this.quoteAuthor = data.author;
+                             });
+                     }, 15000);
+                 }
+             }"
+             x-init="startQuoteRefresh()">
+            "<span x-text="quoteText"></span>"
             <br>
-            <span id="quote-author" class="text-sm">— {{ $quote->author }}</span>
+            <span class="text-sm">— <span x-text="quoteAuthor"></span></span>
         </div>
     @endif
+
     <div class="relative w-full py-16 flex flex-col items-center justify-center overflow-hidden min-h-[600px]" 
         style="perspective: 1500px; -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent); mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);"
         x-data="{ 
             active: 2, 
-            prevActive: 2, /* NEW: Tracks the previous slide */
+            prevActive: 2, 
             
             slides: {{ isset($heroSlides) && $heroSlides->count() > 0 ? $heroSlides->toJson() : json_encode([
                 ['image_path' => 'dummy1.jpg', 'title' => 'Strategy & Planning'],
@@ -26,7 +44,6 @@
             touchStartX: 0,
             touchEndX: 0,
             
-            // Dynamically calculates distance from a specific active index
             getOffset(index, activeIndex) {
                 let offset = index - activeIndex;
                 let total = this.slides.length;
@@ -35,14 +52,12 @@
                 return offset;
             },
 
-            // NEW: Detects if a card is teleporting from one end to the other
             isWrapping(index) {
                 let oldOffset = this.getOffset(index, this.prevActive);
                 let newOffset = this.getOffset(index, this.active);
                 return Math.abs(newOffset - oldOffset) > 2;
             },
             
-            // NEW: Centralized navigation to track previous state
             goTo(index) {
                 this.prevActive = this.active;
                 this.active = index;
@@ -75,7 +90,6 @@
         @mouseenter="stopAutoPlay()"
         @mouseleave="startAutoPlay()">
 
-
         {{-- The Curved Track --}}
         <div class="relative flex justify-center items-center w-full h-[400px] md:h-[500px] cursor-grab active:cursor-grabbing select-none" 
             style="transform-style: preserve-3d;"
@@ -88,7 +102,6 @@
             @mouseleave="handleSwipe()">
             
             <template x-for="(slide, index) in slides" :key="index">
-                {{-- THE FIX: Notice the transition-duration is set dynamically to 0ms if it's wrapping! --}}
                 <div class="absolute flex flex-col items-center transition-all ease-out"
                     :style="`
                         transition-duration: ${isWrapping(index) ? '0ms' : '700ms'};
@@ -155,8 +168,10 @@
             <h2 class="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">Shop By Format</h2>
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <a href="#" class="relative p-8 overflow-hidden transition-colors bg-white border border-gray-200 shadow-sm rounded-3xl group hover:border-cyan-500 hover:shadow-lg">
-                <div class="absolute top-0 right-0 p-6 transition-transform duration-500 opacity-5 group-hover:scale-110 group-hover:-rotate-12"><svg class="w-32 h-32 text-cyan-900" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path></svg></div>
+            <a href="{{ route('categories.index') }}" class="relative p-8 overflow-hidden transition-colors bg-white border border-gray-200 shadow-sm rounded-3xl group hover:border-cyan-500 hover:shadow-lg">
+                <div class="absolute top-0 right-0 p-6 transition-transform duration-500 opacity-5 group-hover:scale-110 group-hover:-rotate-12">
+                    <svg class="w-32 h-32 text-cyan-900" fill="currentColor" viewBox="0 0 20 20"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path></svg>
+                </div>
                 <h3 class="relative z-10 mb-2 text-xl font-bold text-gray-900">Physical Books</h3>
                 <p class="relative z-10 mb-4 text-sm text-gray-500">The classic feel of paper.</p>
                 <span class="relative z-10 text-sm font-bold text-cyan-600 group-hover:text-cyan-700">Explore &rarr;</span>
@@ -165,13 +180,13 @@
                 <div class="absolute top-0 right-0 p-6 transition-transform duration-500 opacity-5 group-hover:scale-110 group-hover:-rotate-12"><svg class="w-32 h-32 text-cyan-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd"></path></svg></div>
                 <h3 class="relative z-10 mb-2 text-xl font-bold text-gray-900">eBooks</h3>
                 <p class="relative z-10 mb-4 text-sm text-gray-500">Read instantly on any device.</p>
-                <span class="relative z-10 text-sm font-bold text-cyan-600 group-hover:text-cyan-700">Explore &rarr;</span>
+                <span class="relative z-10 text-sm font-bold text-cyan-600 group-hover:text-cyan-700">Coming Soon &rarr;</span>
             </a>
             <a href="#" class="relative p-8 overflow-hidden transition-colors bg-white border border-gray-200 shadow-sm rounded-3xl group hover:border-cyan-500 hover:shadow-lg">
                 <div class="absolute top-0 right-0 p-6 transition-transform duration-500 opacity-5 group-hover:scale-110 group-hover:-rotate-12"><svg class="w-32 h-32 text-cyan-900" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd"></path></svg></div>
                 <h3 class="relative z-10 mb-2 text-xl font-bold text-gray-900">Audiobooks</h3>
                 <p class="relative z-10 mb-4 text-sm text-gray-500">Listen to stories on the go.</p>
-                <span class="relative z-10 text-sm font-bold text-cyan-600 group-hover:text-cyan-700">Explore &rarr;</span>
+                <span class="relative z-10 text-sm font-bold text-cyan-600 group-hover:text-cyan-700">Coming Soon &rarr;</span>
             </a>
         </div>
     </div>
@@ -186,8 +201,6 @@
         
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             @foreach($popularAuthors as $item)
-            
-            {{-- UPDATE: The href now points to the categories route with the author parameter --}}
             <a href="{{ route('categories.index', ['authors[]' => $item->author]) }}" class="flex items-center p-5 transition-all duration-300 bg-white border border-gray-100 shadow-sm cursor-pointer rounded-2xl hover:shadow-md hover:-translate-y-1 group">
                 
                 <div class="flex items-center justify-center w-16 h-16 overflow-hidden text-2xl font-black text-white transition-all duration-500 rounded-full shrink-0 bg-cyan-500 group-hover:bg-cyan-600 group-hover:scale-110 group-hover:shadow-inner">
@@ -228,7 +241,8 @@
                     <div class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg">
                         <div class="absolute inset-0 z-10 transition-opacity duration-300 pointer-events-none bg-black/0 group-hover:bg-black/5"></div>
                         @if($book->image_path)
-                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
+                            {{-- FIX 3.3 (from earlier): Added loading="lazy" to the images here just in case! --}}
+                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy" class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
                         @else
                             <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
                         @endif
@@ -268,16 +282,3 @@
 
 </div>
 @endsection
-
-<script>
-    function fetchQuote() {
-        fetch('/random-quote')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('quote-text').innerText = data.quote;
-                document.getElementById('quote-author').innerText = "— " + data.author;
-            });
-    }
-
-    setInterval(fetchQuote, 15000); // 15 seconds
-</script>
