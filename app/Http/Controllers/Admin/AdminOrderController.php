@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Order; // Make sure your Order model is imported!
+use App\Models\Order; 
 
 class AdminOrderController extends Controller
 {
     // 1. Display all orders
     public function index()
     {
-        // Fetch all orders, newest first, 15 per page
-        $orders = Order::orderBy('created_at', 'desc')->paginate(15);
+        // FIX B-3: Added eager loading for the user to prevent massive N+1 queries
+        $orders = Order::with('user')->orderBy('created_at', 'desc')->paginate(15);
         
         return view('admin.orders.index', compact('orders'));
     }
@@ -20,20 +20,23 @@ class AdminOrderController extends Controller
     // 2. Update the status of a specific order
     public function updateStatus(Request $request, $id)
     {
-        // Ensure they only pass valid statuses
+        $order = Order::findOrFail($id);
+
+        // FIX A-5: Require explicit policy authorization before modifying
+        $this->authorize('update', $order);
+
         $request->validate([
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
         ]);
 
-        $order = Order::findOrFail($id);
         $order->update(['status' => $request->status]);
 
         return back()->with('success', "Order #{$order->id} status updated to " . ucfirst($request->status) . ".");
     }
+
     // Show single order details
     public function show($id)
     {
-        // Eager load the items and the associated products to prevent N+1 queries
         $order = Order::with('items.product')->findOrFail($id);
         return view('admin.orders.show', compact('order'));
     }

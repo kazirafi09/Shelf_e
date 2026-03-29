@@ -22,17 +22,17 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    /**
-     * Handle an incoming authentication request.
-     */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        // Admin → admin panel
-        if ($request->user()->role === 'admin') {
+        // FIX 1.10: Aggressive session regeneration for high-privilege accounts
+        if ($request->user()->isAdmin()) { // Using the helper method we created earlier!
+            $request->session()->put('admin_session', true);
+            $request->session()->regenerateToken(); // Force a fresh CSRF token
+            
             return redirect()->route('admin.dashboard');
         }
 

@@ -45,7 +45,7 @@
 
             <div>
                 <label for="category" class="block mb-1 text-sm font-bold text-gray-900">Category</label>
-                <select id="category" name="category" class="block w-full px-4 py-3 text-sm text-gray-600 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
+                <select id="category" name="category_id" class="block w-full px-4 py-3 text-sm text-gray-600 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
                     <option value="">Select a Category...</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -55,7 +55,7 @@
 
             <div>
                 <label for="stock" class="block mb-1 text-sm font-bold text-gray-900">Stock Quantity</label>
-                <input type="number" id="stock" name="stock" placeholder="How many in stock?" required
+                <input type="number" id="stock" name="stock_quantity" placeholder="How many in stock?" required
                     class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
             </div>
 

@@ -83,9 +83,8 @@
 
             <div class="leading-relaxed prose text-gray-700 max-w-none">
                 <p>{{ $product->description }}</p>
-                <p class="mt-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor.</p>
                 <h3 class="mt-6 mb-2 font-bold text-gray-900">Synopsis</h3>
-                <p>Suspendisse dictum feugiat nisl ut dapibus. Mauris iaculis porttitor posuere. Praesent id metus massa, ut blandit odio. Proin quis tortor orci. Etiam at risus et justo dignissim congue. Donec congue lacinia dui, a porttitor lectus condimentum laoreet.</p>
+                <p>{{ $product->synopsis }}</p>
             </div>
         </div>
 

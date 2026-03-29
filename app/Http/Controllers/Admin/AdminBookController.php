@@ -37,16 +37,18 @@ class AdminBookController extends Controller
     }
 
     // 3. Handles the form submission (CREATE)
+    // 3. Handles the form submission (CREATE)
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
             'author'      => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
-            'category'    => 'required|string',
-            'stock'       => 'required|integer|min:0',
+            // FIX A-3: Expect category_id and verify it exists in the categories table
+            'category_id' => 'required|integer|exists:categories,id', 
+            // FIX A-3: Expect 'stock_quantity' instead of 'stock' to match your update() method and DB
+            'stock_quantity' => 'required|integer|min:0', 
             'description' => 'required|string',
-            // Added dimensions validation to force PHP to parse it as a real image
             'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100', 
         ]);
 
@@ -54,7 +56,6 @@ class AdminBookController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             
-            // FIX 1.8: Strict Server-Side MIME Type Verification
             $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 throw ValidationException::withMessages([
@@ -66,18 +67,21 @@ class AdminBookController extends Controller
         }
 
         Product::create([
-            'title'       => $validated['title'],
-            'slug'        => Str::slug($validated['title']) . '-' . substr(uniqid(), -5),
-            'author'      => $validated['author'],
-            'price'       => $validated['price'],
-            'category_id' => 1, // Note: You need to update this to use the dynamic category later!
-            'stock'       => $validated['stock'],
-            'description' => $validated['description'],
-            'image'       => $imagePath,
-            'rating'      => 0, 
+            'title'          => $validated['title'],
+            'slug'           => Str::slug($validated['title']) . '-' . substr(uniqid(), -5),
+            'author'         => $validated['author'],
+            'price'          => $validated['price'],
+            // FIX A-3: Actually use the validated category_id from the form
+            'category_id'    => $validated['category_id'], 
+            // FIX A-3: Use the correct column name
+            'stock_quantity' => $validated['stock_quantity'], 
+            'description'    => $validated['description'],
+            // Match the column name from your update method (usually image_path, not image)
+            'image_path'     => $imagePath, 
+            'rating'         => 0, 
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success', 'New book added successfully!');
+        return redirect()->route('admin.books.index')->with('success', 'New book added successfully!');
     }
 
     // 4. Show the Edit Form
