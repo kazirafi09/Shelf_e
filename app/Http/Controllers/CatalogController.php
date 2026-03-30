@@ -12,6 +12,43 @@ use Illuminate\Support\Facades\Cache; // NEW: Added for caching
 class CatalogController extends Controller
 {
     // 1. Load the Homepage (FIX 2.1: Cached for 5 minutes to prevent N+1 and slow loads)
+    // ADD THIS TO THE BOTTOM OF CatalogController
+    public function liveSearch(Request $request)
+    {
+        $term = $request->query('q');
+
+        if (!$term || strlen($term) < 2) {
+            return response()->json([]);
+        }
+
+        // Split the search term into individual words
+        $words = explode(' ', $term);
+        $query = Product::query();
+
+        foreach ($words as $word) {
+            // Create a fuzzy string for typos (e.g., "poter" becomes "%p%o%t%e%r%")
+            $fuzzyWord = '%' . implode('%', str_split($word)) . '%';
+
+            $query->where(function ($q) use ($word, $fuzzyWord) {
+                $q->where('title', 'LIKE', "%{$word}%")
+                  ->orWhere('title', 'LIKE', $fuzzyWord) // Typo tolerance
+                  ->orWhere('author', 'LIKE', "%{$word}%")
+                  ->orWhere('description', 'LIKE', "%{$word}%")
+                  ->orWhere('synopsis', 'LIKE', "%{$word}%")
+                  ->orWhereHas('category', function($cq) use ($word) {
+                      $cq->where('name', 'LIKE', "%{$word}%");
+                  });
+            });
+        }
+
+        // Only grab the columns we actually need for the dropdown to keep it blazing fast
+        $results = $query->select('id', 'title', 'author', 'slug', 'image_path')
+                         ->take(5) // Limit to 5 results so the dropdown isn't massive
+                         ->get();
+
+        return response()->json($results);
+    }
+    
     public function home()
     {
         $data = Cache::remember('homepage_data', 300, function () {
@@ -41,14 +78,25 @@ class CatalogController extends Controller
         $pageTitle = 'All Books';
         $currentCategory = null; 
 
-        // A. GLOBAL SEARCH (FIX 2.5: Optimized basic search)
+        // A. GLOBAL SEARCH (FIX 2.5 & D-001: Upgraded Scope & Fuzzy Match)
         if ($request->filled('search')) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                // Using standard LIKE for now, but ensure 'title' and 'author' are indexed in the DB
-                $q->where('title', 'LIKE', "%{$searchTerm}%")
-                  ->orWhere('author', 'LIKE', "%{$searchTerm}%");
-            });
+            $words = explode(' ', $searchTerm);
+            
+            foreach ($words as $word) {
+                $fuzzyWord = '%' . implode('%', str_split($word)) . '%';
+                
+                $query->where(function($q) use ($word, $fuzzyWord) {
+                    $q->where('title', 'LIKE', "%{$word}%")
+                      ->orWhere('title', 'LIKE', $fuzzyWord)
+                      ->orWhere('author', 'LIKE', "%{$word}%")
+                      ->orWhere('description', 'LIKE', "%{$word}%")
+                      ->orWhere('synopsis', 'LIKE', "%{$word}%")
+                      ->orWhereHas('category', function($cq) use ($word) {
+                          $cq->where('name', 'LIKE', "%{$word}%");
+                      });
+                });
+            }
             $pageTitle = 'Search Results';
         }
 
@@ -91,12 +139,34 @@ class CatalogController extends Controller
             $query->where('rating', '>=', $request->min_rating);
         }
 
-        // F. PRICE SLIDERS
+        // F. PRICE SLIDERS - Filter by minimum of paperback/hardcover prices
         if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+            $query->where(function($q) use ($request) {
+                $q->where(function($sq) use ($request) {
+                    // Paperback meets min price
+                    $sq->whereNotNull('paperback_price')
+                       ->where('paperback_price', '>=', $request->min_price);
+                })->orWhere(function($sq) use ($request) {
+                    // Hardcover meets min price (and no paperback)
+                    $sq->whereNull('paperback_price')
+                       ->whereNotNull('hardcover_price')
+                       ->where('hardcover_price', '>=', $request->min_price);
+                });
+            });
         }
         if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+            $query->where(function($q) use ($request) {
+                $q->where(function($sq) use ($request) {
+                    // Paperback meets max price
+                    $sq->whereNotNull('paperback_price')
+                       ->where('paperback_price', '<=', $request->max_price);
+                })->orWhere(function($sq) use ($request) {
+                    // Hardcover meets max price (and no paperback)
+                    $sq->whereNull('paperback_price')
+                       ->whereNotNull('hardcover_price')
+                       ->where('hardcover_price', '<=', $request->max_price);
+                });
+            });
         }
 
         // FIX 2.6: Changed ->get() to ->paginate(24) to prevent memory crashes on large catalogs

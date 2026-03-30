@@ -61,14 +61,37 @@
                     </a>
                 </div>
 
-                <div class="flex-1 hidden max-w-xl mx-8 md:block">
+                <div class="relative flex-1 hidden max-w-xl mx-8 md:block" x-data="liveSearch()">
                     <form action="{{ route('categories.index') }}" method="GET" class="relative w-full group">
                         <input type="text" name="search" placeholder="Search by Titles or Authors..." 
+                               x-model="query" 
+                               @input.debounce.300ms="fetchResults" 
+                               @focus="if(query.length >= 2) showDropdown = true" 
+                               @click.away="showDropdown = false"
+                               autocomplete="off"
                                class="w-full px-5 py-2.5 transition-all duration-300 border border-gray-300 rounded-full focus:outline-none focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 bg-gray-50 focus:bg-white text-sm">
                         <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-cyan-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
                     </form>
+
+                    <div x-show="showDropdown" x-transition style="display: none;" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-96">
+                        <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching...</div>
+                        <div x-show="!loading && results.length === 0 && query.length >= 2" class="p-4 text-sm text-center text-gray-500">No books found matching "<span x-text="query"></span>"</div>
+                        
+                        <template x-for="book in results" :key="book.id">
+                            <a :href="'/product/' + book.slug" class="flex items-center p-3 transition-colors border-b hover:bg-cyan-50 border-gray-50 last:border-b-0">
+                                <div class="w-10 overflow-hidden bg-gray-200 rounded h-14 shrink-0">
+                                    <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full">
+                                    <div x-show="!book.image_path" class="flex items-center justify-center w-full h-full text-[8px] text-gray-400 uppercase">Cover</div>
+                                </div>
+                                <div class="ml-3">
+                                    <h4 class="text-sm font-bold text-gray-900" x-text="book.title"></h4>
+                                    <p class="text-xs text-gray-500" x-text="book.author"></p>
+                                </div>
+                            </a>
+                        </template>
+                    </div>
                 </div>
                 
                 <div class="flex items-center space-x-3 sm:space-x-6">
@@ -120,11 +143,38 @@
                 </div>
             </div>
 
-            <div class="mt-4 md:hidden">
+            {{-- MOBILE NAVIGATION FIX --}}
+            <div class="relative mt-4 md:hidden" x-data="liveSearch()">
                 <form action="{{ route('categories.index') }}" method="GET" class="relative w-full">
-                    <input type="text" name="search" placeholder="Search books..." class="w-full px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 bg-gray-50">
-                    <button type="submit" class="absolute text-gray-400 right-3 top-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg></button>
+                    <input type="text" name="search" placeholder="Search books..." 
+                           x-model="query" 
+                           @input.debounce.300ms="fetchResults" 
+                           @focus="if(query.length >= 2) showDropdown = true" 
+                           @click.away="showDropdown = false"
+                           autocomplete="off"
+                           class="w-full px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 bg-gray-50">
+                    <button type="submit" class="absolute text-gray-400 right-3 top-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
                 </form>
+
+                <div x-show="showDropdown" x-transition style="display: none;" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-80">
+                    <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching...</div>
+                    <div x-show="!loading && results.length === 0 && query.length >= 2" class="p-4 text-sm text-center text-gray-500">No books found matching "<span x-text="query"></span>"</div>
+                    
+                    <template x-for="book in results" :key="book.id">
+                        <a :href="'/product/' + book.slug" class="flex items-center p-3 transition-colors border-b hover:bg-cyan-50 border-gray-50 last:border-b-0">
+                            <div class="w-10 overflow-hidden bg-gray-200 rounded h-14 shrink-0">
+                                <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full">
+                                <div x-show="!book.image_path" class="flex items-center justify-center w-full h-full text-[8px] text-gray-400 uppercase">Cover</div>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="text-sm font-bold text-gray-900" x-text="book.title"></h4>
+                                <p class="text-xs text-gray-500" x-text="book.author"></p>
+                            </div>
+                        </a>
+                    </template>
+                </div>
             </div>
         </div>
 
@@ -312,5 +362,40 @@
             </div>
         </div>
     </footer>
+
+
+<script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('liveSearch', () => ({
+                query: '',
+                results: [],
+                loading: false,
+                showDropdown: false,
+
+                async fetchResults() {
+                    if (this.query.length < 2) {
+                        this.results = [];
+                        this.showDropdown = false;
+                        return;
+                    }
+                    
+                    this.loading = true;
+                    this.showDropdown = true;
+                    
+                    try {
+                        // We will build this backend route next!
+                        const response = await fetch(`/api/search-books?q=${encodeURIComponent(this.query)}`);
+                        const data = await response.json();
+                        this.results = data;
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                        this.results = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }));
+        });
+    </script>
 </body>
 </html>

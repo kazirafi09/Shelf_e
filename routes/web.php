@@ -26,6 +26,13 @@ use App\Http\Controllers\Admin\HeroSlideController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
+Route::get('/random-quote', function () {
+    return response()->json(Quote::inRandomOrder()->first());
+});
+
+// ADD THIS NEW ROUTE FOR LIVE SEARCH:
+Route::get('/api/search-books', [CatalogController::class, 'liveSearch'])->name('api.search.books');
+
 /*
 |--------------------------------------------------------------------------
 | Rate Limiters

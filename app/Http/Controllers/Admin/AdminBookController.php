@@ -59,17 +59,27 @@ class AdminBookController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'author'      => 'required|string|max:255',
-            'price'       => 'required|numeric|min:0',
-            // FIX A-3: Expect category_id and verify it exists in the categories table
-            'category_id' => 'required|integer|exists:categories,id', 
-            // FIX A-3: Expect 'stock_quantity' instead of 'stock' to match your update() method and DB
-            'stock_quantity' => 'required|integer|min:0', 
-            'description' => 'required|string',
-            'synopsis'    => 'nullable|string',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100', 
+            'title'           => 'required|string|max:255',
+            'author'          => 'required|string|max:255',
+            'paperback_price' => 'nullable|numeric|min:0',
+            'hardcover_price' => 'nullable|numeric|min:0',
+            // At least one price format must be provided
+            'category_id'     => 'required|integer|exists:categories,id',
+            'stock_quantity'  => 'required|integer|min:0',
+            'description'     => 'required|string',
+            'synopsis'        => 'nullable|string',
+            'image'           => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100',
+        ], [
+            'paperback_price.required' => 'Please provide at least one price (Paperback or Hardcover).',
+            'hardcover_price.required' => 'Please provide at least one price (Paperback or Hardcover).',
         ]);
+
+        // Validate that at least one price is provided
+        if (empty($validated['paperback_price']) && empty($validated['hardcover_price'])) {
+            throw ValidationException::withMessages([
+                'paperback_price' => 'Please provide a price for at least one format (Paperback or Hardcover).',
+            ]);
+        }
 
         $imagePath = null;
         if ($request->hasFile('image')) {
@@ -86,20 +96,17 @@ class AdminBookController extends Controller
         }
 
         Product::create([
-            'title'          => $validated['title'],
-            'slug'           => Str::slug($validated['title']) . '-' . substr(uniqid(), -5),
-            'author'         => $validated['author'],
-            'price'          => $validated['price'],
-            // FIX A-3: Actually use the validated category_id from the form
-            'category_id'    => $validated['category_id'], 
-
-            // FIX A-3: Use the correct column name
-            'stock_quantity' => $validated['stock_quantity'], 
-            'description'    => $validated['description'],
-            'synopsis'       => $validated['synopsis'] ?? null,
-            // Match the column name from your update method (usually image_path, not image)
-            'image_path'     => $imagePath, 
-            'rating'         => 0, 
+            'title'           => $validated['title'],
+            'slug'            => Str::slug($validated['title']) . '-' . substr(uniqid(), -5),
+            'author'          => $validated['author'],
+            'paperback_price' => $validated['paperback_price'] ?? null,
+            'hardcover_price' => $validated['hardcover_price'] ?? null,
+            'category_id'     => $validated['category_id'],
+            'stock_quantity'  => $validated['stock_quantity'],
+            'description'     => $validated['description'],
+            'synopsis'        => $validated['synopsis'] ?? null,
+            'image_path'      => $imagePath,
+            'rating'          => 0,
         ]);
 
         return redirect()->route('admin.books.index')->with('success', 'New book added successfully!');
@@ -120,25 +127,33 @@ class AdminBookController extends Controller
         $book = Product::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'category_id' => 'required|integer|exists:categories,id',
-            'price' => 'required|numeric|min:0',
-            'stock_quantity' => 'required|integer|min:0',
-            'description' => 'nullable|string',
-            'synopsis'    => 'nullable|string',
-            // Added dimensions validation here too
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100', 
+            'title'           => 'required|string|max:255',
+            'author'          => 'required|string|max:255',
+            'category_id'     => 'required|integer|exists:categories,id',
+            'paperback_price' => 'nullable|numeric|min:0',
+            'hardcover_price' => 'nullable|numeric|min:0',
+            'stock_quantity'  => 'required|integer|min:0',
+            'description'     => 'nullable|string',
+            'synopsis'        => 'nullable|string',
+            'image'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100',
         ]);
 
+        // Validate that at least one price is provided
+        if (empty($request->paperback_price) && empty($request->hardcover_price)) {
+            throw ValidationException::withMessages([
+                'paperback_price' => 'Please provide a price for at least one format (Paperback or Hardcover).',
+            ]);
+        }
+
         $updateData = [
-            'title' => $request->title,
-            'author' => $request->author,
-            'category_id' => $request->category_id,
-            'price' => $request->price,
-            'stock_quantity' => $request->stock_quantity,
-            'description' => $request->description,
-            'synopsis'       => $request->synopsis,
+            'title'           => $request->title,
+            'author'          => $request->author,
+            'category_id'     => $request->category_id,
+            'paperback_price' => $request->paperback_price ?? null,
+            'hardcover_price' => $request->hardcover_price ?? null,
+            'stock_quantity'  => $request->stock_quantity,
+            'description'     => $request->description,
+            'synopsis'        => $request->synopsis,
         ];
 
         if ($book->title !== $request->title) {

@@ -20,11 +20,15 @@ class CartController extends Controller
         if (isset($cart[$id])) {
             $cart[$id]['quantity']++;
         } else {
+            $itemPrice = $request->format === 'paperback' 
+                    ? $product->paperback_price 
+                    : $product->hardcover_price;
+
             $cart[$id] = [
                 "title" => $product->title,
                 "author" => $product->author,
                 "quantity" => 1,
-                "price" => $product->price,
+                "price" => $itemPrice,
                 "image_path" => $product->image_path
             ];
         }

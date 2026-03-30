@@ -53,10 +53,15 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-sm font-bold text-gray-700">Price (৳)</label>
-                <input type="number" step="0.01" name="price" value="{{ old('price', $book->price) }}" required 
-                       class="block w-full mt-1 border-gray-300 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm bg-gray-50/50">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label>Paperback Price (৳)</label>
+                    <input type="number" step="0.01" name="paperback_price" value="{{ old('paperback_price', $book->paperback_price) }}" class="...">
+                </div>
+                <div>
+                    <label>Hardcover Price (৳)</label>
+                    <input type="number" step="0.01" name="hardcover_price" value="{{ old('hardcover_price', $book->hardcover_price) }}" class="...">
+                </div>
             </div>
 
             <div>

@@ -38,12 +38,6 @@
             </div>
 
             <div>
-                <label for="price" class="block mb-1 text-sm font-bold text-gray-900">Price (৳)</label>
-                <input type="number" id="price" name="price" step="0.01" placeholder="0.00" required
-                    class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
-            </div>
-
-            <div>
                 <label for="category" class="block mb-1 text-sm font-bold text-gray-900">Category</label>
                 <select id="category" name="category_id" class="block w-full px-4 py-3 text-sm text-gray-600 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
                     <option value="">Select a Category...</option>
@@ -52,6 +46,22 @@
                     @endforeach
                 </select>
             </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="paperback_price" class="block mb-1 text-sm font-bold text-gray-900">Paperback Price (৳)</label>
+                    <input type="number" id="paperback_price" name="paperback_price" step="0.01" placeholder="0.00"
+                        class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
+                    <p class="mt-1 text-xs text-gray-500">Leave empty if not available</p>
+                </div>
+                <div>
+                    <label for="hardcover_price" class="block mb-1 text-sm font-bold text-gray-900">Hardcover Price (৳)</label>
+                    <input type="number" id="hardcover_price" name="hardcover_price" step="0.01" placeholder="0.00"
+                        class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
+                    <p class="mt-1 text-xs text-gray-500">Leave empty if not available</p>
+                </div>
+            </div>
+            <p class="mt-2 text-xs text-orange-600">* At least one price format is required</p>
 
             <div>
                 <label for="stock" class="block mb-1 text-sm font-bold text-gray-900">Stock Quantity</label>

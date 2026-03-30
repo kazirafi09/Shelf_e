@@ -153,9 +153,25 @@
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
                     <div class="relative flex flex-col p-3 transition duration-300 border border-gray-100 bg-gray-50 rounded-xl group hover:shadow-lg">
-                        <button class="absolute z-10 text-gray-400 top-6 right-6 hover:text-orange-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                        </button>
+                        @auth
+                            @php
+                                $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
+                                    ->where('product_id', $product->id)
+                                    ->exists();
+                            @endphp
+                            <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST" class="absolute z-10 top-6 right-6">
+                                @csrf
+                                <button type="submit" class="transition hover:scale-110 {{ $isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}">
+                                    <svg class="w-5 h-5 {{ $isWishlisted ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ route('login') }}" class="absolute z-10 text-gray-400 top-6 right-6 hover:text-red-500" title="Log in to wishlist">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                            </a>
+                        @endauth
                         
                         <a href="/product/{{ $product->slug }}" class="block grow">
                             <div class="w-full aspect-[2/3] bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-400 overflow-hidden">
@@ -176,7 +192,7 @@
                         </a>
                         
                         <div class="pt-2 mt-auto">
-                            <p class="mb-3 text-lg font-bold text-gray-900">৳ {{ number_format($product->price, 0) }}</p>
+                            <p class="mb-3 text-lg font-bold text-gray-900">৳ {{ number_format($product->display_price, 0) }}</p>
                             
                             {{-- THE FIX: Wrap the button in a secure POST form --}}
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">

@@ -58,7 +58,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-sm font-bold text-gray-900">
-                            ৳ {{ number_format($book->price, 0) }}
+                            ৳ {{ number_format($book->display_price, 0) }}
                         </td>
                         <td class="px-6 py-4">
                             @if($book->stock_quantity > 10)

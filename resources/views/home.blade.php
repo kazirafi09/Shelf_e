@@ -233,9 +233,30 @@
             @foreach($topBooks as $book)
             <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 bg-white border border-gray-100 rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-cyan-100">
                 
-                <button class="absolute z-20 p-2 text-gray-300 transition-colors duration-300 transform -translate-y-2 rounded-full shadow-sm opacity-0 bg-white/80 backdrop-blur-sm top-6 right-6 hover:text-orange-500 hover:bg-white group-hover:opacity-100 group-hover:translate-y-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                </button>
+                <div class="absolute z-10 top-2 right-2">
+                    @auth
+                        @php
+                            // Assuming your loop variable is $book. Change to $product if your loop uses $product as $product!
+                            $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
+                                                                ->where('product_id', $book->id)
+                                                                ->exists();
+                        @endphp
+                        <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="p-2 transition bg-white rounded-full shadow-sm hover:scale-110 active:scale-95">
+                                <svg class="w-5 h-5 {{ $isWishlisted ? 'text-red-500 fill-current' : 'text-gray-400 fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="block p-2 transition bg-white rounded-full shadow-sm hover:scale-110">
+                            <svg class="w-5 h-5 text-gray-400 fill-none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </a>
+                    @endauth
+                </div>
                 
                 <a href="/product/{{ $book->slug }}" class="z-10 block grow">
                     <div class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg">
@@ -260,7 +281,7 @@
                 <div class="z-10 flex flex-col justify-center pt-3 mt-auto border-t border-gray-100 h-[88px]">
     
                     <p class="text-lg font-extrabold text-gray-900 transition-all duration-300 ease-out transform group-hover:-translate-y-8 group-hover:opacity-0">
-                        ৳ {{ number_format($book->price, 0) }}
+                        ৳ {{ number_format($book->display_price, 0) }}
                     </p>
                                     
                     <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
