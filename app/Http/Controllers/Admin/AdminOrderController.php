@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Order; 
+use App\Models\Order;
 
 class AdminOrderController extends Controller
 {
@@ -13,7 +13,7 @@ class AdminOrderController extends Controller
     {
         // FIX B-3: Added eager loading for the user to prevent massive N+1 queries
         $orders = Order::with('user')->orderBy('created_at', 'desc')->paginate(15);
-        
+
         return view('admin.orders.index', compact('orders'));
     }
 

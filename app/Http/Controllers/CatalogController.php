@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\HeroSlide; 
+use App\Models\HeroSlide;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache; // NEW: Added for caching
 
@@ -15,6 +15,8 @@ class CatalogController extends Controller
     // ADD THIS TO THE BOTTOM OF CatalogController
     public function liveSearch(Request $request)
     {
+        $request->validate(['q' => 'nullable|string|max:100']);
+
         $term = $request->query('q');
 
         if (!$term || strlen($term) < 2) {
@@ -35,7 +37,7 @@ class CatalogController extends Controller
                   ->orWhere('author', 'LIKE', "%{$word}%")
                   ->orWhere('description', 'LIKE', "%{$word}%")
                   ->orWhere('synopsis', 'LIKE', "%{$word}%")
-                  ->orWhereHas('category', function($cq) use ($word) {
+                  ->orWhereHas('category', function ($cq) use ($word) {
                       $cq->where('name', 'LIKE', "%{$word}%");
                   });
             });
@@ -48,7 +50,7 @@ class CatalogController extends Controller
 
         return response()->json($results);
     }
-    
+
     public function home()
     {
         $data = Cache::remember('homepage_data', 300, function () {
@@ -66,7 +68,7 @@ class CatalogController extends Controller
                 'heroSlides' => HeroSlide::orderBy('order', 'asc')->get()
             ];
         });
-        
+
         return view('home', $data);
     }
 
@@ -74,25 +76,25 @@ class CatalogController extends Controller
     public function categories(Request $request)
     {
         $query = Product::query();
-        
+
         $pageTitle = 'All Books';
-        $currentCategory = null; 
+        $currentCategory = null;
 
         // A. GLOBAL SEARCH (FIX 2.5 & D-001: Upgraded Scope & Fuzzy Match)
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $words = explode(' ', $searchTerm);
-            
+
             foreach ($words as $word) {
                 $fuzzyWord = '%' . implode('%', str_split($word)) . '%';
-                
-                $query->where(function($q) use ($word, $fuzzyWord) {
+
+                $query->where(function ($q) use ($word, $fuzzyWord) {
                     $q->where('title', 'LIKE', "%{$word}%")
                       ->orWhere('title', 'LIKE', $fuzzyWord)
                       ->orWhere('author', 'LIKE', "%{$word}%")
                       ->orWhere('description', 'LIKE', "%{$word}%")
                       ->orWhere('synopsis', 'LIKE', "%{$word}%")
-                      ->orWhereHas('category', function($cq) use ($word) {
+                      ->orWhereHas('category', function ($cq) use ($word) {
                           $cq->where('name', 'LIKE', "%{$word}%");
                       });
                 });
@@ -103,10 +105,10 @@ class CatalogController extends Controller
         // B. QUICK BROWSE LINKS (FROM HOMEPAGE)
         if ($request->filled('category')) {
             $currentCategory = Category::where('slug', $request->category)->first();
-            $query->whereHas('category', function($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
-            
+
             if ($currentCategory) {
                 $pageTitle = $currentCategory->name;
             }
@@ -115,7 +117,7 @@ class CatalogController extends Controller
         // C. GENRE CHECKBOXES (FROM SIDEBAR)
         if ($request->has('genres') && is_array($request->genres) && count($request->genres) > 0) {
             $query->whereIn('category_id', $request->genres);
-            
+
             if (count($request->genres) === 1) {
                 $checkedGenre = Category::find($request->genres[0]);
                 if ($checkedGenre) {
@@ -141,12 +143,12 @@ class CatalogController extends Controller
 
         // F. PRICE SLIDERS - Filter by minimum of paperback/hardcover prices
         if ($request->filled('min_price')) {
-            $query->where(function($q) use ($request) {
-                $q->where(function($sq) use ($request) {
+            $query->where(function ($q) use ($request) {
+                $q->where(function ($sq) use ($request) {
                     // Paperback meets min price
                     $sq->whereNotNull('paperback_price')
                        ->where('paperback_price', '>=', $request->min_price);
-                })->orWhere(function($sq) use ($request) {
+                })->orWhere(function ($sq) use ($request) {
                     // Hardcover meets min price (and no paperback)
                     $sq->whereNull('paperback_price')
                        ->whereNotNull('hardcover_price')
@@ -155,12 +157,12 @@ class CatalogController extends Controller
             });
         }
         if ($request->filled('max_price')) {
-            $query->where(function($q) use ($request) {
-                $q->where(function($sq) use ($request) {
+            $query->where(function ($q) use ($request) {
+                $q->where(function ($sq) use ($request) {
                     // Paperback meets max price
                     $sq->whereNotNull('paperback_price')
                        ->where('paperback_price', '<=', $request->max_price);
-                })->orWhere(function($sq) use ($request) {
+                })->orWhere(function ($sq) use ($request) {
                     // Hardcover meets max price (and no paperback)
                     $sq->whereNull('paperback_price')
                        ->whereNotNull('hardcover_price')
@@ -172,9 +174,9 @@ class CatalogController extends Controller
         // FIX 2.6: Changed ->get() to ->paginate(24) to prevent memory crashes on large catalogs
         // Added withQueryString() so pagination works WITH the applied filters
         $products = $query->paginate(24)->withQueryString();
-        
+
         $genres = Category::all();
-        
+
         // FIX 3.4: Optimized Author fetch by grouping instead of distinct pluck
         $authors = Product::selectRaw('author, MIN(id) as min_id')
             ->whereNotNull('author')
@@ -182,7 +184,7 @@ class CatalogController extends Controller
             ->groupBy('author')
             ->orderBy('author')
             ->pluck('author');
-        
+
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
     }
 
@@ -209,7 +211,7 @@ class CatalogController extends Controller
                            ->withQueryString();
 
         $genres = Category::all();
-        
+
         // FIX 3.4 (Applied here as well)
         $authors = Product::selectRaw('author, MIN(id) as min_id')
             ->whereNotNull('author')
@@ -217,7 +219,7 @@ class CatalogController extends Controller
             ->groupBy('author')
             ->orderBy('author')
             ->pluck('author');
-        
+
         $pageTitle = 'Bestsellers & Top Rated';
 
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
@@ -226,13 +228,13 @@ class CatalogController extends Controller
     // 3. Load Single Product Page
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        
+        $product = Product::with('category')->where('slug', $slug)->firstOrFail();
+
         $relatedProducts = Product::where('id', '!=', $product->id)
                                   ->inRandomOrder()
                                   ->take(3)
                                   ->get();
-                                         
+
         return view('products.show', compact('product', 'relatedProducts'));
     }
 }

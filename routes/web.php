@@ -4,9 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-
 use App\Models\Quote;
-
 // Controllers
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CartController;
@@ -16,22 +14,26 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\WishlistController;
-
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\HeroSlideController;
-
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
 Route::get('/random-quote', function () {
-    return response()->json(Quote::inRandomOrder()->first());
+    $quote = Quote::inRandomOrder()->first(['quote', 'author']);
+
+    if (! $quote) {
+        return response()->json(['quote' => '', 'author' => ''], 404);
+    }
+
+    return response()->json($quote);
 });
 
 // ADD THIS NEW ROUTE FOR LIVE SEARCH:
-Route::get('/api/search-books', [CatalogController::class, 'liveSearch'])->name('api.search.books');
+Route::get('/api/search-books', [CatalogController::class, 'liveSearch'])->name('api.search.books')->middleware('throttle:60,1');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +45,7 @@ RateLimiter::for('cart', function (Request $request) {
 });
 
 /*
-|--------------------------------------------------------------------------
+|------------------------------------------------------------------f--------
 | Public Routes
 |--------------------------------------------------------------------------
 */
@@ -80,21 +82,10 @@ Route::middleware(['throttle:cart'])->group(function () {
 | Checkout (Public + Throttled)
 |--------------------------------------------------------------------------
 */
-Route::get('/checkout', function () {
-    $cartItems = session()->get('cart', []);
-    $subtotal = 0;
-
-    foreach ($cartItems as $item) {
-        $subtotal += $item['price'] * $item['quantity'];
-    }
-
-    $shipping = count($cartItems) > 0 ? 150 : 0;
-    $total = $subtotal + $shipping;
-
-    return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total'));
-});
+Route::get('/checkout', [OrderController::class, 'index']);
 
 Route::middleware('throttle:5,1')->post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+Route::get('/orders/{order}/confirmation', [OrderController::class, 'confirmation'])->name('order.confirmation');
 
 /*
 |--------------------------------------------------------------------------
@@ -111,7 +102,6 @@ Route::middleware('auth')->group(function () {
         ->name('profile.destroy');
 
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('order.show');
-    Route::get('/orders/{order}/confirmation', [OrderController::class, 'confirmation'])->name('order.confirmation');
 
     // Wishlist
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');

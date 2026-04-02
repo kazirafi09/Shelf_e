@@ -21,10 +21,10 @@ class AdminDashboardController extends Controller
         $recentOrders = Order::orderBy('created_at', 'desc')->take(10)->get();
 
         return view('admin.dashboard', compact(
-            'totalSales', 
-            'totalOrders', 
-            'totalBooks', 
-            'totalCustomers', 
+            'totalSales',
+            'totalOrders',
+            'totalBooks',
+            'totalCustomers',
             'recentOrders'
         ));
     }

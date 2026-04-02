@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
-    public function submit(Request $request)
+    public function store(Request $request)
     {
         // 1. Validate the incoming request
         $validated = $request->validate([
@@ -18,7 +18,7 @@ class ContactController extends Controller
 
         // 2. Process the data (Log it for now, later you can use Mail::to())
         // Log::info('New Contact Message:', $validated);
-        
+
         // 3. Return to the form with a success flash message
         return back()->with('success', 'Thank you for reaching out! Your message has been sent successfully.');
     }

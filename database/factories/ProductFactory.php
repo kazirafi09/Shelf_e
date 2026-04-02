@@ -21,9 +21,11 @@ class ProductFactory extends Factory
         // Randomly decide if a book has paperback, hardcover, or both
         $hasPaperback = $this->faker->boolean(80); // 80% chance
         $hasHardcover = $this->faker->boolean(60); // 60% chance
-        
+
         // Ensure at least one format exists
-        if (!$hasPaperback && !$hasHardcover) { $hasPaperback = true; }
+        if (!$hasPaperback && !$hasHardcover) {
+            $hasPaperback = true;
+        }
 
         return [
             'category_id' => \App\Models\Category::inRandomOrder()->first()->id ?? 1,

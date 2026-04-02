@@ -15,7 +15,7 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->isAdmin()){
+        if (auth()->check() && auth()->user()->isAdmin()) {
             return $next($request);
         }
         return redirect('/')->with('error', 'Unauthorized Access: Admins only.');

@@ -25,47 +25,83 @@
             <form action="{{ route('checkout.store') }}" method="POST">
                 @csrf
                 
+                @php
+                    $prefillName     = old('name',        auth()->user()->name  ?? $lastOrder->name     ?? '');
+                    $prefillEmail    = old('email',       auth()->user()->email ?? $lastOrder->email    ?? '');
+                    $prefillAddress  = old('address',     $lastOrder->address  ?? '');
+                    $prefillDivision = old('division',    $lastOrder->division ?? 'Dhaka');
+                    $prefillDistrict = old('district',    $lastOrder->district ?? '');
+                    $prefillPostal   = old('postal_code', $lastOrder->postal_code ?? '');
+                    // Strip the +880 prefix stored in DB so the input only shows the local part
+                    $rawPhone = $lastOrder->phone ?? '';
+                    $prefillPhone = old('phone', preg_replace('/^\+?880/', '', $rawPhone));
+                @endphp
+
                 <h2 class="mb-6 text-2xl font-bold text-gray-900">Address Details</h2>
+
+                @auth
+                    @if($lastOrder)
+                        <div class="flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium text-cyan-800 border border-cyan-200 rounded-lg bg-cyan-50">
+                            <svg class="w-4 h-4 shrink-0 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
+                            We pre-filled your details from your last order. Feel free to update anything.
+                        </div>
+                    @endif
+                @endauth
+
                 <div class="mb-10 space-y-4">
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" name="name" value="{{ old('name', auth()->user()->name ?? '') }}" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="text" name="name" value="{{ $prefillName }}" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Email Address (For Order Updates)</label>
-                        <input type="email" name="email" value="{{ old('email', auth()->user()->email ?? '') }}" placeholder="guest@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="email" name="email" value="{{ $prefillEmail }}" placeholder="guest@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Detailed Address</label>
-                        <input type="text" name="address" value="{{ old('address') }}" placeholder="House #, Street, Apartment..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="text" name="address" value="{{ $prefillAddress }}" placeholder="House #, Street, Apartment..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">Division</label>
                             <select name="division" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
-                                <option value="Dhaka">Dhaka</option>
-                                <option value="Chittagong">Chittagong</option>
-                                <option value="Sylhet">Sylhet</option>
-                                <option value="Rajshahi">Rajshahi</option>
+                                @foreach(['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Mymensingh'] as $div)
+                                    <option value="{{ $div }}" {{ $prefillDivision === $div ? 'selected' : '' }}>{{ $div }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">District</label>
-                            <input type="text" name="district" value="{{ old('district') }}" placeholder="e.g. Dhaka City" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                            <input type="text" name="district" value="{{ $prefillDistrict }}" placeholder="e.g. Dhaka City" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                         </div>
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">Postal Code</label>
-                            <input type="text" name="postal_code" value="{{ old('postal_code') }}" placeholder="Enter Code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
+                            <input type="text" name="postal_code" value="{{ $prefillPostal }}" placeholder="Enter Code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
                         </div>
                     </div>
-                    
-                    <div class="w-full md:w-1/2">
+
+                    <div class="w-full md:w-1/2"
+                         x-data="{ phone: '{{ $prefillPhone }}', get valid() { return /^[0-9]{10}$/.test(this.phone); }, get touched() { return this.phone.length > 0; } }">
                         <label class="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
                         <div class="flex">
                             <span class="inline-flex items-center px-3 font-bold text-gray-500 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50">+880</span>
-                            <input type="text" name="phone" value="{{ old('phone') }}" placeholder="1712345678" class="w-full px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                            <input type="text" name="phone" x-model="phone"
+                                   placeholder="1XXXXXXXXX"
+                                   maxlength="10"
+                                   inputmode="numeric"
+                                   :class="touched && !valid ? 'border-red-400 focus:ring-red-400 focus:border-red-400' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'"
+                                   class="w-full px-4 py-3 border rounded-r-lg transition-colors"
+                                   required>
                         </div>
+                        <p x-show="touched && !valid" x-transition
+                           class="mt-1 text-xs font-medium text-red-500">
+                            Enter exactly 10 digits after +880 &mdash; e.g. <strong>1712345678</strong>
+                        </p>
+                        <p x-show="!touched || valid"
+                           class="mt-1 text-xs text-gray-400">
+                            Format: <strong>+880</strong> followed by 10 digits (e.g. +880&nbsp;1712345678)
+                        </p>
                     </div>
                 </div>
 

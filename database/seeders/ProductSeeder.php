@@ -12,10 +12,10 @@ class ProductSeeder extends Seeder
     {
         // 1. Disable foreign key checks to allow truncation
         Schema::disableForeignKeyConstraints();
-        
+
         // 2. Wipe the existing products
         Product::truncate();
-        
+
         Schema::enableForeignKeyConstraints();
 
         // 3. Create 100 fresh books using the factory

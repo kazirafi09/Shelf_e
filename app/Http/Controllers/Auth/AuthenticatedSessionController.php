@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         if ($request->user()->isAdmin()) { // Using the helper method we created earlier!
             $request->session()->put('admin_session', true);
             $request->session()->regenerateToken(); // Force a fresh CSRF token
-            
+
             return redirect()->route('admin.dashboard');
         }
 

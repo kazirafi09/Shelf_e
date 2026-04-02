@@ -82,7 +82,7 @@
                         </thead>
 
                         <tbody class="divide-y divide-gray-100">
-                            @forelse($orders as $order)
+                            @forelse($recentOrders as $order)
                                 <tr onclick="window.location='{{ route('order.show', $order->id) }}'" class="transition-colors cursor-pointer hover:bg-gray-50 group">
                                     <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
                                         #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}

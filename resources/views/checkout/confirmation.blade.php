@@ -31,9 +31,11 @@
         </div>
 
         <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <a href="{{ route('dashboard') }}" class="px-6 py-3 font-bold text-white transition-colors shadow-md bg-cyan-600 rounded-xl hover:bg-cyan-700">
-                View My Orders
-            </a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="px-6 py-3 font-bold text-white transition-colors shadow-md bg-cyan-600 rounded-xl hover:bg-cyan-700">
+                    View My Orders
+                </a>
+            @endauth
             <a href="{{ route('home') }}" class="px-6 py-3 font-bold text-gray-700 transition-colors bg-white border border-gray-300 shadow-sm rounded-xl hover:bg-gray-50">
                 Continue Shopping
             </a>

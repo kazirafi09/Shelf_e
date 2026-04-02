@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shelf-E | Your Favorite Books</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -230,30 +231,41 @@
                 
                 {{-- Alpine.js Accordion for Categories --}}
                 <div x-data="{ openCategories: false }" class="w-full">
-                    <button @click="openCategories = !openCategories" class="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-left text-gray-700 transition-colors rounded-md hover:text-cyan-600 hover:bg-cyan-50">
+                    <button type="button" @click="openCategories = !openCategories" class="flex items-center justify-between w-full px-3 py-2 text-base font-medium text-left text-gray-700 transition-colors rounded-md hover:text-cyan-600 hover:bg-cyan-50">
                         Categories
                         <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': openCategories}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
-                    
-                    <div x-show="openCategories" x-collapse class="pb-2 pl-6 mt-1 space-y-3">
+
+                    <div x-show="openCategories"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-1"
+                         class="pb-2 pl-6 mt-1 space-y-3">
                         @if(isset($globalCategories))
                             @foreach($globalCategories as $category)
-                                <a href="{{ route('categories.index', ['category' => $category->slug]) }}" class="block text-sm font-medium text-gray-500 transition-colors hover:text-cyan-600">
+                                <a href="{{ route('categories.index', ['category' => $category->slug]) }}"
+                                   @click="mobileMenuOpen = false"
+                                   class="block text-sm font-medium text-gray-500 transition-colors hover:text-cyan-600">
                                     {{ $category->name }}
                                 </a>
                             @endforeach
                         @endif
-                        <a href="{{ route('categories.index') }}" class="block pt-2 text-sm font-bold text-orange-500 transition-colors hover:text-orange-600">
+                        <a href="{{ route('categories.index') }}"
+                           @click="mobileMenuOpen = false"
+                           class="block pt-2 text-sm font-bold text-orange-500 transition-colors hover:text-orange-600">
                             See All Books &rarr;
                         </a>
                     </div>
                 </div>
 
-                <a href="/authors" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Authors</a>
-                <a href="/categories?min_rating=4" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Bestsellers</a>
-                <a href="/contact" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Contact</a>
-                <a href="#newsletter" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Newsletter</a>
-                
+                <a href="/authors"      @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Authors</a>
+                <a href="/categories?min_rating=4" @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Bestsellers</a>
+                <a href="/contact"      @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Contact</a>
+                <a href="#newsletter"   @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-orange-500 hover:bg-orange-50">Newsletter</a>
+
                 @auth
                     <div class="pt-4 mt-4 border-t border-gray-200">
                         <div class="px-3 mb-2 text-xs font-bold text-gray-400 uppercase">
@@ -261,14 +273,20 @@
                         </div>
 
                         <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('dashboard') }}"
-                        class="block px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-cyan-600 hover:bg-cyan-50">
+                           @click="mobileMenuOpen = false"
+                           class="block px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-cyan-600 hover:bg-cyan-50">
                             Dashboard
+                        </a>
+
+                        <a href="{{ route('wishlist.index') }}"
+                           @click="mobileMenuOpen = false"
+                           class="block px-3 py-2 text-base font-medium text-gray-700 rounded-md hover:text-cyan-600 hover:bg-cyan-50">
+                            My Wishlist
                         </a>
 
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit"
-                                class="block w-full px-3 py-2 text-base font-medium text-left text-red-600 rounded-md hover:bg-red-50">
+                            <button type="submit" class="block w-full px-3 py-2 text-base font-medium text-left text-red-600 rounded-md hover:bg-red-50">
                                 Log Out
                             </button>
                         </form>
@@ -276,12 +294,11 @@
                 @else
                     <div class="pt-4 mt-4 space-y-2 border-t border-gray-200">
                         <a href="{{ route('login') }}"
-                        class="block w-full px-4 py-2 font-bold text-center text-white bg-orange-500 rounded-md hover:bg-orange-600">
+                           class="block w-full px-4 py-2 font-bold text-center text-white bg-orange-500 rounded-md hover:bg-orange-600">
                             Login
                         </a>
-
                         <a href="{{ route('register') }}"
-                        class="block w-full px-4 py-2 font-bold text-center rounded-md text-cyan-700 bg-cyan-100 hover:bg-cyan-200">
+                           class="block w-full px-4 py-2 font-bold text-center rounded-md text-cyan-700 bg-cyan-100 hover:bg-cyan-200">
                             Register
                         </a>
                     </div>
@@ -363,6 +380,23 @@
         </div>
     </footer>
 
+
+@if(session('error'))
+    <div x-data="{ show: true }"
+         x-init="setTimeout(() => show = false, 2000)"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed z-[9999] bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-3 bg-red-600 text-white text-sm font-semibold rounded-xl shadow-lg pointer-events-none"
+         style="display: none;">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        {{ session('error') }}
+    </div>
+@endif
 
 <script>
         document.addEventListener('alpine:init', () => {

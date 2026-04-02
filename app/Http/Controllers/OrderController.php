@@ -11,7 +11,29 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    // Add this method to OrderController
+    public function index()
+    {
+        $cartItems = session()->get('cart', []);
+        $subtotal = 0;
+
+        foreach ($cartItems as $item) {
+            $subtotal += $item['price'] * $item['quantity'];
+        }
+
+        $shipping = count($cartItems) > 0 ? 150 : 0;
+        $total = $subtotal + $shipping;
+
+        // Pre-fill from the user's most recent order (returning customers)
+        $lastOrder = null;
+        if (auth()->check()) {
+            $lastOrder = Order::where('user_id', auth()->id())
+                ->latest()
+                ->first(['name', 'email', 'phone', 'address', 'division', 'district', 'postal_code']);
+        }
+
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder'));
+    }
+
     public function show($id)
     {
         // Eager load items and products
@@ -39,7 +61,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $cart = session()->get('cart', []);
-        
+
         if (empty($cart)) {
             return redirect('/categories')->with('error', 'Your cart is empty!');
         }
@@ -56,7 +78,7 @@ class OrderController extends Controller
             'payment' => 'required|string',
         ]);
 
-        $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
+        $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['quantity']);
         $shipping = ($request->delivery === 'express') ? 150 : 60;
         $total = $subtotal + $shipping;
 
@@ -64,62 +86,82 @@ class OrderController extends Controller
         $standardizedPhone = '+880' . ltrim($cleanPhone, '0');
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
-        $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone) {
-            
-            // Inside the transaction, we create the order
-            $newOrder = Order::create([
-                'user_id' => auth()->id(),
-                'name' => $validatedData['name'] ?? (auth()->check() ? auth()->user()->name : 'Guest'),
-                'email' => $validatedData['email'],
-                'phone' => $standardizedPhone, 
-                'address' => $validatedData['address'],
-                'division' => $validatedData['division'],
-                'district' => $validatedData['district'],
-                'postal_code' => $validatedData['postal_code'],
-                'delivery_method' => $validatedData['delivery'],
-                'payment_method' => $validatedData['payment'],
-                'subtotal' => $subtotal,
-                'shipping_cost' => $shipping,
-                'total_amount' => $total,
-                'status' => 'pending',
-            ]);
+        try {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone) {
 
-            $orderItems = collect($cart)->map(function ($item, $id) use ($newOrder) {
-                return [
-                    'order_id' => $newOrder->id,
-                    'product_id' => $id,
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ];
-            })->values()->toArray();
-            
-            OrderItem::insert($orderItems);
+                // Re-verify stock for every cart item before committing
+                $productIds = array_keys($cart);
+                $products = Product::whereIn('id', $productIds)->lockForUpdate()->get()->keyBy('id');
 
-            $cases = [];
-            $params = [];
-            $ids = [];
-            
-            foreach ($cart as $id => $item) {
-                $cases[] = "WHEN id = ? THEN stock_quantity - ?";
-                $params[] = $id;
-                $params[] = $item['quantity'];
-                $ids[] = $id;
+                foreach ($cart as $id => $item) {
+                    $product = $products->get($id);
+                    if (! $product || $product->stock_quantity < $item['quantity']) {
+                        throw new \Exception('stock_insufficient');
+                    }
+                }
+
+                // Inside the transaction, we create the order
+                $newOrder = Order::create([
+                    'user_id' => auth()->id(),
+                    'name' => $validatedData['name'] ?? (auth()->check() ? auth()->user()->name : 'Guest'),
+                    'email' => $validatedData['email'],
+                    'phone' => $standardizedPhone,
+                    'address' => $validatedData['address'],
+                    'division' => $validatedData['division'],
+                    'district' => $validatedData['district'],
+                    'postal_code' => $validatedData['postal_code'],
+                    'delivery_method' => $validatedData['delivery'],
+                    'payment_method' => $validatedData['payment'],
+                    'subtotal' => $subtotal,
+                    'shipping_cost' => $shipping,
+                    'total_amount' => $total,
+                    'status' => 'pending',
+                ]);
+
+                $orderItems = collect($cart)->map(function ($item, $id) use ($newOrder) {
+                    return [
+                        'order_id'   => $newOrder->id,
+                        'product_id' => $id,
+                        'quantity'   => $item['quantity'],
+                        'price'      => $item['price'],
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ];
+                })->values()->toArray();
+
+                OrderItem::insert($orderItems);
+
+                $cases = [];
+                $params = [];
+                $ids = [];
+
+                foreach ($cart as $id => $item) {
+                    $cases[] = "WHEN id = ? THEN stock_quantity - ?";
+                    $params[] = $id;
+                    $params[] = $item['quantity'];
+                    $ids[] = $id;
+                }
+
+                $idsPlaceholders = implode(',', array_fill(0, count($ids), '?'));
+                $params = array_merge($params, $ids);
+                $casesSql = implode(' ', $cases);
+
+                DB::update("UPDATE products SET stock_quantity = CASE {$casesSql} ELSE stock_quantity END WHERE id IN ({$idsPlaceholders})", $params);
+
+                // NOTICE THIS LINE: We must return the newly created order out of the transaction
+                return $newOrder;
+            });
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'stock_insufficient') {
+                return redirect()->route('home')
+                    ->with('error', 'Sorry, an item in your cart just went out of stock. Please review your cart.');
             }
-            
-            $idsPlaceholders = implode(',', array_fill(0, count($ids), '?'));
-            $params = array_merge($params, $ids);
-            $casesSql = implode(' ', $cases);
-            
-            DB::update("UPDATE products SET stock_quantity = CASE {$casesSql} ELSE stock_quantity END WHERE id IN ({$idsPlaceholders})", $params);
-            
-            // NOTICE THIS LINE: We must return the newly created order out of the transaction
-            return $newOrder;
-        });
+            throw $e;
+        }
 
         // Now $order exists outside the transaction!
         session()->forget('cart');
+
 
         return redirect()->route('order.confirmation', $order->id)
                          ->with('success', 'Your order has been placed successfully!');

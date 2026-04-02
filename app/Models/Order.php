@@ -31,7 +31,7 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-    
+
     // Optional: Add the inverse relationship to User if you need it
     public function user()
     {

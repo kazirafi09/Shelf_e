@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Product; 
-use Illuminate\Support\Str; 
+use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Validation\ValidationException; // Add this import
 
@@ -21,7 +20,7 @@ class AdminBookController extends Controller
 
         // Keep your existing Category Filter
         if ($request->filled('category')) {
-            $query->whereHas('category', function($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
@@ -29,7 +28,7 @@ class AdminBookController extends Controller
         // NEW: Add the Keyword Search logic (Fixes D-003)
         if ($request->filled('search')) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('author', 'LIKE', "%{$searchTerm}%")
                   ->orWhere('slug', 'LIKE', "%{$searchTerm}%"); // Bonus: search by slug too
@@ -37,9 +36,9 @@ class AdminBookController extends Controller
         }
 
         // Add withQueryString() so pagination links remember the search term
-        $books = $query->latest()->paginate(10)->withQueryString(); 
-        
-        $globalCategories = Category::all(); 
+        $books = $query->latest()->paginate(10)->withQueryString();
+
+        $globalCategories = Category::all();
 
         return view('admin.books.index', compact('books', 'globalCategories'));
     }
@@ -50,7 +49,7 @@ class AdminBookController extends Controller
     {
         // FIX: Fetch the categories so the Blade view doesn't crash
         $categories = Category::orderBy('name')->get();
-        
+
         return view('admin.books.create', compact('categories'));
     }
 
@@ -84,7 +83,7 @@ class AdminBookController extends Controller
         $imagePath = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            
+
             $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 throw ValidationException::withMessages([
@@ -116,8 +115,8 @@ class AdminBookController extends Controller
     public function edit($id)
     {
         $book = Product::findOrFail($id);
-        $categories = Category::all(); 
-        
+        $categories = Category::all();
+
         return view('admin.books.edit', compact('book', 'categories'));
     }
 
@@ -162,7 +161,7 @@ class AdminBookController extends Controller
 
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            
+
             // FIX 1.8: Strict Server-Side MIME Type Verification
             $allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
             if (!in_array($file->getMimeType(), $allowedMimes)) {
@@ -174,7 +173,7 @@ class AdminBookController extends Controller
             if ($book->image_path && Storage::disk('public')->exists($book->image_path)) {
                 Storage::disk('public')->delete($book->image_path);
             }
-            
+
             $updateData['image_path'] = $file->store('books', 'public');
         }
 
@@ -187,7 +186,7 @@ class AdminBookController extends Controller
     public function destroy($id)
     {
         $book = Product::findOrFail($id);
-        
+
         if ($book->image_path && Storage::disk('public')->exists($book->image_path)) {
             Storage::disk('public')->delete($book->image_path);
         }

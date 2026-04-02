@@ -19,7 +19,7 @@ class Category extends Model
 
     /**
      * The "booted" method of the model.
-     * This automatically clears the global category cache anytime 
+     * This automatically clears the global category cache anytime
      * a category is created, updated, or deleted!
      */
     protected static function booted(): void

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -22,7 +23,7 @@ class HeroSlideController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100',
             'tag' => 'nullable|string|max:20',
             'title' => 'nullable|string|max:50',
             'order' => 'integer'
@@ -48,7 +49,7 @@ class HeroSlideController extends Controller
     public function update(Request $request, HeroSlide $heroSlide)
     {
         $request->validate([
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=100,min_height=100',
             'tag' => 'nullable|string|max:20',
             'title' => 'nullable|string|max:50',
             'order' => 'integer'
