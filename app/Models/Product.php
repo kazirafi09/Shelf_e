@@ -28,6 +28,26 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function approvedReviews()
+    {
+        return $this->hasMany(Review::class)->approved();
+    }
+
+    public function previews()
+    {
+        return $this->hasMany(ProductPreview::class)->orderBy('sort_order');
+    }
     public function getDisplayPriceAttribute()
     {
         // If both exist, show the lowest price

@@ -14,11 +14,18 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\CoinController;
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\HeroSlideController;
+use App\Http\Controllers\Admin\AuthorController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\CoinController as AdminCoinController;
+use App\Http\Controllers\Admin\ProductPreviewController;
+use App\Http\Controllers\Admin\BookScraperController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -106,6 +113,12 @@ Route::middleware('auth')->group(function () {
     // Wishlist
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{product}/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+
+    // Reviews
+    Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+    // Wallet
+    Route::get('/wallet', [CoinController::class, 'index'])->name('wallet.index');
 });
 
 /*
@@ -135,6 +148,28 @@ Route::prefix('admin')
         Route::get('/books/{id}/edit', [AdminBookController::class, 'edit'])->name('books.edit');
         Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
         Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
+
+        // Authors — search route must be above the resource to avoid {author} capture
+        Route::get('/authors/search', [AuthorController::class, 'search'])->name('authors.search');
+        Route::resource('authors', AuthorController::class);
+
+        // Reviews
+        Route::resource('reviews', AdminReviewController::class)->only(['index']);
+        Route::put('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+        Route::put('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
+
+        // Coins
+        Route::get('/coins', [AdminCoinController::class, 'index'])->name('coins.index');
+        Route::post('/coins/{user}/adjust', [AdminCoinController::class, 'adjust'])->name('coins.adjust');
+
+        // Product Previews
+        Route::post('/products/{product}/previews', [ProductPreviewController::class, 'store'])->name('product-previews.store');
+        Route::delete('/previews/{preview}', [ProductPreviewController::class, 'destroy'])->name('product-previews.destroy');
+
+        // Book Scraper
+        Route::get('/scraper', [BookScraperController::class, 'index'])->name('scraper.index');
+        Route::post('/scraper/search', [BookScraperController::class, 'search'])->name('scraper.search');
+        Route::post('/scraper/import', [BookScraperController::class, 'import'])->name('scraper.import');
     });
 
 require __DIR__.'/auth.php';

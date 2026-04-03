@@ -1,7 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container px-4 py-8 mx-auto" x-data="{ shipping: {{ old('delivery', 'express') === 'standard' ? 60 : 150 }} }">
+<div class="container px-4 py-8 mx-auto" x-data="{
+    shipping: {{ old('delivery', 'express') === 'standard' ? 60 : 150 }},
+    subtotal: {{ $subtotal }},
+    availableCoins: {{ auth()->check() ? auth()->user()->coin_balance : 0 }},
+    redeemCoins: false,
+    get coinsToApply() {
+        return Math.min(this.availableCoins, this.subtotal + this.shipping);
+    },
+    get grandTotal() {
+        return this.subtotal + this.shipping - (this.redeemCoins ? this.coinsToApply : 0);
+    }
+}">
     
     <div class="mb-8 text-sm text-gray-500">
         <a href="/" class="hover:text-orange-500">Home</a> <span class="mx-2">></span> 
@@ -140,6 +151,11 @@
                     <label for="terms" class="text-sm text-gray-600">I accept the terms of <a href="#" class="underline text-cyan-600">Privacy Policy</a></label>
                 </div>
 
+                {{-- Hidden redeem_coins flag — only submitted when the toggle is on --}}
+                <template x-if="redeemCoins">
+                    <input type="hidden" name="redeem_coins" value="1">
+                </template>
+
                 <button type="submit" class="w-full px-12 py-4 font-bold text-white transition bg-orange-500 rounded-lg shadow-lg hover:bg-orange-600 md:w-auto">
                     Confirm Order
                 </button>
@@ -206,9 +222,47 @@
                             <span>Shipping</span>
                             <span class="font-medium text-cyan-600">+৳ <span x-text="shipping"></span></span>
                         </div>
+
+                        {{-- Redeem Coins toggle (auth users with a balance only) --}}
+                        @auth
+                        <div x-show="availableCoins > 0"
+                             class="pt-3 mt-1 border-t border-dashed border-gray-200">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <div class="relative mt-0.5 shrink-0">
+                                    <input type="checkbox" x-model="redeemCoins" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-gray-200 rounded-full transition-colors peer-checked:bg-amber-500"></div>
+                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 transition-colors">
+                                        Redeem Coins
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        You have
+                                        <span class="font-bold text-amber-600" x-text="availableCoins.toLocaleString()"></span>
+                                        coins available
+                                        (<span x-text="'৳ ' + coinsToApply.toLocaleString()"></span> discount)
+                                    </p>
+                                </div>
+                            </label>
+
+                            <div x-show="redeemCoins"
+                                 x-transition:enter="transition ease-out duration-150"
+                                 x-transition:enter-start="opacity-0 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 translate-y-0"
+                                 class="flex justify-between mt-2 text-sm text-gray-600"
+                                 style="display: none;">
+                                <span class="text-amber-700 font-medium">Coin Discount</span>
+                                <span class="font-bold text-amber-700">
+                                    −৳ <span x-text="coinsToApply.toLocaleString()"></span>
+                                </span>
+                            </div>
+                        </div>
+                        @endauth
+
                         <div class="flex justify-between pt-4 mt-2 text-xl font-bold text-gray-900 border-t border-gray-200">
                             <span>Total</span>
-                            <span class="text-orange-600">৳ <span x-text="{{ $subtotal }} + shipping"></span></span>
+                            <span class="text-orange-600">৳ <span x-text="grandTotal.toLocaleString()"></span></span>
                         </div>
                     </div>
                 @else

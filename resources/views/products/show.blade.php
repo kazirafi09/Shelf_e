@@ -11,7 +11,7 @@
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
         
-        <div class="lg:col-span-3">
+        <div class="lg:col-span-3" x-data="{ openPeekInside: false, currentIndex: 0, total: {{ $product->previews->count() }} }">
             @auth
                 @php
                     $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
@@ -39,7 +39,139 @@
                     Cover Image
                 @endif
             </div>
-            
+
+            @if($product->previews->isNotEmpty())
+                <button
+                    @click="openPeekInside = true; currentIndex = 0"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 text-sm font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-xl transition-colors active:scale-95 mb-4"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    Peek Inside
+                    <span class="px-1.5 py-0.5 text-xs bg-cyan-100 rounded-md">{{ $product->previews->count() }}</span>
+                </button>
+
+                {{-- ======================================================
+                     Peek Inside Lightbox
+                     Fixed overlay — position takes it out of normal flow
+                     ====================================================== --}}
+                <div
+                    x-show="openPeekInside"
+                    x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-150"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    @keydown.escape.window="openPeekInside = false"
+                    @click.self="openPeekInside = false"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+                    style="display: none;"
+                >
+                    {{-- Modal panel --}}
+                    <div
+                        x-show="openPeekInside"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="relative flex flex-col items-center w-full max-w-3xl max-h-[90vh]"
+                    >
+                        {{-- Close button --}}
+                        <button
+                            @click="openPeekInside = false"
+                            class="absolute -top-10 right-0 flex items-center justify-center w-9 h-9 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                            aria-label="Close"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+
+                        {{-- Media slides --}}
+                        <div class="relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl">
+                            @foreach($product->previews as $preview)
+                            <div
+                                x-show="currentIndex === {{ $loop->index }}"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="flex items-center justify-center w-full"
+                                style="display: none;"
+                            >
+                                @if($preview->type === 'image')
+                                    <img
+                                        src="{{ asset('storage/' . $preview->path) }}"
+                                        alt="Preview {{ $loop->iteration }}"
+                                        class="object-contain w-full max-h-[75vh] rounded-2xl"
+                                    >
+                                @else
+                                    <video
+                                        src="{{ asset('storage/' . $preview->path) }}"
+                                        controls
+                                        class="w-full max-h-[75vh] rounded-2xl"
+                                    ></video>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Navigation + counter --}}
+                        @if($product->previews->count() > 1)
+                        <div class="flex items-center justify-between w-full mt-4 px-1">
+                            <button
+                                @click="currentIndex = (currentIndex - 1 + total) % total"
+                                class="flex items-center justify-center w-10 h-10 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                                aria-label="Previous"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+
+                            <span class="text-sm font-semibold text-white/70">
+                                <span x-text="currentIndex + 1"></span>
+                                <span class="text-white/40">/</span>
+                                {{ $product->previews->count() }}
+                            </span>
+
+                            <button
+                                @click="currentIndex = (currentIndex + 1) % total"
+                                class="flex items-center justify-center w-10 h-10 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                                aria-label="Next"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        {{-- Dot indicators --}}
+                        <div class="flex items-center gap-1.5 mt-3">
+                            @foreach($product->previews as $preview)
+                            <button
+                                @click="currentIndex = {{ $loop->index }}"
+                                :class="currentIndex === {{ $loop->index }} ? 'bg-white w-4' : 'bg-white/30 w-2'"
+                                class="h-2 rounded-full transition-all duration-200"
+                                aria-label="Go to slide {{ $loop->iteration }}"
+                            ></button>
+                            @endforeach
+                        </div>
+                        @endif
+
+                    </div>
+                </div>
+            @endif
+
             </div>
 
         <div class="lg:col-span-6">
@@ -86,7 +218,7 @@
                         <p>Learn more about {{ $product->author }}...</p>
                     </div>
                     <div x-show="activeTab === 'reviews'" x-cloak x-transition.opacity>
-                        <p>Customer reviews will appear here.</p>
+                        <p class="text-sm text-gray-500">See the <a href="#customer-reviews" class="text-cyan-600 hover:underline font-medium">Customer Reviews</a> section below.</p>
                     </div>
                 </div>
             </div>
@@ -199,5 +331,175 @@
             </div>
         </div>
     </div>
+
+    {{-- ============================================================ --}}
+    {{-- Customer Reviews                                             --}}
+    {{-- ============================================================ --}}
+    <section id="customer-reviews" class="mt-16 pt-10 border-t border-gray-100">
+
+        <div
+            x-data="{ showReviewForm: false }"
+            class="max-w-3xl"
+        >
+            {{-- Section header --}}
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Customer Reviews</h2>
+                    <p class="mt-0.5 text-sm text-gray-500">
+                        {{ $product->approvedReviews->count() }}
+                        {{ Str::plural('review', $product->approvedReviews->count()) }}
+                    </p>
+                </div>
+
+                @auth
+                    <button
+                        @click="showReviewForm = !showReviewForm"
+                        :class="showReviewForm
+                            ? 'bg-gray-100 text-gray-700'
+                            : 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg shadow-cyan-600/20'"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all active:scale-95"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H9v-2.414A2 2 0 019.586 13z"/>
+                        </svg>
+                        <span x-text="showReviewForm ? 'Cancel' : 'Write a Review'"></span>
+                    </button>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-cyan-600 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-xl transition-colors">
+                        Log in to review
+                    </a>
+                @endauth
+            </div>
+
+            {{-- Write a Review Form --}}
+            @auth
+            <div
+                x-show="showReviewForm"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 -translate-y-2"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                class="mb-10 p-6 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5"
+                style="display: none;"
+            >
+                <h3 class="mb-5 text-base font-bold text-gray-900">Your Review</h3>
+
+                <form action="{{ route('reviews.store', $product) }}" method="POST" class="space-y-5">
+                    @csrf
+
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold text-gray-700">Rating</label>
+                        <select name="rating" required
+                                class="block w-40 text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">
+                            <option value="">Pick a rating…</option>
+                            <option value="5">★★★★★ — Excellent</option>
+                            <option value="4">★★★★☆ — Good</option>
+                            <option value="3">★★★☆☆ — Average</option>
+                            <option value="2">★★☆☆☆ — Poor</option>
+                            <option value="1">★☆☆☆☆ — Terrible</option>
+                        </select>
+                        @error('rating')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold text-gray-700">
+                            Title <span class="font-normal text-gray-400">(optional)</span>
+                        </label>
+                        <input type="text" name="title" value="{{ old('title') }}"
+                               placeholder="Summarise your experience…"
+                               class="block w-full text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">
+                        @error('title')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold text-gray-700">Review</label>
+                        <textarea name="body" rows="4" required
+                                  placeholder="What did you think of this book?"
+                                  class="block w-full text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">{{ old('body') }}</textarea>
+                        @error('body')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end gap-3 pt-2">
+                        <button type="button" @click="showReviewForm = false"
+                                class="text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-6 py-2.5 text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors active:scale-95">
+                            Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+            @endauth
+
+            {{-- Success flash --}}
+            @if(session('success'))
+                <div class="mb-6 p-4 text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-xl">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Reviews list --}}
+            @if($product->approvedReviews->isEmpty())
+                <div class="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl ring-1 ring-gray-900/5">
+                    <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <p class="font-semibold text-gray-700">Be the first to review this book!</p>
+                    <p class="mt-1 text-sm text-gray-400">Share your thoughts with other readers.</p>
+                </div>
+            @else
+                <div class="space-y-5">
+                    @foreach($product->approvedReviews as $review)
+                    <article class="p-6 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5">
+
+                        {{-- Stars + meta --}}
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <div class="flex items-center gap-0.5">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-amber-400' : 'text-gray-200' }}"
+                                         fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                @endfor
+                            </div>
+
+                            @if($review->is_verified_purchase)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Verified Purchase
+                                </span>
+                            @endif
+
+                            <span class="ml-auto text-xs text-gray-400">
+                                {{ $review->user?->name ?? 'Anonymous' }} &middot; {{ $review->created_at->format('M d, Y') }}
+                            </span>
+                        </div>
+
+                        {{-- Title + body --}}
+                        @if($review->title)
+                            <p class="mb-1 text-sm font-bold text-gray-900">{{ $review->title }}</p>
+                        @endif
+                        <p class="text-sm leading-relaxed text-gray-600">{{ $review->body }}</p>
+
+                    </article>
+                    @endforeach
+                </div>
+            @endif
+
+        </div>
+    </section>
+
 </div>
 @endsection

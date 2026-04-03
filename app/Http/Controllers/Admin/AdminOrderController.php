@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Order;
 
 class AdminOrderController extends Controller
@@ -23,7 +24,7 @@ class AdminOrderController extends Controller
         $order = Order::findOrFail($id);
 
         // FIX A-5: Require explicit policy authorization before modifying
-        $this->authorize('update', $order);
+        Gate::authorize('update', $order);
 
         $request->validate([
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled'

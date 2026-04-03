@@ -46,6 +46,27 @@
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     Manage Slides
                 </a>
+
+                {{-- V2 Links --}}
+                <a href="{{ route('admin.authors.index') }}" class="flex items-center px-4 py-3 font-medium transition rounded-lg {{ request()->routeIs('admin.authors.*') ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    Authors
+                </a>
+
+                <a href="{{ route('admin.reviews.index') }}" class="flex items-center px-4 py-3 font-medium transition rounded-lg {{ request()->routeIs('admin.reviews.*') ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Reviews
+                </a>
+
+                <a href="{{ route('admin.coins.index') }}" class="flex items-center px-4 py-3 font-medium transition rounded-lg {{ request()->routeIs('admin.coins.*') ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Coin Ledger
+                </a>
+
+                <a href="{{ route('admin.scraper.index') }}" class="flex items-center px-4 py-3 font-medium transition rounded-lg {{ request()->routeIs('admin.scraper.*') ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    Book Scraper
+                </a>
             </div>
 
             <form method="POST" action="{{ route('logout') }}" class="pt-10 pb-6 mt-auto">

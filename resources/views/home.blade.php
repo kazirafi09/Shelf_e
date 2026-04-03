@@ -259,11 +259,17 @@
                 </div>
                 
                 <a href="/product/{{ $book->slug }}" class="z-10 block grow">
-                    <div class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg">
+                    <div
+                        x-data="{ zoomed: false }"
+                        @mouseenter="zoomed = true"
+                        @mouseleave="zoomed = false"
+                        class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg"
+                    >
                         <div class="absolute inset-0 z-10 transition-opacity duration-300 pointer-events-none bg-black/0 group-hover:bg-black/5"></div>
                         @if($book->image_path)
-                            {{-- FIX 3.3 (from earlier): Added loading="lazy" to the images here just in case! --}}
-                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy" class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
+                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
+                                 class="object-cover w-full h-full transition-transform duration-300"
+                                 :class="{ 'scale-125 z-10': zoomed }">
                         @else
                             <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
                         @endif

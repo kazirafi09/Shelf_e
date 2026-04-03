@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'coin_balance',
     ];
 
     public function isAdmin()
@@ -60,6 +61,17 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'coin_balance' => 'integer',
         ];
+    }
+
+    public function coinLedger()
+    {
+        return $this->hasMany(CoinLedger::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

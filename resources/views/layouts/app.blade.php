@@ -243,6 +243,7 @@
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 translate-y-0"
                          x-transition:leave-end="opacity-0 -translate-y-1"
+                         style="display: none;"
                          class="pb-2 pl-6 mt-1 space-y-3">
                         @if(isset($globalCategories))
                             @foreach($globalCategories as $category)
