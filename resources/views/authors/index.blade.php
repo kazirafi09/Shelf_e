@@ -22,16 +22,20 @@
         </div>
 
         <!-- Search -->
-        <div class="relative w-full md:w-80">
-            <input 
-                type="text" 
+        <form method="GET" action="{{ route('authors.index') }}" class="relative w-full md:w-80">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
                 placeholder="Search authors..."
                 class="w-full py-2 pl-10 pr-4 transition border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
             >
-            <svg class="absolute w-5 h-5 text-gray-400 left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3m1.3-5.2a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-        </div>
+            <button type="submit" class="absolute left-3 top-2.5 text-gray-400 hover:text-cyan-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3m1.3-5.2a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </button>
+        </form>
     </div>
 
     <!-- Authors Grid -->
@@ -43,8 +47,16 @@
            class="relative p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm group rounded-2xl hover:shadow-xl hover:-translate-y-1">
 
             <!-- Avatar -->
-            <div class="flex items-center justify-center w-20 h-20 mb-4 text-3xl font-bold text-white rounded-full shadow-md bg-gradient-to-br from-cyan-500 to-blue-500">
-                {{ strtoupper(substr($author->author,0,1)) }}
+            <div class="w-32 h-32 mb-4 overflow-hidden rounded-full shadow-md shrink-0">
+                @if($author->photo_path)
+                    <img src="{{ asset('storage/' . $author->photo_path) }}"
+                         alt="{{ $author->author }}"
+                         class="object-cover w-full h-full">
+                @else
+                    <div class="flex items-center justify-center w-full h-full text-3xl font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-500">
+                        {{ strtoupper(substr($author->author, 0, 1)) }}
+                    </div>
+                @endif
             </div>
 
             <!-- Author Name -->

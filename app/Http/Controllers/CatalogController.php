@@ -188,15 +188,21 @@ class CatalogController extends Controller
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
     }
 
-    public function authors()
+    public function authors(Request $request)
     {
-        $authors = Product::select('author')
+        $authors = Product::select('products.author')
             ->selectRaw('count(*) as book_count')
-            ->whereNotNull('author')
-            ->where('author', '!=', '')
-            ->groupBy('author')
-            ->orderBy('author')
-            ->paginate(24);
+            ->selectRaw('MAX(authors.photo_path) as photo_path')
+            ->leftJoin('authors', 'products.author', '=', 'authors.name')
+            ->whereNotNull('products.author')
+            ->where('products.author', '!=', '')
+            ->when($request->filled('search'), function ($q) use ($request) {
+                $q->where('products.author', 'LIKE', '%' . $request->search . '%');
+            })
+            ->groupBy('products.author')
+            ->orderBy('products.author')
+            ->paginate(24)
+            ->withQueryString();
 
         return view('authors.index', compact('authors'));
     }

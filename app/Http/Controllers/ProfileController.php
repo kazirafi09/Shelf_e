@@ -12,11 +12,21 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display the user's profile form (Breeze default).
      */
     public function edit(Request $request): View
     {
         return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Display account settings inside the dashboard layout.
+     */
+    public function accountSettings(Request $request): View
+    {
+        return view('account.settings', [
             'user' => $request->user(),
         ]);
     }

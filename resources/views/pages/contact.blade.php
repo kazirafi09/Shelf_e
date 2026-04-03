@@ -44,7 +44,7 @@
             @endif
 
             {{-- Updated Form --}}
-            <form action="{{ route('contact.submit') }}" method="POST" class="space-y-5">
+            <form action="{{ route('contact.store') }}" method="POST" class="space-y-5">
                 @csrf
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>

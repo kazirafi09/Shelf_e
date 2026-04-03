@@ -11,6 +11,16 @@
     },
     get grandTotal() {
         return this.subtotal + this.shipping - (this.redeemCoins ? this.coinsToApply : 0);
+    },
+    fillAddress(addr) {
+        this.$refs.fieldName.value      = addr.name;
+        this.$refs.fieldEmail.value     = addr.email;
+        this.$refs.fieldAddress.value   = addr.address;
+        this.$refs.fieldDivision.value  = addr.division;
+        this.$refs.fieldDistrict.value  = addr.district;
+        this.$refs.fieldPostal.value    = addr.postal_code ?? '';
+        this.$refs.fieldPhone.value     = addr.phone;
+        this.$refs.fieldPhone.dispatchEvent(new Event('input'));
     }
 }">
     
@@ -51,6 +61,30 @@
                 <h2 class="mb-6 text-2xl font-bold text-gray-900">Address Details</h2>
 
                 @auth
+                    @if($savedAddresses->isNotEmpty())
+                        <div class="mb-6">
+                            <p class="mb-2 text-sm font-semibold text-gray-600">Autofill from saved address:</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($savedAddresses as $addr)
+                                    <button type="button"
+                                            @click="fillAddress({{ json_encode(['name' => $addr->name, 'email' => $addr->email, 'address' => $addr->address, 'division' => $addr->division, 'district' => $addr->district, 'postal_code' => $addr->postal_code, 'phone' => $addr->phone]) }})"
+                                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-lg hover:bg-cyan-100 transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        {{ $addr->label }}
+                                        @if($addr->is_default)
+                                            <span class="text-[10px] text-cyan-500">(default)</span>
+                                        @endif
+                                    </button>
+                                @endforeach
+                                <a href="{{ route('addresses.index') }}" class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-500 border border-gray-200 rounded-lg hover:text-gray-700 hover:bg-gray-50 transition-colors">
+                                    Manage
+                                </a>
+                            </div>
+                        </div>
+                    @endif
+                @endauth
+
+                @auth
                     @if($lastOrder)
                         <div class="flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium text-cyan-800 border border-cyan-200 rounded-lg bg-cyan-50">
                             <svg class="w-4 h-4 shrink-0 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
@@ -62,21 +96,21 @@
                 <div class="mb-10 space-y-4">
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
-                        <input type="text" name="name" value="{{ $prefillName }}" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="text" name="name" x-ref="fieldName" value="{{ $prefillName }}" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Email Address (For Order Updates)</label>
-                        <input type="email" name="email" value="{{ $prefillEmail }}" placeholder="guest@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="email" name="email" x-ref="fieldEmail" value="{{ $prefillEmail }}" placeholder="guest@example.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
                     <div>
                         <label class="block mb-1 text-sm font-medium text-gray-700">Detailed Address</label>
-                        <input type="text" name="address" value="{{ $prefillAddress }}" placeholder="House #, Street, Apartment..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <input type="text" name="address" x-ref="fieldAddress" value="{{ $prefillAddress }}" placeholder="House #, Street, Apartment..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">Division</label>
-                            <select name="division" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                            <select name="division" x-ref="fieldDivision" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                                 @foreach(['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Mymensingh'] as $div)
                                     <option value="{{ $div }}" {{ $prefillDivision === $div ? 'selected' : '' }}>{{ $div }}</option>
                                 @endforeach
@@ -84,11 +118,11 @@
                         </div>
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">District</label>
-                            <input type="text" name="district" value="{{ $prefillDistrict }}" placeholder="e.g. Dhaka City" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                            <input type="text" name="district" x-ref="fieldDistrict" value="{{ $prefillDistrict }}" placeholder="e.g. Dhaka City" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
                         </div>
                         <div>
                             <label class="block mb-1 text-sm font-medium text-gray-700">Postal Code</label>
-                            <input type="text" name="postal_code" value="{{ $prefillPostal }}" placeholder="Enter Code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
+                            <input type="text" name="postal_code" x-ref="fieldPostal" value="{{ $prefillPostal }}" placeholder="Enter Code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
                         </div>
                     </div>
 
@@ -97,7 +131,7 @@
                         <label class="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
                         <div class="flex">
                             <span class="inline-flex items-center px-3 font-bold text-gray-500 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50">+880</span>
-                            <input type="text" name="phone" x-model="phone"
+                            <input type="text" name="phone" x-ref="fieldPhone" x-model="phone"
                                    placeholder="1XXXXXXXXX"
                                    maxlength="10"
                                    inputmode="numeric"
@@ -223,39 +257,53 @@
                             <span class="font-medium text-cyan-600">+৳ <span x-text="shipping"></span></span>
                         </div>
 
-                        {{-- Redeem Coins toggle (auth users with a balance only) --}}
+                        {{-- Redeem Coins (authenticated users only) --}}
                         @auth
-                        <div x-show="availableCoins > 0"
-                             class="pt-3 mt-1 border-t border-dashed border-gray-200">
-                            <label class="flex items-start gap-3 cursor-pointer group">
-                                <div class="relative mt-0.5 shrink-0">
-                                    <input type="checkbox" x-model="redeemCoins" class="sr-only peer">
-                                    <div class="w-10 h-6 bg-gray-200 rounded-full transition-colors peer-checked:bg-amber-500"></div>
-                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                        <div class="pt-3 mt-1 border-t border-dashed border-gray-200">
+                            <div x-show="availableCoins > 0">
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <div class="relative mt-0.5 shrink-0">
+                                        <input type="checkbox" x-model="redeemCoins" class="sr-only peer">
+                                        <div class="w-10 h-6 bg-gray-200 rounded-full transition-colors peer-checked:bg-amber-500"></div>
+                                        <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 transition-colors">
+                                            Redeem Coins
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            You have
+                                            <span class="font-bold text-amber-600" x-text="availableCoins.toLocaleString()"></span>
+                                            coins &mdash; saves
+                                            <span class="font-bold text-amber-600" x-text="'৳ ' + coinsToApply.toLocaleString()"></span>
+                                        </p>
+                                    </div>
+                                </label>
+
+                                <div x-show="redeemCoins"
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 -translate-y-1"
+                                     x-transition:enter-end="opacity-100 translate-y-0"
+                                     class="flex justify-between mt-2 text-sm"
+                                     style="display: none;">
+                                    <span class="font-medium text-amber-700">Coin Discount</span>
+                                    <span class="font-bold text-amber-700">
+                                        −৳ <span x-text="coinsToApply.toLocaleString()"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div x-show="availableCoins === 0"
+                                 class="flex items-start gap-3"
+                                 style="display: none;">
+                                <div class="relative mt-0.5 shrink-0 opacity-40 cursor-not-allowed">
+                                    <div class="w-10 h-6 bg-gray-200 rounded-full"></div>
+                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"></div>
                                 </div>
                                 <div class="flex-1">
-                                    <p class="text-sm font-semibold text-gray-800 group-hover:text-amber-700 transition-colors">
-                                        Redeem Coins
-                                    </p>
-                                    <p class="text-xs text-gray-500">
-                                        You have
-                                        <span class="font-bold text-amber-600" x-text="availableCoins.toLocaleString()"></span>
-                                        coins available
-                                        (<span x-text="'৳ ' + coinsToApply.toLocaleString()"></span> discount)
-                                    </p>
+                                    <p class="text-sm font-semibold text-gray-400">Redeem Coins</p>
+                                    <p class="text-xs text-gray-400">You have 0 coins. Earn coins by placing orders!</p>
                                 </div>
-                            </label>
-
-                            <div x-show="redeemCoins"
-                                 x-transition:enter="transition ease-out duration-150"
-                                 x-transition:enter-start="opacity-0 -translate-y-1"
-                                 x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="flex justify-between mt-2 text-sm text-gray-600"
-                                 style="display: none;">
-                                <span class="text-amber-700 font-medium">Coin Discount</span>
-                                <span class="font-bold text-amber-700">
-                                    −৳ <span x-text="coinsToApply.toLocaleString()"></span>
-                                </span>
                             </div>
                         </div>
                         @endauth

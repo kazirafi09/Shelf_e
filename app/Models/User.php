@@ -70,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(CoinLedger::class);
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
     public function reviews()
     {
         return $this->hasMany(Review::class);

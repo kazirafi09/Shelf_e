@@ -180,8 +180,8 @@
                                 @mouseleave="zoomed = false"
                                 class="relative w-full aspect-[2/3] bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-400 overflow-hidden"
                             >
-                                @if($product->image)
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->title }}"
+                                @if($product->image_path)
+                                    <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}"
                                          class="object-cover w-full h-full transition-transform duration-300"
                                          :class="{ 'scale-125 z-10': zoomed }">
                                 @else

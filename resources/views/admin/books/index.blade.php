@@ -6,13 +6,14 @@
 @section('admin-content')
     {{-- Top Action Bar --}}
     <div class="flex flex-col gap-4 mb-8 sm:flex-row sm:items-center sm:justify-between">
-        <div class="relative w-full max-w-sm">
+        <form method="GET" action="{{ route('admin.books.index') }}" class="relative w-full max-w-sm">
             <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </span>
-            <input type="text" placeholder="Search by title or author..." 
+            <input type="text" name="search" value="{{ request('search') }}"
+                   placeholder="Search by title or author..."
                    class="block w-full py-2.5 pl-10 pr-3 text-sm border-gray-200 rounded-xl bg-white shadow-sm focus:border-cyan-500 focus:ring-cyan-500 transition-all">
-        </div>
+        </form>
         
         <a href="{{ route('admin.books.create') }}" 
            class="inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-white transition bg-orange-500 shadow-lg rounded-xl hover:bg-orange-600 shadow-orange-500/20 active:scale-95 shrink-0">

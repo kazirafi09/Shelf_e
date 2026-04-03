@@ -16,6 +16,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\CoinController;
+use App\Http\Controllers\AddressController;
 // Admin Controllers
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminBookController;
@@ -68,10 +69,6 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::view('/newsletter', 'pages.newsletter')->name('newsletter');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
-Route::get('/random-quote', function () {
-    return response()->json(Quote::inRandomOrder()->first());
-});
-
 /*
 |--------------------------------------------------------------------------
 | Cart Routes (Rate Limited)
@@ -119,6 +116,16 @@ Route::middleware('auth')->group(function () {
 
     // Wallet
     Route::get('/wallet', [CoinController::class, 'index'])->name('wallet.index');
+
+    // Saved Addresses
+    Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
+    Route::patch('/addresses/{address}/default', [AddressController::class, 'setDefault'])->name('addresses.default');
+
+    // Account Settings
+    Route::get('/account/settings', [ProfileController::class, 'accountSettings'])->name('account.settings');
 });
 
 /*

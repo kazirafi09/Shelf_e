@@ -180,6 +180,8 @@
                                     <input type="hidden" name="description"    :value="book.description">
                                     <input type="hidden" name="published_year" :value="book.published_year">
                                     <input type="hidden" name="cover_url"      :value="book.cover_url">
+                                    <input type="hidden" name="work_key"       :value="book.work_key">
+                                    <input type="hidden" name="subjects_json"  :value="JSON.stringify(book.subjects || [])">
                                     <button
                                         type="submit"
                                         class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white transition bg-cyan-600 rounded-lg hover:bg-cyan-700 active:scale-95"

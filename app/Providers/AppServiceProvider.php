@@ -23,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useTailwind();
+        Paginator::defaultView('vendor.pagination.custom');
+        Paginator::defaultSimpleView('vendor.pagination.simple-tailwind');
 
         // FIX 2.3: View Composer + Caching
         // 1. View::composer delays the query until a view actually needs it (protects Artisan commands).

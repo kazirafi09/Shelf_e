@@ -6,6 +6,7 @@ use App\Exceptions\InsufficientCoinsException;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\UserAddress;
 use App\Services\CoinService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,11 @@ class OrderController extends Controller
                 ->first(['name', 'email', 'phone', 'address', 'division', 'district', 'postal_code']);
         }
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder'));
+        $savedAddresses = auth()->check()
+            ? UserAddress::where('user_id', auth()->id())->orderByDesc('is_default')->orderBy('created_at')->get()
+            : collect();
+
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses'));
     }
 
     public function show($id)
