@@ -29,7 +29,7 @@
 
             <div>
                 <label for="name" class="block mb-1 text-sm font-bold text-foreground">
-                    Full Name <span class="text-red-500">*</span>
+                    Full Name <span class="text-destructive">*</span>
                 </label>
                 <input type="text" id="name" name="name" value="{{ old('name', $author->name) }}" required
                        placeholder="e.g. Gabriel García Márquez"
@@ -49,15 +49,15 @@
                     <div class="flex items-center gap-3 mb-3">
                         <img src="{{ asset('storage/' . $author->photo_path) }}"
                              alt="{{ $author->name }}"
-                             class="object-cover w-16 h-16 rounded-full ring-1 ring-gray-900/5">
+                             class="object-cover w-16 h-16 rounded-full border border-border">
                         <p class="text-xs text-muted-foreground">Current photo — upload a new file to replace it.</p>
                     </div>
                 @endif
                 <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp"
                        class="block w-full text-sm text-muted-foreground border border-input rounded-[var(--radius)] bg-background cursor-pointer
                               file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-lg
-                              file:text-sm file:font-bold file:bg-cyan-50 file:text-cyan-700
-                              hover:file:bg-cyan-100">
+                              file:text-sm file:font-bold file:bg-muted file:text-foreground
+                              hover:file:bg-muted/80">
                 <p class="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP. Max 2 MB. Leave blank to keep the current photo.</p>
             </div>
 
@@ -65,7 +65,7 @@
 
         <div class="flex items-center gap-4 pt-8 mt-8 border-t border-border">
             <button type="submit"
-                    class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white transition rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-95">
+                    class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>

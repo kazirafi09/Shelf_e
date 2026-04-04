@@ -58,7 +58,7 @@ class AdminBookController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'           => 'required|string|max:255',
+            'title'           => 'required|string|max:255|unique:products,title',
             'author'          => 'required|string|max:255',
             'paperback_price' => 'nullable|numeric|min:0',
             'hardcover_price' => 'nullable|numeric|min:0',
@@ -126,7 +126,7 @@ class AdminBookController extends Controller
         $book = Product::findOrFail($id);
 
         $request->validate([
-            'title'           => 'required|string|max:255',
+            'title'           => 'required|string|max:255|unique:products,title,' . $id,
             'author'          => 'required|string|max:255',
             'category_id'     => 'required|integer|exists:categories,id',
             'paperback_price' => 'nullable|numeric|min:0',

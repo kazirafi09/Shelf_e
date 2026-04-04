@@ -5,8 +5,8 @@
 
     <div class="mb-6 transition-all duration-700 ease-out transform md:mb-8"
          :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'">
-        <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">@yield('page-title', 'My Dashboard')</h1>
-        <p class="mt-1 text-sm font-medium text-gray-500">Welcome back, <span class="text-cyan-700">{{ auth()->user()->name }}</span>!</p>
+        <h1 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">@yield('page-title', 'My Dashboard')</h1>
+        <p class="mt-1 text-sm font-medium text-muted-foreground">Welcome back, <span class="text-cyan-700">{{ auth()->user()->name }}</span>!</p>
     </div>
 
     <div class="flex flex-col gap-6 md:flex-row md:gap-8">
@@ -51,9 +51,9 @@
                     <a href="{{ route($item['route']) }}"
                        class="flex items-center px-4 py-2.5 text-sm transition-all duration-300 rounded-xl md:py-3 md:text-base
                               {{ $active
-                                  ? 'font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 shadow-sm'
-                                  : 'font-medium text-gray-600 border border-gray-200 shadow-sm bg-white md:border-transparent md:shadow-none md:bg-transparent hover:text-cyan-700 hover:bg-gray-50' }}">
-                        <svg class="w-5 h-5 mr-2 md:mr-3 shrink-0 {{ $active ? 'text-cyan-500' : 'text-gray-400' }}"
+                                  ? 'font-bold text-sidebar-primary bg-sidebar-accent border border-sidebar-border shadow-sm'
+                                  : 'font-medium text-sidebar-foreground/70 border border-sidebar-border shadow-sm bg-sidebar md:border-transparent md:shadow-none md:bg-transparent hover:text-sidebar-accent-foreground hover:bg-sidebar-accent' }}">
+                        <svg class="w-5 h-5 mr-2 md:mr-3 shrink-0 {{ $active ? 'text-sidebar-primary' : 'text-sidebar-foreground/40' }}"
                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {!! $item['svg'] !!}
                         </svg>

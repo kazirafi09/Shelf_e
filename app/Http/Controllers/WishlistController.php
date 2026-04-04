@@ -10,7 +10,7 @@ class WishlistController extends Controller
     // 1. Show the user's wishlist page
     public function index()
     {
-        $wishlists = Wishlist::with('product')
+        $wishlists = Wishlist::with(['product' => fn($q) => $q->withAvg('approvedReviews', 'rating')])
             ->where('user_id', auth()->id())
             ->latest()
             ->get();

@@ -54,11 +54,11 @@
 >
 
     {{-- Search Bar --}}
-    <div class="p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+    <div class="p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
         <form @submit.prevent="search()" class="flex gap-3">
             <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
@@ -74,7 +74,7 @@
             <button
                 type="submit"
                 :disabled="isLoading || query.trim().length < 2"
-                class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white transition rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {{-- Spinner inside button --}}
                 <svg x-show="isLoading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -103,8 +103,8 @@
     </div>
 
     {{-- Empty State --}}
-    <div x-show="!isLoading && results.length === 0 && !error && query.length > 0" x-transition.opacity class="flex flex-col items-center justify-center py-20 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5" style="display: none;">
-        <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div x-show="!isLoading && results.length === 0 && !error && query.length > 0" x-transition.opacity class="flex flex-col items-center justify-center py-20 bg-card text-card-foreground border border-border rounded-2xl shadow-sm" style="display: none;">
+        <svg class="w-12 h-12 mb-3 text-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
         </svg>
@@ -112,7 +112,7 @@
     </div>
 
     {{-- Results Table --}}
-    <div x-show="results.length > 0" x-transition.opacity class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5" style="display: none;">
+    <div x-show="results.length > 0" x-transition.opacity class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl" style="display: none;">
 
         <div class="px-6 py-4 border-b border-border">
             <p class="text-sm font-semibold text-foreground">
@@ -139,12 +139,12 @@
                             <td class="px-6 py-4">
                                 <template x-if="book.cover_url">
                                     <img :src="book.cover_url" :alt="book.title"
-                                         class="object-cover w-10 h-14 rounded-md shadow-sm ring-1 ring-gray-900/5"
+                                         class="object-cover w-10 h-14 rounded-md shadow-sm border border-border"
                                          onerror="this.style.display='none'">
                                 </template>
                                 <template x-if="!book.cover_url">
-                                    <div class="flex items-center justify-center w-10 h-14 rounded-md bg-muted ring-1 ring-gray-900/5">
-                                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center justify-center w-10 h-14 rounded-md bg-muted border border-border">
+                                        <svg class="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                         </svg>
@@ -184,7 +184,7 @@
                                     <input type="hidden" name="subjects_json"  :value="JSON.stringify(book.subjects || [])">
                                     <button
                                         type="submit"
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white transition bg-cyan-600 rounded-lg hover:bg-cyan-700 active:scale-95"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95"
                                     >
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

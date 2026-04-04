@@ -20,10 +20,23 @@ class ReviewService
     public function approve(Review $review): void
     {
         $review->update(['status' => 'approved']);
+        $this->syncProductRating($review->product_id);
     }
 
     public function reject(Review $review): void
     {
         $review->update(['status' => 'rejected']);
+        $this->syncProductRating($review->product_id);
+    }
+
+    private function syncProductRating(int $productId): void
+    {
+        $avg = Review::where('product_id', $productId)
+            ->where('status', 'approved')
+            ->avg('rating');
+
+        Product::where('id', $productId)->update([
+            'rating' => $avg ? round($avg, 1) : 0,
+        ]);
     }
 }

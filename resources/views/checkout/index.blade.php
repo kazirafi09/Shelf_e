@@ -63,31 +63,45 @@
                 @auth
                     @if($savedAddresses->isNotEmpty())
                         <div class="mb-6">
-                            <p class="mb-2 text-sm font-semibold text-muted-foreground">Autofill from saved address:</p>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($savedAddresses as $addr)
-                                    <button type="button"
-                                            @click="fillAddress({{ json_encode(['name' => $addr->name, 'email' => $addr->email, 'address' => $addr->address, 'division' => $addr->division, 'district' => $addr->district, 'postal_code' => $addr->postal_code, 'phone' => $addr->phone]) }})"
-                                            class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-lg hover:bg-cyan-100 transition-colors">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                        {{ $addr->label }}
-                                        @if($addr->is_default)
-                                            <span class="text-[10px] text-cyan-500">(default)</span>
-                                        @endif
-                                    </button>
-                                @endforeach
-                                <a href="{{ route('addresses.index') }}" class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:text-foreground hover:bg-muted transition-colors">
+                            <label class="block mb-1.5 text-sm font-semibold text-foreground">
+                                Use a Saved Address
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <select
+                                    class="flex-1 px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg"
+                                    @change="
+                                        if ($event.target.value) {
+                                            fillAddress(JSON.parse($event.target.value));
+                                        }
+                                    ">
+                                    <option value="">— Choose a saved address —</option>
+                                    @foreach($savedAddresses as $addr)
+                                        <option value="{{ json_encode(['name' => $addr->name, 'email' => $addr->email, 'address' => $addr->address, 'division' => $addr->division, 'district' => $addr->district, 'postal_code' => $addr->postal_code, 'phone' => $addr->phone]) }}">
+                                            {{ $addr->label }}{{ $addr->is_default ? ' (default)' : '' }} — {{ $addr->address }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <a href="{{ route('addresses.index') }}"
+                                   class="shrink-0 px-3 py-2.5 text-xs font-medium text-muted-foreground border border-border rounded-lg hover:text-foreground hover:bg-muted transition-colors">
                                     Manage
                                 </a>
                             </div>
+                        </div>
+                    @else
+                        <div class="mb-6">
+                            <p class="text-sm text-muted-foreground">
+                                No saved addresses yet.
+                                <a href="{{ route('addresses.index') }}" class="font-semibold text-cyan-600 hover:underline">Add one</a>
+                                to speed up checkout next time.
+                            </p>
                         </div>
                     @endif
                 @endauth
 
                 @auth
                     @if($lastOrder)
-                        <div class="flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium text-cyan-800 border border-cyan-200 rounded-lg bg-cyan-50">
-                            <svg class="w-4 h-4 shrink-0 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
+                        <div class="flex items-center gap-2 px-4 py-2 mb-6 text-sm font-medium text-foreground border border-border rounded-lg bg-muted">
+                            <svg class="w-4 h-4 shrink-0 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/></svg>
                             We pre-filled your details from your last order. Feel free to update anything.
                         </div>
                     @endif
@@ -181,7 +195,7 @@
                 </div>
 
                 <div class="flex items-center mb-8 space-x-2">
-                    <input type="checkbox" id="terms" class="w-4 h-4 border-gray-300 rounded text-cyan-600 focus:ring-cyan-500" required>
+                    <input type="checkbox" id="terms" class="w-4 h-4 border-input rounded text-primary focus:ring-ring" required>
                     <label for="terms" class="text-sm text-muted-foreground">I accept the terms of <a href="#" class="underline text-cyan-600">Privacy Policy</a></label>
                 </div>
 
@@ -190,7 +204,7 @@
                     <input type="hidden" name="redeem_coins" value="1">
                 </template>
 
-                <button type="submit" class="w-full px-12 py-4 font-bold text-white transition bg-orange-500 rounded-lg shadow-lg hover:bg-orange-600 md:w-auto">
+                <button type="submit" class="w-full px-12 py-4 font-bold transition bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90 md:w-auto">
                     Confirm Order
                 </button>
             </form>
@@ -238,7 +252,7 @@
                                 
                                 <form action="{{ route('cart.remove', $id) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="text-gray-400 transition hover:text-red-500">
+                                    <button type="submit" class="text-muted-foreground transition hover:text-destructive">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </button>
                                 </form>
@@ -264,7 +278,7 @@
                                 <label class="flex items-start gap-3 cursor-pointer group">
                                     <div class="relative mt-0.5 shrink-0">
                                         <input type="checkbox" x-model="redeemCoins" class="sr-only peer">
-                                        <div class="w-10 h-6 bg-gray-200 rounded-full transition-colors peer-checked:bg-amber-500"></div>
+                                        <div class="w-10 h-6 bg-muted rounded-full transition-colors peer-checked:bg-amber-500"></div>
                                         <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
                                     </div>
                                     <div class="flex-1">
@@ -297,7 +311,7 @@
                                  class="flex items-start gap-3"
                                  style="display: none;">
                                 <div class="relative mt-0.5 shrink-0 opacity-40 cursor-not-allowed">
-                                    <div class="w-10 h-6 bg-gray-200 rounded-full"></div>
+                                    <div class="w-10 h-6 bg-muted rounded-full"></div>
                                     <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"></div>
                                 </div>
                                 <div class="flex-1">

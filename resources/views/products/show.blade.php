@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container px-4 py-8 mx-auto">
-    
+
     <div class="mb-8 text-sm text-muted-foreground">
         <a href="/" class="transition hover:text-orange-500">Home</a> <span class="mx-2">></span>
         <a href="{{ route('categories.index') }}" class="transition hover:text-orange-500">Categories</a> <span class="mx-2">></span>
@@ -10,7 +10,7 @@
     </div>
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
-        
+
         <div class="lg:col-span-3" x-data="{ openPeekInside: false, currentIndex: 0, total: {{ $product->previews->count() }} }">
             @auth
                 @php
@@ -20,18 +20,18 @@
                 @endphp
                 <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST" class="inline-block mb-4">
                     @csrf
-                    <button type="submit" class="flex items-center transition {{ $isWishlisted ? 'text-orange-500 font-bold' : 'text-gray-500 hover:text-orange-500' }}">
+                    <button type="submit" class="flex items-center transition {{ $isWishlisted ? 'text-orange-500 font-bold' : 'text-muted-foreground hover:text-orange-500' }}">
                         <svg class="w-5 h-5 mr-2 {{ $isWishlisted ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         {{ $isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="flex items-center mb-4 text-gray-500 transition hover:text-orange-500">
+                <a href="{{ route('login') }}" class="flex items-center mb-4 text-muted-foreground transition hover:text-orange-500">
                     <svg class="w-5 h-5 mr-2 fill-none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     Log in to Wishlist
                 </a>
             @endauth
-            
+
             <div class="w-full aspect-[2/3] bg-muted rounded-2xl flex items-center justify-center text-muted-foreground mb-4 shadow-xl overflow-hidden border border-border">
                 @if($product->image_path)
                     <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}" class="object-cover w-full h-full transition-transform duration-500 hover:scale-105">
@@ -185,11 +185,11 @@
             </div>
 
             <div class="flex items-center mb-8 space-x-2">
-                <span class="font-bold text-foreground">{{ number_format($product->rating, 1) }}</span>
+                <span class="font-bold text-foreground">{{ number_format($product->approved_reviews_avg_rating ?? 0, 1) }}</span>
                 <div class="flex text-yellow-400">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                 </div>
-                <span class="text-sm text-muted-foreground">({{ number_format($product->reviews_count ?? 0) }} ratings)</span>
+                <span class="text-sm text-muted-foreground">({{ number_format($product->approved_reviews_count ?? 0) }} ratings)</span>
             </div>
 
             <div class="grid grid-cols-2 pb-10 mb-10 text-sm border-b border-border gap-y-4 gap-x-8">
@@ -203,9 +203,9 @@
 
             <div x-data="{ activeTab: 'description' }">
                 <div class="flex mb-6 space-x-8 border-b border-border">
-                    <button @click="activeTab = 'description'" :class="activeTab === 'description' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">Description</button>
-                    <button @click="activeTab = 'author'" :class="activeTab === 'author' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">About Author</button>
-                    <button @click="activeTab = 'reviews'" :class="activeTab === 'reviews' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">Reviews</button>
+                    <button @click="activeTab = 'description'" :class="activeTab === 'description' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'" class="pb-3 font-medium transition border-b-2">Description</button>
+                    <button @click="activeTab = 'author'" :class="activeTab === 'author' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'" class="pb-3 font-medium transition border-b-2">About Author</button>
+                    <button @click="activeTab = 'reviews'" :class="activeTab === 'reviews' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'" class="pb-3 font-medium transition border-b-2">Reviews</button>
                 </div>
 
                 <div class="leading-relaxed prose text-foreground max-w-none">
@@ -218,7 +218,7 @@
                         <p>Learn more about {{ $product->author }}...</p>
                     </div>
                     <div x-show="activeTab === 'reviews'" x-cloak x-transition.opacity>
-                        <p class="text-sm text-gray-500">See the <a href="#customer-reviews" class="text-cyan-600 hover:underline font-medium">Customer Reviews</a> section below.</p>
+                        <p class="text-sm text-muted-foreground">See the <a href="#customer-reviews" class="text-cyan-600 hover:underline font-medium">Customer Reviews</a> section below.</p>
                     </div>
                 </div>
             </div>
@@ -231,13 +231,13 @@
                 quantity: 1,
                 actionType: 'add_to_cart',
                 loading: false,
-                
+
                 // Intelligently set default format based on what is available
                 format: '{{ $product->paperback_price ? 'paperback' : ($product->hardcover_price ? 'hardcover' : '') }}',
-                
+
                 get hasPaperback() { return this.paperbackPrice !== null; },
                 get hasHardcover() { return this.hardcoverPrice !== null; },
-                
+
                 get currentPrice() {
                     return this.format === 'paperback' ? this.paperbackPrice : this.hardcoverPrice;
                 },
@@ -250,41 +250,41 @@
                 }
             }">
                 <div class="p-8 mb-10 bg-card text-card-foreground border border-border shadow-2xl rounded-3xl">
-                    
+
                     <div class="flex mb-8 space-x-3 text-center">
-                        <button type="button" 
-                            @click="if(hasPaperback) format = 'paperback'" 
+                        <button type="button"
+                            @click="if(hasPaperback) format = 'paperback'"
                             :disabled="!hasPaperback"
                             :class="{
-                                'border-cyan-500 bg-cyan-50 ring-1 ring-cyan-500 cursor-pointer': format === 'paperback' && hasPaperback,
-                                'border-gray-200 bg-white hover:border-cyan-300 cursor-pointer': format !== 'paperback' && hasPaperback,
-                                'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed': !hasPaperback
+                                'border-primary bg-primary/5 ring-1 ring-primary cursor-pointer': format === 'paperback' && hasPaperback,
+                                'border-border bg-background hover:border-primary/50 cursor-pointer': format !== 'paperback' && hasPaperback,
+                                'border-border bg-muted opacity-50 cursor-not-allowed': !hasPaperback
                             }"
                             class="flex-1 p-3 text-left transition border rounded-xl">
                             <span class="block text-sm text-muted-foreground">Paperback</span>
                             <template x-if="hasPaperback">
-                                <span class="font-bold text-gray-900" x-text="'৳ ' + formatPrice(paperbackPrice)"></span>
+                                <span class="font-bold text-foreground" x-text="'৳ ' + formatPrice(paperbackPrice)"></span>
                             </template>
                             <template x-if="!hasPaperback">
-                                <span class="text-sm font-medium text-gray-400">Unavailable</span>
+                                <span class="text-sm font-medium text-muted-foreground">Unavailable</span>
                             </template>
                         </button>
 
-                        <button type="button" 
-                            @click="if(hasHardcover) format = 'hardcover'" 
+                        <button type="button"
+                            @click="if(hasHardcover) format = 'hardcover'"
                             :disabled="!hasHardcover"
                             :class="{
-                                'border-cyan-500 bg-cyan-50 ring-1 ring-cyan-500 cursor-pointer': format === 'hardcover' && hasHardcover,
-                                'border-gray-200 bg-white hover:border-cyan-300 cursor-pointer': format !== 'hardcover' && hasHardcover,
-                                'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed': !hasHardcover
+                                'border-primary bg-primary/5 ring-1 ring-primary cursor-pointer': format === 'hardcover' && hasHardcover,
+                                'border-border bg-background hover:border-primary/50 cursor-pointer': format !== 'hardcover' && hasHardcover,
+                                'border-border bg-muted opacity-50 cursor-not-allowed': !hasHardcover
                             }"
                             class="flex-1 p-3 text-left transition border rounded-xl">
                             <span class="block text-sm text-muted-foreground">Hardcover</span>
                             <template x-if="hasHardcover">
-                                <span class="font-bold text-gray-900" x-text="'৳ ' + formatPrice(hardcoverPrice)"></span>
+                                <span class="font-bold text-foreground" x-text="'৳ ' + formatPrice(hardcoverPrice)"></span>
                             </template>
                             <template x-if="!hasHardcover">
-                                <span class="text-sm font-medium text-gray-400">Unavailable</span>
+                                <span class="text-sm font-medium text-muted-foreground">Unavailable</span>
                             </template>
                         </button>
                     </div>
@@ -306,22 +306,22 @@
                         <input type="hidden" name="format" x-model="format">
                         <input type="hidden" name="quantity" x-model="quantity">
                         <input type="hidden" name="action_type" x-model="actionType">
-                        
+
                         <div class="space-y-3">
-                            <button type="submit" 
+                            <button type="submit"
                                     @click="actionType = 'buy_now'"
-                                    :disabled="loading || (!hasPaperback && !hasHardcover)" 
-                                    class="w-full py-4 font-bold text-white transition bg-orange-500 shadow-lg rounded-xl shadow-orange-500/30 hover:bg-orange-600 hover:shadow-orange-600/40 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    :disabled="loading || (!hasPaperback && !hasHardcover)"
+                                    class="w-full py-4 font-bold transition bg-primary text-primary-foreground shadow-sm rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
                                 Buy Now
                             </button>
-                            
-                            <button type="submit" 
+
+                            <button type="submit"
                                     @click="actionType = 'add_to_cart'"
-                                    :disabled="loading || (!hasPaperback && !hasHardcover)" 
-                                    class="w-full py-4 font-bold text-orange-500 transition bg-white border-2 border-orange-100 shadow-sm rounded-xl hover:bg-orange-50 hover:border-orange-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    :disabled="loading || (!hasPaperback && !hasHardcover)"
+                                    class="w-full py-4 font-bold transition bg-background text-foreground border-2 border-input shadow-sm rounded-xl hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span x-show="!loading">Add to Cart</span>
                                 <span x-show="loading" x-cloak class="flex items-center justify-center">
-                                    <svg class="w-5 h-5 mr-3 -ml-1 text-orange-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <svg class="w-5 h-5 mr-3 -ml-1 text-foreground animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     Processing...
                                 </span>
                             </button>
@@ -355,8 +355,8 @@
                     <button
                         @click="showReviewForm = !showReviewForm"
                         :class="showReviewForm
-                            ? 'bg-gray-100 text-gray-700'
-                            : 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg shadow-cyan-600/20'"
+                            ? 'bg-muted text-muted-foreground'
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'"
                         class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all active:scale-95"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,7 +380,7 @@
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 -translate-y-2"
                 x-transition:enter-end="opacity-100 translate-y-0"
-                class="mb-10 p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5"
+                class="mb-10 p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm"
                 style="display: none;"
             >
                 <h3 class="mb-5 text-base font-bold text-foreground">Your Review</h3>
@@ -432,7 +432,7 @@
                             Cancel
                         </button>
                         <button type="submit"
-                                class="px-6 py-2.5 text-sm font-bold text-white bg-cyan-600 hover:bg-cyan-700 rounded-xl transition-colors active:scale-95">
+                                class="px-6 py-2.5 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl transition-colors active:scale-95">
                             Submit Review
                         </button>
                     </div>
@@ -449,8 +449,8 @@
 
             {{-- Reviews list --}}
             @if($product->approvedReviews->isEmpty())
-                <div class="flex flex-col items-center justify-center py-16 text-center bg-card text-card-foreground border border-border rounded-2xl ring-1 ring-gray-900/5">
-                    <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex flex-col items-center justify-center py-16 text-center bg-card text-card-foreground border border-border rounded-2xl">
+                    <svg class="w-12 h-12 mb-3 text-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
@@ -460,13 +460,13 @@
             @else
                 <div class="space-y-5">
                     @foreach($product->approvedReviews as $review)
-                    <article class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5">
+                    <article class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
 
                         {{-- Stars + meta --}}
                         <div class="flex flex-wrap items-center gap-2 mb-3">
                             <div class="flex items-center gap-0.5">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-amber-400' : 'text-gray-200' }}"
+                                    <svg class="w-4 h-4 {{ $i <= $review->rating ? 'text-amber-400' : 'text-border' }}"
                                          fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                     </svg>

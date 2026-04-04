@@ -16,17 +16,17 @@
     class="space-y-6"
 >
     {{-- Tab Bar --}}
-    <div class="flex space-x-1 bg-background border border-border rounded-xl shadow-sm ring-1 ring-gray-900/5 p-1 w-fit">
+    <div class="flex space-x-1 bg-background border border-border rounded-xl shadow-sm p-1 w-fit">
         <button
             @click="activeTab = 'pending'"
             :class="activeTab === 'pending'
                 ? 'bg-amber-500 text-white shadow'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
             class="flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
         >
             Pending
             <span
-                :class="activeTab === 'pending' ? 'bg-amber-400/50' : 'bg-gray-100 text-gray-600'"
+                :class="activeTab === 'pending' ? 'bg-amber-400/50' : 'bg-muted text-muted-foreground'"
                 class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full"
             >{{ $pending->count() }}</span>
         </button>
@@ -34,25 +34,25 @@
             @click="activeTab = 'approved'"
             :class="activeTab === 'approved'
                 ? 'bg-emerald-500 text-white shadow'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
             class="flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
         >
             Approved
             <span
-                :class="activeTab === 'approved' ? 'bg-emerald-400/50' : 'bg-gray-100 text-gray-600'"
+                :class="activeTab === 'approved' ? 'bg-emerald-400/50' : 'bg-muted text-muted-foreground'"
                 class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full"
             >{{ $approved->count() }}</span>
         </button>
         <button
             @click="activeTab = 'rejected'"
             :class="activeTab === 'rejected'
-                ? 'bg-red-500 text-white shadow'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
+                ? 'bg-destructive text-destructive-foreground shadow'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
             class="flex items-center gap-2 px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
         >
             Rejected
             <span
-                :class="activeTab === 'rejected' ? 'bg-red-400/50' : 'bg-gray-100 text-gray-600'"
+                :class="activeTab === 'rejected' ? 'bg-white/20' : 'bg-muted text-muted-foreground'"
                 class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full"
             >{{ $rejected->count() }}</span>
         </button>

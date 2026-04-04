@@ -53,9 +53,13 @@ class CatalogController extends Controller
 
     public function home()
     {
-        $data = Cache::remember('homepage_data', 300, function () {
+        $data = Cache::remember('homepage_data_v2', 300, function () {
             return [
-                'topBooks' => Product::orderBy('rating', 'desc')->take(5)->get(),
+                'topBooks' => Product::withAvg('approvedReviews', 'rating')
+                                ->withCount('approvedReviews')
+                                ->orderBy('rating', 'desc')
+                                ->take(5)
+                                ->get(),
                 'popularAuthors' => Product::selectRaw('author, count(*) as book_count')
                                 ->whereNotNull('author')
                                 ->where('author', '!=', '')
@@ -75,7 +79,7 @@ class CatalogController extends Controller
     // 2. Load Categories with Search & Filters
     public function categories(Request $request)
     {
-        $query = Product::query();
+        $query = Product::withAvg('approvedReviews', 'rating')->withCount('approvedReviews');
 
         $pageTitle = 'All Books';
         $currentCategory = null;
@@ -211,7 +215,9 @@ class CatalogController extends Controller
     public function bestsellers(Request $request)
     {
         // Added withQueryString() here too just in case filters are ever added
-        $products = Product::where('rating', '>=', 4)
+        $products = Product::withAvg('approvedReviews', 'rating')
+                           ->withCount('approvedReviews')
+                           ->where('rating', '>=', 4)
                            ->orderBy('rating', 'desc')
                            ->paginate(12)
                            ->withQueryString();
@@ -234,7 +240,11 @@ class CatalogController extends Controller
     // 3. Load Single Product Page
     public function show($slug)
     {
-        $product = Product::with('category')->where('slug', $slug)->firstOrFail();
+        $product = Product::with(['category', 'previews', 'approvedReviews.user'])
+            ->withCount('approvedReviews')
+            ->withAvg('approvedReviews', 'rating')
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         $relatedProducts = Product::where('id', '!=', $product->id)
                                   ->inRandomOrder()

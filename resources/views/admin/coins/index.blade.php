@@ -19,7 +19,7 @@
     </div>
 @endif
 
-<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
     <table class="w-full text-left">
         <thead class="bg-muted">
             <tr>
@@ -46,8 +46,8 @@
                 <td class="px-6 py-4">
                     <button
                         @click="showAdjustForm = !showAdjustForm"
-                        :class="showAdjustForm ? 'bg-gray-100 text-gray-700' : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100'"
-                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold border border-transparent rounded-lg transition-colors"
+                        :class="showAdjustForm ? 'bg-muted text-muted-foreground' : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100'"
+                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold border border-border rounded-lg transition-colors"
                     >
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,7 +63,7 @@
                 x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 -translate-y-1"
                 x-transition:enter-end="opacity-100 translate-y-0"
-                class="bg-cyan-50/40"
+                class="bg-muted/40"
                 style="display: none;">
                 <td colspan="4" class="px-6 py-4">
                     <form action="{{ route('admin.coins.adjust', $user) }}" method="POST"
@@ -92,7 +92,7 @@
                         </div>
 
                         <button type="submit"
-                                class="px-5 py-2 text-sm font-bold text-white transition bg-cyan-600 rounded-lg hover:bg-cyan-700 active:scale-95 shrink-0">
+                                class="px-5 py-2 text-sm font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95 shrink-0">
                             Confirm
                         </button>
                     </form>

@@ -32,7 +32,7 @@
 
         <div class="flex flex-col gap-4 sm:flex-row sm:justify-center">
             @auth
-                <a href="{{ route('dashboard') }}" class="px-6 py-3 font-bold text-white transition-colors shadow-md bg-cyan-600 rounded-xl hover:bg-cyan-700">
+                <a href="{{ route('dashboard') }}" class="px-6 py-3 font-bold transition-colors shadow-sm bg-primary text-primary-foreground rounded-xl hover:bg-primary/90">
                     View My Orders
                 </a>
             @endauth

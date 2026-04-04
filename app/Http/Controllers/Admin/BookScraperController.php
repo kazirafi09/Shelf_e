@@ -36,7 +36,7 @@ class BookScraperController extends Controller
     public function import(Request $request)
     {
         $validated = $request->validate([
-            'title'          => 'required|string|max:255',
+            'title'          => 'required|string|max:255|unique:products,title',
             'author'         => 'nullable|string|max:255',
             'isbn'           => 'nullable|string|max:20',
             'description'    => 'nullable|string',

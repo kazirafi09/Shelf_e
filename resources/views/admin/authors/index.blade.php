@@ -17,19 +17,19 @@
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search authors..."
                class="block w-full px-4 py-2.5 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
         <button type="submit"
-                class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white transition bg-cyan-600 rounded-lg hover:bg-cyan-700 active:scale-95 shrink-0">
+                class="inline-flex items-center px-4 py-2.5 text-sm font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95 shrink-0">
             Search
         </button>
         @if(request('search'))
             <a href="{{ route('admin.authors.index') }}"
-               class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-foreground transition bg-muted rounded-lg hover:bg-muted hover:opacity-80 shrink-0">
+               class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-foreground transition bg-muted rounded-lg hover:opacity-80 shrink-0">
                 Clear
             </a>
         @endif
     </form>
 
     <a href="{{ route('admin.authors.create') }}"
-       class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white transition bg-cyan-600 rounded-xl hover:bg-cyan-700 active:scale-95 shrink-0">
+       class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl active:scale-95 shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -37,7 +37,7 @@
     </a>
 </div>
 
-<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
     <table class="w-full text-left">
         <thead class="bg-muted">
             <tr>
@@ -51,7 +51,7 @@
             <tr class="transition hover:bg-muted/50">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 overflow-hidden bg-muted rounded-full ring-1 ring-gray-900/5 shrink-0">
+                        <div class="w-10 h-10 overflow-hidden bg-muted rounded-full shrink-0">
                             @if($author->photo_path)
                                 <img src="{{ asset('storage/' . $author->photo_path) }}"
                                      alt="{{ $author->name }}"
@@ -85,7 +85,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors">
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg transition-colors">
                                 Delete
                             </button>
                         </form>

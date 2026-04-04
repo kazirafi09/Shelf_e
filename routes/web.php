@@ -86,7 +86,7 @@ Route::middleware(['throttle:cart'])->group(function () {
 | Checkout (Public + Throttled)
 |--------------------------------------------------------------------------
 */
-Route::get('/checkout', [OrderController::class, 'index']);
+Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index');
 
 Route::middleware('throttle:5,1')->post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
 Route::get('/orders/{order}/confirmation', [OrderController::class, 'confirmation'])->name('order.confirmation');
@@ -140,7 +140,8 @@ Route::prefix('admin')
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        Route::resource('hero-slides', HeroSlideController::class);
+        Route::get('/hero-slides/search', [HeroSlideController::class, 'search'])->name('hero-slides.search');
+        Route::resource('hero-slides', HeroSlideController::class)->only(['index', 'store', 'destroy']);
 
         // Orders
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

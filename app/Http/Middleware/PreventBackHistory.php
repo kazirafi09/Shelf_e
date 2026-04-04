@@ -17,9 +17,8 @@ class PreventBackHistory
     {
         $response = $next($request);
 
-        // Apply no-cache headers only if the user is logged in
-        if (auth()->check() && $response instanceof Response) {
-            $response->headers->set('Cache-Control', 'nocache, no-store, max-age=0, must-revalidate');
+        if ($response instanceof Response) {
+            $response->headers->set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
             $response->headers->set('Pragma', 'no-cache');
             $response->headers->set('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
         }

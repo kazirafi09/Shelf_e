@@ -52,6 +52,10 @@ class CartController extends Controller
 
         $request->session()->put('cart', $cart);
 
+        if ($request->input('action_type') === 'buy_now') {
+            return redirect()->route('checkout.index');
+        }
+
         return redirect()->back()->with('success', 'Book added to cart successfully!');
     }
 
