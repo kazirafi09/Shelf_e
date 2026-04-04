@@ -12,33 +12,33 @@
     @endif
 
     {{-- Orders Table --}}
-    <div class="overflow-hidden bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+    <div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
         <div class="overflow-x-auto">
             <table class="w-full text-left whitespace-nowrap">
-                <thead class="bg-gray-50/50">
+                <thead class="bg-muted">
                     <tr>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Order ID</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Customer</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Amount</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Date</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Status Action</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Order ID</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Customer</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Amount</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Date</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Status Action</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
+                <tbody class="bg-card divide-y divide-border">
                     @forelse($orders as $order)
-                    <tr class="transition duration-150 hover:bg-gray-50/30 group">
-                        <td class="px-6 py-4 font-bold text-gray-900 transition-colors group-hover:text-cyan-600">
+                    <tr class="transition duration-150 hover:bg-muted/30 group">
+                        <td class="px-6 py-4 font-bold text-foreground transition-colors group-hover:text-cyan-600">
                             #{{ $order->id }}
                         </td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-600">
+                        <td class="px-6 py-4 text-sm font-medium text-muted-foreground">
                             {{ $order->name ?? 'Guest User' }}
                         </td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">
+                        <td class="px-6 py-4 text-sm font-bold text-foreground">
                             ৳ {{ number_format($order->total_amount, 0) }}
                         </td>
-                        <td class="px-6 py-4 text-xs font-medium text-gray-500">
+                        <td class="px-6 py-4 text-xs font-medium text-muted-foreground">
                             {{ $order->created_at->format('M d, Y') }}
-                            <span class="block text-[10px] text-gray-400">{{ $order->created_at->format('h:ia') }}</span>
+                            <span class="block text-[10px] text-muted-foreground">{{ $order->created_at->format('h:ia') }}</span>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center space-x-4">
@@ -47,7 +47,7 @@
                                     @csrf
                                     @method('PATCH')
                                     <select name="status" onchange="this.form.submit()" 
-                                            class="block w-full py-1.5 text-[11px] font-black uppercase tracking-widest rounded-lg shadow-sm border-gray-200 focus:ring-cyan-500 focus:border-cyan-500 transition-all cursor-pointer
+                                            class="block w-full py-1.5 text-[11px] font-black uppercase tracking-widest rounded-lg shadow-sm bg-background border border-input focus:ring-2 focus:ring-ring focus:outline-none transition-all cursor-pointer
                                             @if($order->status == 'pending') bg-yellow-50 text-yellow-700
                                             @elseif($order->status == 'processing') bg-purple-50 text-purple-700
                                             @elseif($order->status == 'shipped') bg-blue-50 text-blue-700
@@ -74,7 +74,7 @@
                         <td colspan="5" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center">
                                 <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                                <p class="font-medium text-gray-500">No customer orders yet.</p>
+                                <p class="font-medium text-muted-foreground">No customer orders yet.</p>
                             </div>
                         </td>
                     </tr>

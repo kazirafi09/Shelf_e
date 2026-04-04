@@ -21,49 +21,49 @@
     @endif
 
     <form action="{{ route('admin.authors.update', $author) }}" method="POST" enctype="multipart/form-data"
-          class="p-8 bg-white border border-gray-100 shadow-sm rounded-3xl">
+          class="p-8 bg-card text-card-foreground border border-border shadow-sm rounded-3xl">
         @csrf
         @method('PUT')
 
         <div class="space-y-6">
 
             <div>
-                <label for="name" class="block mb-1 text-sm font-bold text-gray-900">
+                <label for="name" class="block mb-1 text-sm font-bold text-foreground">
                     Full Name <span class="text-red-500">*</span>
                 </label>
                 <input type="text" id="name" name="name" value="{{ old('name', $author->name) }}" required
                        placeholder="e.g. Gabriel García Márquez"
-                       class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
+                       class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
             </div>
 
             <div>
-                <label for="bio" class="block mb-1 text-sm font-bold text-gray-900">Biography</label>
+                <label for="bio" class="block mb-1 text-sm font-bold text-foreground">Biography</label>
                 <textarea id="bio" name="bio" rows="5"
                           placeholder="A short biography of the author..."
-                          class="block w-full px-4 py-3 text-sm placeholder-gray-400 transition-all border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">{{ old('bio', $author->bio) }}</textarea>
+                          class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">{{ old('bio', $author->bio) }}</textarea>
             </div>
 
             <div>
-                <label for="photo" class="block mb-1 text-sm font-bold text-gray-900">Author Photo</label>
+                <label for="photo" class="block mb-1 text-sm font-bold text-foreground">Author Photo</label>
                 @if($author->photo_path)
                     <div class="flex items-center gap-3 mb-3">
                         <img src="{{ asset('storage/' . $author->photo_path) }}"
                              alt="{{ $author->name }}"
                              class="object-cover w-16 h-16 rounded-full ring-1 ring-gray-900/5">
-                        <p class="text-xs text-gray-500">Current photo — upload a new file to replace it.</p>
+                        <p class="text-xs text-muted-foreground">Current photo — upload a new file to replace it.</p>
                     </div>
                 @endif
                 <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp"
-                       class="block w-full text-sm text-gray-500 border border-gray-200 rounded-lg bg-gray-50 cursor-pointer
+                       class="block w-full text-sm text-muted-foreground border border-input rounded-[var(--radius)] bg-background cursor-pointer
                               file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-lg
                               file:text-sm file:font-bold file:bg-cyan-50 file:text-cyan-700
                               hover:file:bg-cyan-100">
-                <p class="mt-1 text-xs text-gray-400">JPEG, PNG, or WebP. Max 2 MB. Leave blank to keep the current photo.</p>
+                <p class="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP. Max 2 MB. Leave blank to keep the current photo.</p>
             </div>
 
         </div>
 
-        <div class="flex items-center gap-4 pt-8 mt-8 border-t border-gray-100">
+        <div class="flex items-center gap-4 pt-8 mt-8 border-t border-border">
             <button type="submit"
                     class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold text-white transition rounded-xl bg-cyan-600 hover:bg-cyan-700 active:scale-95">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
                 Save Changes
             </button>
             <a href="{{ route('admin.authors.index') }}"
-               class="text-sm font-semibold text-gray-400 transition-colors hover:text-gray-600">
+               class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground">
                 Cancel
             </a>
         </div>

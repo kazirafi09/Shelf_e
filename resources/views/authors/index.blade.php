@@ -4,19 +4,19 @@
 <div class="container px-4 py-12 mx-auto max-w-7xl">
 
     <!-- Breadcrumb -->
-    <div class="flex items-center mb-8 text-sm text-gray-500">
+    <div class="flex items-center mb-8 text-sm text-muted-foreground">
         <a href="/" class="hover:text-cyan-600">Home</a>
         <span class="mx-2">/</span>
-        <span class="font-medium text-gray-900">Authors</span>
+        <span class="font-medium text-foreground">Authors</span>
     </div>
 
     <!-- Page Header -->
     <div class="flex flex-col items-start justify-between gap-6 mb-10 md:flex-row md:items-center">
         <div>
-            <h1 class="text-4xl font-bold tracking-tight text-gray-900">
+            <h1 class="text-4xl font-bold tracking-tight text-foreground">
                 Discover Authors
             </h1>
-            <p class="mt-2 text-gray-500">
+            <p class="mt-2 text-muted-foreground">
                 Explore writers behind the books you love.
             </p>
         </div>
@@ -28,7 +28,7 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="Search authors..."
-                class="w-full py-2 pl-10 pr-4 transition border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
+                class="w-full py-2 pl-10 pr-4 transition bg-background border border-input text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:outline-none"
             >
             <button type="submit" class="absolute left-3 top-2.5 text-gray-400 hover:text-cyan-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
@@ -44,7 +44,7 @@
         @foreach($authors as $author)
 
         <a href="{{ route('categories.index', ['authors[]' => $author->author]) }}"
-           class="relative p-6 transition-all duration-300 bg-white border border-gray-100 shadow-sm group rounded-2xl hover:shadow-xl hover:-translate-y-1">
+           class="relative p-6 transition-all duration-300 bg-card text-card-foreground border border-border shadow-sm group rounded-2xl hover:shadow-xl hover:-translate-y-1">
 
             <!-- Avatar -->
             <div class="w-32 h-32 mb-4 overflow-hidden rounded-full shadow-md shrink-0">
@@ -60,12 +60,12 @@
             </div>
 
             <!-- Author Name -->
-            <h3 class="text-lg font-bold text-gray-900 transition-colors group-hover:text-cyan-600">
+            <h3 class="text-lg font-bold text-foreground transition-colors group-hover:text-cyan-600">
                 {{ $author->author }}
             </h3>
 
             <!-- Book Count -->
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-muted-foreground">
                 {{ $author->book_count }} {{ Str::plural('Book', $author->book_count) }}
             </p>
 

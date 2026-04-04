@@ -7,7 +7,7 @@
     <title>Admin Dashboard - Shelf-E</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-50">
+<body class="font-sans antialiased bg-background text-foreground">
 
 <div class="flex min-h-screen font-sans" x-data="{ sidebarOpen: false }">
     

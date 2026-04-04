@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container max-w-3xl px-4 py-16 mx-auto">
-    <div class="p-8 text-center bg-white border border-gray-100 shadow-xl rounded-3xl sm:p-12">
+    <div class="p-8 text-center bg-card text-card-foreground border border-border shadow-xl rounded-3xl sm:p-12">
         
         <div class="inline-flex items-center justify-center w-20 h-20 mb-6 text-green-500 rounded-full bg-green-50 ring-8 ring-green-50">
             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -10,22 +10,22 @@
             </svg>
         </div>
 
-        <h1 class="mb-2 text-4xl font-extrabold text-gray-900">Order Confirmed!</h1>
-        <p class="mb-8 text-lg text-gray-600">Thank you for your purchase. We're getting your books ready for shipment.</p>
+        <h1 class="mb-2 text-4xl font-extrabold text-foreground">Order Confirmed!</h1>
+        <p class="mb-8 text-lg text-muted-foreground">Thank you for your purchase. We're getting your books ready for shipment.</p>
 
-        <div class="p-6 mb-8 text-left border border-gray-100 bg-gray-50 rounded-2xl">
-            <h3 class="pb-2 mb-4 text-lg font-bold text-gray-900 border-b border-gray-200">Order Details</h3>
-            
+        <div class="p-6 mb-8 text-left border border-border bg-muted rounded-2xl">
+            <h3 class="pb-2 mb-4 text-lg font-bold text-foreground border-b border-border">Order Details</h3>
+
             <div class="flex justify-between mb-2">
-                <span class="text-gray-600">Order Number:</span>
-                <span class="font-bold text-gray-900">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
+                <span class="text-muted-foreground">Order Number:</span>
+                <span class="font-bold text-foreground">#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</span>
             </div>
             <div class="flex justify-between mb-2">
-                <span class="text-gray-600">Date:</span>
-                <span class="font-medium text-gray-900">{{ $order->created_at->format('M j, Y') }}</span>
+                <span class="text-muted-foreground">Date:</span>
+                <span class="font-medium text-foreground">{{ $order->created_at->format('M j, Y') }}</span>
             </div>
-            <div class="flex justify-between pt-2 mt-2 border-t border-gray-200">
-                <span class="font-bold text-gray-900">Total Paid:</span>
+            <div class="flex justify-between pt-2 mt-2 border-t border-border">
+                <span class="font-bold text-foreground">Total Paid:</span>
                 <span class="font-bold text-cyan-600">৳{{ number_format($order->total_amount, 2) }}</span>
             </div>
         </div>
@@ -36,7 +36,7 @@
                     View My Orders
                 </a>
             @endauth
-            <a href="{{ route('home') }}" class="px-6 py-3 font-bold text-gray-700 transition-colors bg-white border border-gray-300 shadow-sm rounded-xl hover:bg-gray-50">
+            <a href="{{ route('home') }}" class="px-6 py-3 font-bold text-foreground transition-colors bg-background border border-border shadow-sm rounded-xl hover:bg-muted">
                 Continue Shopping
             </a>
         </div>

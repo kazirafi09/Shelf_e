@@ -1,26 +1,26 @@
 @if($reviews->isEmpty())
-    <div class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5">
+    <div class="flex flex-col items-center justify-center py-20 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5">
         <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
-        <p class="text-sm font-medium text-gray-400">No {{ $status }} reviews.</p>
+        <p class="text-sm font-medium text-muted-foreground">No {{ $status }} reviews.</p>
     </div>
 @else
     <div class="space-y-4">
         @foreach($reviews as $review)
-        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5 p-6">
+        <div class="bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5 p-6">
             <div class="flex items-start justify-between gap-4">
 
                 {{-- Left: review meta --}}
                 <div class="flex-1 min-w-0">
                     {{-- Product + user --}}
                     <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <span class="text-sm font-bold text-gray-900 truncate">
+                        <span class="text-sm font-bold text-foreground truncate">
                             {{ $review->product?->title ?? '(deleted product)' }}
                         </span>
                         <span class="text-gray-300">·</span>
-                        <span class="text-xs text-gray-500">
+                        <span class="text-xs text-muted-foreground">
                             by {{ $review->user?->name ?? 'Deleted User' }}
                         </span>
                         @if($review->is_verified_purchase)
@@ -46,14 +46,14 @@
                                 </svg>
                             @endif
                         @endfor
-                        <span class="ml-1.5 text-xs text-gray-400">{{ $review->created_at->format('M d, Y') }}</span>
+                        <span class="ml-1.5 text-xs text-muted-foreground">{{ $review->created_at->format('M d, Y') }}</span>
                     </div>
 
                     {{-- Title + body --}}
                     @if($review->title)
-                        <p class="mb-1 text-sm font-semibold text-gray-800">{{ $review->title }}</p>
+                        <p class="mb-1 text-sm font-semibold text-foreground">{{ $review->title }}</p>
                     @endif
-                    <p class="text-sm leading-relaxed text-gray-600 line-clamp-3">{{ $review->body }}</p>
+                    <p class="text-sm leading-relaxed text-muted-foreground line-clamp-3">{{ $review->body }}</p>
                 </div>
 
                 {{-- Right: action buttons --}}

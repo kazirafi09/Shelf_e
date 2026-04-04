@@ -14,7 +14,7 @@
 @if($addresses->isNotEmpty())
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         @foreach($addresses as $addr)
-        <div class="relative p-5 bg-white border rounded-2xl shadow-sm {{ $addr->is_default ? 'border-cyan-300 ring-1 ring-cyan-200' : 'border-gray-200' }}"
+        <div class="relative p-5 bg-card text-card-foreground border rounded-2xl shadow-sm {{ $addr->is_default ? 'border-cyan-300 ring-1 ring-cyan-200' : 'border-border' }}"
              x-data="{ editOpen: false }">
 
             {{-- Default badge --}}
@@ -23,15 +23,15 @@
             @endif
 
             <div class="flex items-center gap-2 mb-3">
-                <span class="text-xs font-bold tracking-wider uppercase text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">{{ $addr->label }}</span>
+                <span class="text-xs font-bold tracking-wider uppercase text-muted-foreground bg-muted px-2.5 py-1 rounded-full">{{ $addr->label }}</span>
             </div>
 
-            <p class="font-bold text-gray-900">{{ $addr->name }}</p>
-            <p class="text-sm text-gray-600 mt-0.5">{{ $addr->address }}</p>
-            <p class="text-sm text-gray-500">{{ $addr->district }}, {{ $addr->division }} {{ $addr->postal_code }}</p>
-            <p class="text-sm text-gray-500 mt-1">+880 {{ $addr->phone }}</p>
+            <p class="font-bold text-foreground">{{ $addr->name }}</p>
+            <p class="text-sm text-muted-foreground mt-0.5">{{ $addr->address }}</p>
+            <p class="text-sm text-muted-foreground">{{ $addr->district }}, {{ $addr->division }} {{ $addr->postal_code }}</p>
+            <p class="text-sm text-muted-foreground mt-1">+880 {{ $addr->phone }}</p>
 
-            <div class="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+            <div class="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border">
                 @if(!$addr->is_default)
                     <form action="{{ route('addresses.default', $addr) }}" method="POST">
                         @csrf
@@ -43,7 +43,7 @@
                     <span class="text-gray-300">|</span>
                 @endif
 
-                <button @click="editOpen = true" class="text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors">
+                <button @click="editOpen = true" class="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
                     Edit
                 </button>
                 <span class="text-gray-300">|</span>
@@ -62,72 +62,72 @@
             <div x-show="editOpen" x-transition
                  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
                  style="display:none">
-                <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto"
+                <div class="w-full max-w-lg bg-card text-card-foreground rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto"
                      @click.outside="editOpen = false">
-                    <h3 class="text-lg font-bold text-gray-900 mb-5">Edit Address</h3>
+                    <h3 class="text-lg font-bold text-foreground mb-5">Edit Address</h3>
 
                     <form action="{{ route('addresses.update', $addr) }}" method="POST" class="space-y-4">
                         @csrf
                         @method('PUT')
 
                         <div>
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Label</label>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Label</label>
                             <input type="text" name="label" value="{{ $addr->label }}" placeholder="e.g. Home, Work"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                         </div>
                         <div>
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Full Name</label>
                             <input type="text" name="name" value="{{ $addr->name }}"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                         </div>
                         <div>
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Email</label>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Email</label>
                             <input type="email" name="email" value="{{ $addr->email }}"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                         </div>
                         <div>
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Detailed Address</label>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Detailed Address</label>
                             <input type="text" name="address" value="{{ $addr->address }}"
-                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                         </div>
                         <div class="grid grid-cols-3 gap-3">
                             <div>
-                                <label class="block mb-1 text-sm font-medium text-gray-700">Division</label>
-                                <select name="division" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                <label class="block mb-1 text-sm font-medium text-foreground">Division</label>
+                                <select name="division" class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                                     @foreach(['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Mymensingh'] as $div)
                                         <option value="{{ $div }}" {{ $addr->division === $div ? 'selected' : '' }}>{{ $div }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <label class="block mb-1 text-sm font-medium text-gray-700">District</label>
+                                <label class="block mb-1 text-sm font-medium text-foreground">District</label>
                                 <input type="text" name="district" value="{{ $addr->district }}"
-                                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                       class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                             </div>
                             <div>
-                                <label class="block mb-1 text-sm font-medium text-gray-700">Postal Code</label>
+                                <label class="block mb-1 text-sm font-medium text-foreground">Postal Code</label>
                                 <input type="text" name="postal_code" value="{{ $addr->postal_code }}"
-                                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
+                                       class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
                             </div>
                         </div>
                         <div x-data="{ phone: '{{ $addr->phone }}', get valid() { return /^[0-9]{10}$/.test(this.phone); } }">
-                            <label class="block mb-1 text-sm font-medium text-gray-700">Phone</label>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Phone</label>
                             <div class="flex">
-                                <span class="inline-flex items-center px-3 font-bold text-gray-500 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50">+880</span>
+                                <span class="inline-flex items-center px-3 font-bold text-muted-foreground border border-r-0 border-input rounded-l-lg bg-muted">+880</span>
                                 <input type="text" name="phone" x-model="phone" maxlength="10" inputmode="numeric"
                                        :class="phone.length > 0 && !valid ? 'border-red-400' : 'border-gray-300'"
-                                       class="w-full px-4 py-2.5 border rounded-r-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                                       class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-r-lg" required>
                             </div>
                         </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" name="is_default" value="1" {{ $addr->is_default ? 'checked' : '' }}
-                                   class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
-                            <span class="text-sm font-medium text-gray-700">Set as default address</span>
+                                   class="w-4 h-4 text-cyan-600 border-input rounded focus:ring-2 focus:ring-ring">
+                            <span class="text-sm font-medium text-foreground">Set as default address</span>
                         </label>
 
                         <div class="flex justify-end gap-3 pt-2">
                             <button type="button" @click="editOpen = false"
-                                    class="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                    class="px-4 py-2 text-sm font-semibold text-foreground bg-background border border-border rounded-lg hover:bg-muted transition-colors">
                                 Cancel
                             </button>
                             <button type="submit"
@@ -142,15 +142,15 @@
         @endforeach
     </div>
 @else
-    <div class="py-16 text-center bg-white border border-gray-100 rounded-2xl shadow-sm">
+    <div class="py-16 text-center bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
         <div class="inline-flex items-center justify-center w-16 h-16 mb-5 text-cyan-500 rounded-full bg-cyan-50">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
         </div>
-        <h2 class="mb-2 text-xl font-bold text-gray-900">No saved addresses yet</h2>
-        <p class="text-gray-500">Save an address below to speed up checkout.</p>
+        <h2 class="mb-2 text-xl font-bold text-foreground">No saved addresses yet</h2>
+        <p class="text-muted-foreground">Save an address below to speed up checkout.</p>
     </div>
 @endif
 
@@ -167,72 +167,72 @@
     <div x-show="open" x-transition
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
          style="display:none">
-        <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto"
+        <div class="w-full max-w-lg bg-card text-card-foreground rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto"
              @click.outside="open = false">
-            <h3 class="text-lg font-bold text-gray-900 mb-5">Add New Address</h3>
+            <h3 class="text-lg font-bold text-foreground mb-5">Add New Address</h3>
 
             <form action="{{ route('addresses.store') }}" method="POST" class="space-y-4">
                 @csrf
 
                 <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-700">Label</label>
+                    <label class="block mb-1 text-sm font-medium text-foreground">Label</label>
                     <input type="text" name="label" value="{{ old('label') }}" placeholder="e.g. Home, Work, Other"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                           class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                 </div>
                 <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
+                    <label class="block mb-1 text-sm font-medium text-foreground">Full Name</label>
                     <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                           class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                 </div>
                 <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-700">Email</label>
+                    <label class="block mb-1 text-sm font-medium text-foreground">Email</label>
                     <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                           class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                 </div>
                 <div>
-                    <label class="block mb-1 text-sm font-medium text-gray-700">Detailed Address</label>
+                    <label class="block mb-1 text-sm font-medium text-foreground">Detailed Address</label>
                     <input type="text" name="address" value="{{ old('address') }}" placeholder="House #, Street, Apartment..."
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                           class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-700">Division</label>
-                        <select name="division" class="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                        <label class="block mb-1 text-sm font-medium text-foreground">Division</label>
+                        <select name="division" class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                             @foreach(['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Mymensingh'] as $div)
                                 <option value="{{ $div }}" {{ old('division', 'Dhaka') === $div ? 'selected' : '' }}>{{ $div }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-700">District</label>
+                        <label class="block mb-1 text-sm font-medium text-foreground">District</label>
                         <input type="text" name="district" value="{{ old('district') }}" placeholder="e.g. Dhaka City"
-                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                               class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg" required>
                     </div>
                     <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-700">Postal Code</label>
+                        <label class="block mb-1 text-sm font-medium text-foreground">Postal Code</label>
                         <input type="text" name="postal_code" value="{{ old('postal_code') }}"
-                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
+                               class="w-full px-3 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
                     </div>
                 </div>
                 <div x-data="{ phone: '{{ old('phone') }}', get valid() { return /^[0-9]{10}$/.test(this.phone); } }">
-                    <label class="block mb-1 text-sm font-medium text-gray-700">Phone</label>
+                    <label class="block mb-1 text-sm font-medium text-foreground">Phone</label>
                     <div class="flex">
-                        <span class="inline-flex items-center px-3 font-bold text-gray-500 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50">+880</span>
+                        <span class="inline-flex items-center px-3 font-bold text-muted-foreground border border-r-0 border-input rounded-l-lg bg-muted">+880</span>
                         <input type="text" name="phone" x-model="phone" placeholder="1XXXXXXXXX" maxlength="10" inputmode="numeric"
                                :class="phone.length > 0 && !valid ? 'border-red-400' : 'border-gray-300'"
-                               class="w-full px-4 py-2.5 border rounded-r-lg focus:ring-cyan-500 focus:border-cyan-500" required>
+                               class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-r-lg" required>
                     </div>
                     <p x-show="phone.length > 0 && !valid" class="mt-1 text-xs text-red-500">Enter exactly 10 digits after +880</p>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="is_default" value="1"
-                           class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
-                    <span class="text-sm font-medium text-gray-700">Set as default address</span>
+                           class="w-4 h-4 text-cyan-600 border-input rounded focus:ring-2 focus:ring-ring">
+                    <span class="text-sm font-medium text-foreground">Set as default address</span>
                 </label>
 
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" @click="open = false"
-                            class="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            class="px-4 py-2 text-sm font-semibold text-foreground bg-background border border-border rounded-lg hover:bg-muted transition-colors">
                         Cancel
                     </button>
                     <button type="submit"

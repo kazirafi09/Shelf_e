@@ -3,10 +3,10 @@
 @section('content')
 <div class="container px-4 py-8 mx-auto">
     
-    <div class="mb-8 text-sm text-gray-500">
-        <a href="/" class="transition hover:text-orange-500">Home</a> <span class="mx-2">></span> 
-        <a href="{{ route('categories.index') }}" class="transition hover:text-orange-500">Categories</a> <span class="mx-2">></span> 
-        <span class="text-gray-900">{{ $product->title }}</span>
+    <div class="mb-8 text-sm text-muted-foreground">
+        <a href="/" class="transition hover:text-orange-500">Home</a> <span class="mx-2">></span>
+        <a href="{{ route('categories.index') }}" class="transition hover:text-orange-500">Categories</a> <span class="mx-2">></span>
+        <span class="text-foreground">{{ $product->title }}</span>
     </div>
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
@@ -32,7 +32,7 @@
                 </a>
             @endauth
             
-            <div class="w-full aspect-[2/3] bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 mb-4 shadow-xl overflow-hidden border border-gray-100">
+            <div class="w-full aspect-[2/3] bg-muted rounded-2xl flex items-center justify-center text-muted-foreground mb-4 shadow-xl overflow-hidden border border-border">
                 @if($product->image_path)
                     <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}" class="object-cover w-full h-full transition-transform duration-500 hover:scale-105">
                 @else
@@ -175,43 +175,43 @@
             </div>
 
         <div class="lg:col-span-6">
-            <h1 class="mb-2 text-4xl font-bold text-gray-900">{{ $product->title }}</h1>
-            
+            <h1 class="mb-2 text-4xl font-bold text-foreground">{{ $product->title }}</h1>
+
             <div class="flex items-center mb-6 space-x-4">
-                <div class="flex items-center text-gray-600">
-                    <div class="w-8 h-8 mr-3 overflow-hidden bg-gray-200 rounded-full"></div>
-                    <span>By <span class="font-bold text-gray-900">{{ $product->author }}</span></span>
+                <div class="flex items-center text-muted-foreground">
+                    <div class="w-8 h-8 mr-3 overflow-hidden bg-muted rounded-full"></div>
+                    <span>By <span class="font-bold text-foreground">{{ $product->author }}</span></span>
                 </div>
             </div>
 
             <div class="flex items-center mb-8 space-x-2">
-                <span class="font-bold text-gray-900">{{ number_format($product->rating, 1) }}</span>
+                <span class="font-bold text-foreground">{{ number_format($product->rating, 1) }}</span>
                 <div class="flex text-yellow-400">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                 </div>
-                <span class="text-sm text-gray-500">({{ number_format($product->reviews_count ?? 0) }} ratings)</span>
+                <span class="text-sm text-muted-foreground">({{ number_format($product->reviews_count ?? 0) }} ratings)</span>
             </div>
 
-            <div class="grid grid-cols-2 pb-10 mb-10 text-sm border-b border-gray-100 gap-y-4 gap-x-8">
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">Publisher</span><span class="text-gray-600">{{ $product->publisher ?? 'Shelf-E Press' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">Language</span><span class="text-gray-600">{{ $product->language ?? 'English' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">First Publish</span><span class="text-gray-600">{{ $product->publish_year ?? 'N/A' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">Pages</span><span class="text-gray-600">{{ $product->pages ?? 'N/A' }}p</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">ISBN</span><span class="text-gray-600">{{ $product->isbn ?? 'N/A' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-gray-900">Dimensions</span><span class="text-gray-600">{{ $product->dimensions ?? 'N/A' }}</span></div>
+            <div class="grid grid-cols-2 pb-10 mb-10 text-sm border-b border-border gap-y-4 gap-x-8">
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Publisher</span><span class="text-muted-foreground">{{ $product->publisher ?? 'Shelf-E Press' }}</span></div>
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Language</span><span class="text-muted-foreground">{{ $product->language ?? 'English' }}</span></div>
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">First Publish</span><span class="text-muted-foreground">{{ $product->publish_year ?? 'N/A' }}</span></div>
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Pages</span><span class="text-muted-foreground">{{ $product->pages ?? 'N/A' }}p</span></div>
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">ISBN</span><span class="text-muted-foreground">{{ $product->isbn ?? 'N/A' }}</span></div>
+                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Dimensions</span><span class="text-muted-foreground">{{ $product->dimensions ?? 'N/A' }}</span></div>
             </div>
 
             <div x-data="{ activeTab: 'description' }">
-                <div class="flex mb-6 space-x-8 border-b border-gray-100">
+                <div class="flex mb-6 space-x-8 border-b border-border">
                     <button @click="activeTab = 'description'" :class="activeTab === 'description' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">Description</button>
                     <button @click="activeTab = 'author'" :class="activeTab === 'author' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">About Author</button>
                     <button @click="activeTab = 'reviews'" :class="activeTab === 'reviews' ? 'border-cyan-500 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-900'" class="pb-3 font-medium transition border-b-2">Reviews</button>
                 </div>
 
-                <div class="leading-relaxed prose text-gray-700 max-w-none">
+                <div class="leading-relaxed prose text-foreground max-w-none">
                     <div x-show="activeTab === 'description'" x-cloak x-transition.opacity>
                         <p>{{ $product->description }}</p>
-                        <h3 class="mt-6 mb-2 font-bold text-gray-900">Synopsis</h3>
+                        <h3 class="mt-6 mb-2 font-bold text-foreground">Synopsis</h3>
                         <p>{{ $product->synopsis }}</p>
                     </div>
                     <div x-show="activeTab === 'author'" x-cloak x-transition.opacity>
@@ -249,7 +249,7 @@
                     return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(price);
                 }
             }">
-                <div class="p-8 mb-10 bg-white border border-gray-100 shadow-2xl rounded-3xl">
+                <div class="p-8 mb-10 bg-card text-card-foreground border border-border shadow-2xl rounded-3xl">
                     
                     <div class="flex mb-8 space-x-3 text-center">
                         <button type="button" 
@@ -261,7 +261,7 @@
                                 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed': !hasPaperback
                             }"
                             class="flex-1 p-3 text-left transition border rounded-xl">
-                            <span class="block text-sm text-gray-500">Paperback</span>
+                            <span class="block text-sm text-muted-foreground">Paperback</span>
                             <template x-if="hasPaperback">
                                 <span class="font-bold text-gray-900" x-text="'৳ ' + formatPrice(paperbackPrice)"></span>
                             </template>
@@ -279,7 +279,7 @@
                                 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed': !hasHardcover
                             }"
                             class="flex-1 p-3 text-left transition border rounded-xl">
-                            <span class="block text-sm text-gray-500">Hardcover</span>
+                            <span class="block text-sm text-muted-foreground">Hardcover</span>
                             <template x-if="hasHardcover">
                                 <span class="font-bold text-gray-900" x-text="'৳ ' + formatPrice(hardcoverPrice)"></span>
                             </template>
@@ -290,14 +290,14 @@
                     </div>
 
                     <div class="flex items-center justify-center mb-8">
-                        <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm">
-                            <button @click="if(quantity > 1) quantity--" type="button" class="px-5 py-2 text-gray-500 transition rounded-l-lg hover:text-orange-500 hover:bg-gray-50">-</button>
-                            <span class="px-6 py-2 font-medium text-gray-900 border-gray-200 border-x" x-text="quantity"></span>
-                            <button @click="quantity++" type="button" class="px-5 py-2 text-gray-500 transition rounded-r-lg hover:text-orange-500 hover:bg-gray-50">+</button>
+                        <div class="flex items-center bg-background border border-border rounded-lg shadow-sm">
+                            <button @click="if(quantity > 1) quantity--" type="button" class="px-5 py-2 text-muted-foreground transition rounded-l-lg hover:text-orange-500 hover:bg-muted">-</button>
+                            <span class="px-6 py-2 font-medium text-foreground border-border border-x" x-text="quantity"></span>
+                            <button @click="quantity++" type="button" class="px-5 py-2 text-muted-foreground transition rounded-r-lg hover:text-orange-500 hover:bg-muted">+</button>
                         </div>
                     </div>
 
-                    <div class="mb-8 text-4xl font-extrabold text-center text-gray-900 transition-all duration-300" x-text="'৳ ' + formatPrice(totalPrice)">
+                    <div class="mb-8 text-4xl font-extrabold text-center text-foreground transition-all duration-300" x-text="'৳ ' + formatPrice(totalPrice)">
                         ৳ {{ number_format($product->paperback_price ?? $product->hardcover_price ?? 0, 0) }}
                     </div>
 
@@ -335,7 +335,7 @@
     {{-- ============================================================ --}}
     {{-- Customer Reviews                                             --}}
     {{-- ============================================================ --}}
-    <section id="customer-reviews" class="mt-16 pt-10 border-t border-gray-100">
+    <section id="customer-reviews" class="mt-16 pt-10 border-t border-border">
 
         <div
             x-data="{ showReviewForm: false }"
@@ -344,8 +344,8 @@
             {{-- Section header --}}
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Customer Reviews</h2>
-                    <p class="mt-0.5 text-sm text-gray-500">
+                    <h2 class="text-2xl font-bold text-foreground">Customer Reviews</h2>
+                    <p class="mt-0.5 text-sm text-muted-foreground">
                         {{ $product->approvedReviews->count() }}
                         {{ Str::plural('review', $product->approvedReviews->count()) }}
                     </p>
@@ -380,18 +380,18 @@
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 -translate-y-2"
                 x-transition:enter-end="opacity-100 translate-y-0"
-                class="mb-10 p-6 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5"
+                class="mb-10 p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5"
                 style="display: none;"
             >
-                <h3 class="mb-5 text-base font-bold text-gray-900">Your Review</h3>
+                <h3 class="mb-5 text-base font-bold text-foreground">Your Review</h3>
 
                 <form action="{{ route('reviews.store', $product) }}" method="POST" class="space-y-5">
                     @csrf
 
                     <div>
-                        <label class="block mb-1 text-sm font-semibold text-gray-700">Rating</label>
+                        <label class="block mb-1 text-sm font-semibold text-foreground">Rating</label>
                         <select name="rating" required
-                                class="block w-40 text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">
+                                class="block w-40 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
                             <option value="">Pick a rating…</option>
                             <option value="5">★★★★★ — Excellent</option>
                             <option value="4">★★★★☆ — Good</option>
@@ -405,22 +405,22 @@
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-sm font-semibold text-gray-700">
-                            Title <span class="font-normal text-gray-400">(optional)</span>
+                        <label class="block mb-1 text-sm font-semibold text-foreground">
+                            Title <span class="font-normal text-muted-foreground">(optional)</span>
                         </label>
                         <input type="text" name="title" value="{{ old('title') }}"
                                placeholder="Summarise your experience…"
-                               class="block w-full text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">
+                               class="block w-full text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
                         @error('title')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block mb-1 text-sm font-semibold text-gray-700">Review</label>
+                        <label class="block mb-1 text-sm font-semibold text-foreground">Review</label>
                         <textarea name="body" rows="4" required
                                   placeholder="What did you think of this book?"
-                                  class="block w-full text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500">{{ old('body') }}</textarea>
+                                  class="block w-full text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">{{ old('body') }}</textarea>
                         @error('body')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
@@ -428,7 +428,7 @@
 
                     <div class="flex items-center justify-end gap-3 pt-2">
                         <button type="button" @click="showReviewForm = false"
-                                class="text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+                                class="text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
                             Cancel
                         </button>
                         <button type="submit"
@@ -449,18 +449,18 @@
 
             {{-- Reviews list --}}
             @if($product->approvedReviews->isEmpty())
-                <div class="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl ring-1 ring-gray-900/5">
+                <div class="flex flex-col items-center justify-center py-16 text-center bg-card text-card-foreground border border-border rounded-2xl ring-1 ring-gray-900/5">
                     <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
-                    <p class="font-semibold text-gray-700">Be the first to review this book!</p>
-                    <p class="mt-1 text-sm text-gray-400">Share your thoughts with other readers.</p>
+                    <p class="font-semibold text-foreground">Be the first to review this book!</p>
+                    <p class="mt-1 text-sm text-muted-foreground">Share your thoughts with other readers.</p>
                 </div>
             @else
                 <div class="space-y-5">
                     @foreach($product->approvedReviews as $review)
-                    <article class="p-6 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5">
+                    <article class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5">
 
                         {{-- Stars + meta --}}
                         <div class="flex flex-wrap items-center gap-2 mb-3">
@@ -482,16 +482,16 @@
                                 </span>
                             @endif
 
-                            <span class="ml-auto text-xs text-gray-400">
+                            <span class="ml-auto text-xs text-muted-foreground">
                                 {{ $review->user?->name ?? 'Anonymous' }} &middot; {{ $review->created_at->format('M d, Y') }}
                             </span>
                         </div>
 
                         {{-- Title + body --}}
                         @if($review->title)
-                            <p class="mb-1 text-sm font-bold text-gray-900">{{ $review->title }}</p>
+                            <p class="mb-1 text-sm font-bold text-foreground">{{ $review->title }}</p>
                         @endif
-                        <p class="text-sm leading-relaxed text-gray-600">{{ $review->body }}</p>
+                        <p class="text-sm leading-relaxed text-muted-foreground">{{ $review->body }}</p>
 
                     </article>
                     @endforeach

@@ -19,21 +19,21 @@
     </div>
 @endif
 
-<div class="overflow-hidden bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
     <table class="w-full text-left">
-        <thead class="bg-gray-50/50">
+        <thead class="bg-muted">
             <tr>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">User</th>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Email</th>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Coin Balance</th>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Actions</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">User</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Email</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Coin Balance</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-border">
             @forelse($users as $user)
             <tr x-data="{ showAdjustForm: false }" class="group">
-                <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ $user->name }}</td>
-                <td class="px-6 py-4 text-sm text-gray-500">{{ $user->email }}</td>
+                <td class="px-6 py-4 text-sm font-semibold text-foreground">{{ $user->name }}</td>
+                <td class="px-6 py-4 text-sm text-muted-foreground">{{ $user->email }}</td>
                 <td class="px-6 py-4">
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full">
                         <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -71,24 +71,24 @@
                         @csrf
 
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Type</label>
+                            <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</label>
                             <select name="type"
-                                    class="py-2 text-sm border-gray-200 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+                                    class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
                                 <option value="credit">Credit</option>
                                 <option value="debit">Debit</option>
                             </select>
                         </div>
 
                         <div class="flex flex-col gap-1">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</label>
+                            <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Amount</label>
                             <input type="number" name="amount" min="1" placeholder="e.g. 100"
-                                   class="py-2 text-sm border-gray-200 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500 w-32">
+                                   class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm w-32">
                         </div>
 
                         <div class="flex flex-col flex-1 gap-1 min-w-48">
-                            <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Description</label>
+                            <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description</label>
                             <input type="text" name="description" placeholder="e.g. Loyalty reward"
-                                   class="py-2 text-sm border-gray-200 rounded-lg shadow-sm focus:ring-cyan-500 focus:border-cyan-500">
+                                   class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
                         </div>
 
                         <button type="submit"
@@ -101,7 +101,7 @@
 
             @empty
             <tr>
-                <td colspan="4" class="px-6 py-16 text-sm font-medium text-center text-gray-400">
+                <td colspan="4" class="px-6 py-16 text-sm font-medium text-center text-muted-foreground">
                     No users found.
                 </td>
             </tr>

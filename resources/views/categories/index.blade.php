@@ -3,23 +3,23 @@
 @section('content')
 <div class="container px-4 py-8 mx-auto" x-data="{ mobileFiltersOpen: false }">
     
-    <div class="mb-6 text-sm text-gray-500">
-        <a href="/" class="transition-colors hover:text-orange-500">Home</a> 
-        <span class="mx-2">&gt;</span> 
-        
+    <div class="mb-6 text-sm text-muted-foreground">
+        <a href="/" class="transition-colors hover:text-orange-500">Home</a>
+        <span class="mx-2">&gt;</span>
+
         {{-- If the title is anything other than 'All Books', we show the expanded breadcrumb --}}
         @if($pageTitle !== 'All Books')
             <a href="/categories" class="transition-colors hover:text-orange-500">Books</a>
             <span class="mx-2">&gt;</span>
-            <span class="font-medium text-gray-900">{{ $pageTitle }}</span>
+            <span class="font-medium text-foreground">{{ $pageTitle }}</span>
         @else
-            <span class="font-medium text-gray-900">Books</span>
+            <span class="font-medium text-foreground">Books</span>
         @endif
     </div>
 
     <div class="mb-8">
         {{-- Clean header without inline buttons --}}
-        <h1 class="text-3xl font-bold text-gray-900">
+        <h1 class="text-3xl font-bold text-foreground">
             {{ $pageTitle ?? 'All Books' }}
         </h1>
     </div>
@@ -32,7 +32,7 @@
     </button>
 
     <div class="flex items-center justify-between mb-8">      
-        <button @click="mobileFiltersOpen = true" class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md lg:hidden hover:bg-gray-50">
+        <button @click="mobileFiltersOpen = true" class="flex items-center px-4 py-2 text-sm font-medium text-foreground bg-background border border-border rounded-md lg:hidden hover:bg-muted">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
             Filters
         </button>
@@ -45,27 +45,27 @@
              @click="mobileFiltersOpen = false"
              class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" style="display: none;"></div>
 
-        <aside class="fixed inset-y-0 left-0 z-50 w-3/4 h-full max-w-sm p-6 pb-24 overflow-y-auto transition-transform duration-300 ease-in-out transform bg-white shadow-2xl lg:sticky lg:top-36 lg:translate-x-0 lg:w-72 lg:p-6 lg:rounded-2xl lg:border lg:border-gray-100 lg:shadow-sm lg:max-h-[calc(100vh-10rem)] shrink-0 custom-scrollbar"
+        <aside class="fixed inset-y-0 left-0 z-50 w-3/4 h-full max-w-sm p-6 pb-24 overflow-y-auto transition-transform duration-300 ease-in-out transform bg-background shadow-2xl lg:sticky lg:top-36 lg:translate-x-0 lg:w-72 lg:p-6 lg:rounded-2xl lg:border lg:border-border lg:shadow-sm lg:max-h-[calc(100vh-10rem)] shrink-0 custom-scrollbar"
             :class="mobileFiltersOpen ? 'translate-x-0' : '-translate-x-full'">
             
             <div class="flex items-center justify-between mb-6 lg:hidden">
-                <h2 class="text-xl font-bold text-gray-900">Filters</h2>
-                <button @click="mobileFiltersOpen = false" class="p-2 text-gray-400 bg-gray-100 rounded-full hover:text-gray-600 hover:bg-gray-200">
+                <h2 class="text-xl font-bold text-foreground">Filters</h2>
+                <button @click="mobileFiltersOpen = false" class="p-2 text-muted-foreground bg-muted rounded-full hover:text-foreground hover:bg-muted hover:opacity-80">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
             <form action="/categories" method="GET">
-                <div class="pb-4 mb-4 border-b border-gray-200" x-data="{ open: true }">
-                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-gray-900 focus:outline-none">
+                <div class="pb-4 mb-4 border-b border-border" x-data="{ open: true }">
+                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-foreground focus:outline-none">
                         Genres
                         <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="open" x-collapse class="mt-4 space-y-3">
                         @foreach($genres as $genre)
-                            <label class="flex items-center space-x-3 text-sm text-gray-700 cursor-pointer">
-                                <input type="checkbox" name="genres[]" value="{{ $genre->id }}" 
-                                    class="w-4 h-4 border-gray-300 rounded text-cyan-500 focus:ring-cyan-500"
+                            <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
+                                <input type="checkbox" name="genres[]" value="{{ $genre->id }}"
+                                    class="w-4 h-4 border-border rounded text-cyan-500 focus:ring-cyan-500"
                                     @if(is_array(request('genres')) && in_array($genre->id, request('genres'))) checked @endif>
                                 <span class="capitalize">{{ $genre->name }}</span>
                             </label>
@@ -73,39 +73,39 @@
                     </div>
                 </div>
 
-                <div class="py-4 mb-6 border-b border-gray-200" x-data="{ open: true }">
-                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-gray-900 focus:outline-none">
+                <div class="py-4 mb-6 border-b border-border" x-data="{ open: true }">
+                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-foreground focus:outline-none">
                         Price Range
                         <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="open" x-collapse class="flex items-center justify-between mt-4 space-x-4 text-sm">
                         <div class="flex flex-col w-1/2">
-                            <span class="mb-1 text-gray-500">Min</span>
-                            <div class="flex items-center px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                                <span class="mr-1 text-gray-500">৳</span>
-                                <input type="number" name="min_price" value="{{ request('min_price', 100) }}" class="w-full p-0 text-sm bg-transparent border-none focus:ring-0">
+                            <span class="mb-1 text-muted-foreground">Min</span>
+                            <div class="flex items-center px-3 py-2 border border-border rounded-md bg-muted">
+                                <span class="mr-1 text-muted-foreground">৳</span>
+                                <input type="number" name="min_price" value="{{ request('min_price', 100) }}" class="w-full p-0 text-sm bg-transparent border-none focus:ring-0 text-foreground">
                             </div>
                         </div>
-                        <span class="mt-5 text-gray-400">-</span>
+                        <span class="mt-5 text-muted-foreground">-</span>
                         <div class="flex flex-col w-1/2">
-                            <span class="mb-1 text-gray-500">Max</span>
-                            <div class="flex items-center px-3 py-2 border border-gray-200 rounded-md bg-gray-50">
-                                <span class="mr-1 text-gray-500">৳</span>
-                                <input type="number" name="max_price" value="{{ request('max_price', 3000) }}" class="w-full p-0 text-sm bg-transparent border-none focus:ring-0">
+                            <span class="mb-1 text-muted-foreground">Max</span>
+                            <div class="flex items-center px-3 py-2 border border-border rounded-md bg-muted">
+                                <span class="mr-1 text-muted-foreground">৳</span>
+                                <input type="number" name="max_price" value="{{ request('max_price', 3000) }}" class="w-full p-0 text-sm bg-transparent border-none focus:ring-0 text-foreground">
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="pb-4 mb-4 border-b border-gray-200" x-data="{ open: false }">
-                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-gray-900 focus:outline-none">
+                <div class="pb-4 mb-4 border-b border-border" x-data="{ open: false }">
+                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-foreground focus:outline-none">
                         Authors
                         <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="open" x-collapse class="mt-4 space-y-3 overflow-y-auto max-h-48 custom-scrollbar">
                         @foreach($authors as $author)
-                            <label class="flex items-center space-x-3 text-sm text-gray-700 cursor-pointer">
-                                <input type="checkbox" name="authors[]" value="{{ $author }}" 
-                                    class="w-4 h-4 border-gray-300 rounded text-cyan-500 focus:ring-cyan-500"
+                            <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
+                                <input type="checkbox" name="authors[]" value="{{ $author }}"
+                                    class="w-4 h-4 border-border rounded text-cyan-500 focus:ring-cyan-500"
                                     @if(is_array(request('authors')) && in_array($author, request('authors'))) checked @endif>
                                 <span class="capitalize">{{ $author }}</span>
                             </label>
@@ -113,22 +113,22 @@
                     </div>
                 </div>
 
-                <div class="pb-4 mb-4 border-b border-gray-200" x-data="{ open: true }">
-                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-gray-900 focus:outline-none">
+                <div class="pb-4 mb-4 border-b border-border" x-data="{ open: true }">
+                    <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-foreground focus:outline-none">
                         Rating
                         <svg class="w-5 h-5 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                     <div x-show="open" x-collapse class="mt-4 space-y-3">
                         @foreach([4, 3, 2, 1] as $rating)
-                            <label class="flex items-center space-x-3 text-sm text-gray-700 cursor-pointer">
-                                <input type="radio" name="min_rating" value="{{ $rating }}" 
-                                    class="w-4 h-4 border-gray-300 text-cyan-500 focus:ring-cyan-500"
+                            <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
+                                <input type="radio" name="min_rating" value="{{ $rating }}"
+                                    class="w-4 h-4 border-border text-cyan-500 focus:ring-cyan-500"
                                     @if(request('min_rating') == $rating) checked @endif>
                                 <span class="flex items-center">
                                     @for($i = 0; $i < $rating; $i++)
                                         <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                                     @endfor
-                                    <span class="ml-1 text-gray-500">& Up</span>
+                                    <span class="ml-1 text-muted-foreground">& Up</span>
                                 </span>
                             </label>
                         @endforeach
@@ -144,15 +144,15 @@
         </aside>
 
         <div class="flex-1">
-            <div class="flex items-center justify-between p-4 mb-6 bg-white border border-gray-200 rounded-lg">
-                <div class="text-sm font-medium text-gray-500">
-                    Showing all <span class="font-bold text-gray-900">{{ $products->count() }}</span> results
+            <div class="flex items-center justify-between p-4 mb-6 bg-card text-card-foreground border border-border rounded-lg">
+                <div class="text-sm font-medium text-muted-foreground">
+                    Showing all <span class="font-bold text-foreground">{{ $products->count() }}</span> results
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
-                    <div class="relative flex flex-col p-3 transition duration-300 border border-gray-100 bg-gray-50 rounded-xl group hover:shadow-lg">
+                    <div class="relative flex flex-col p-3 transition duration-300 border border-border bg-card text-card-foreground rounded-xl group hover:shadow-lg">
                         @auth
                             @php
                                 $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
@@ -178,7 +178,7 @@
                                 x-data="{ zoomed: false }"
                                 @mouseenter="zoomed = true"
                                 @mouseleave="zoomed = false"
-                                class="relative w-full aspect-[2/3] bg-gray-200 rounded-md mb-3 flex items-center justify-center text-gray-400 overflow-hidden"
+                                class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden"
                             >
                                 @if($product->image_path)
                                     <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}"
@@ -191,15 +191,15 @@
                             
                             <div class="flex items-center justify-center mb-1 space-x-1">
                                 <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                <span class="text-sm font-bold text-gray-700">{{ $product->rating }}</span>
+                                <span class="text-sm font-bold text-foreground">{{ $product->rating }}</span>
                             </div>
                             
-                            <h3 class="font-bold text-gray-900 truncate transition group-hover:text-cyan-500" title="{{ $product->title }}">{{ $product->title }}</h3>
-                            <p class="mb-2 text-xs text-gray-500 truncate">{{ $product->author }}</p>
+                            <h3 class="font-bold text-foreground truncate transition group-hover:text-cyan-500" title="{{ $product->title }}">{{ $product->title }}</h3>
+                            <p class="mb-2 text-xs text-muted-foreground truncate">{{ $product->author }}</p>
                         </a>
                         
                         <div class="pt-2 mt-auto">
-                            <p class="mb-3 text-lg font-bold text-gray-900">৳ {{ number_format($product->display_price, 0) }}</p>
+                            <p class="mb-3 text-lg font-bold text-foreground">৳ {{ number_format($product->display_price, 0) }}</p>
                             
                             {{-- THE FIX: Wrap the button in a secure POST form --}}
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
@@ -211,7 +211,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="py-12 text-center text-gray-500 col-span-full">
+                    <div class="py-12 text-center text-muted-foreground col-span-full">
                         No books found matching your criteria. Try clearing your filters.
                     </div>
                 @endforelse

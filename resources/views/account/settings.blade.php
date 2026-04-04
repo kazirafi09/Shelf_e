@@ -17,27 +17,27 @@
 @endif
 
 {{-- Profile Information --}}
-<div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-2xl">
-    <div class="px-6 py-5 border-b border-gray-100">
-        <h2 class="text-base font-bold text-gray-900">Profile Information</h2>
-        <p class="mt-1 text-sm text-gray-500">Update your name and email address.</p>
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
+    <div class="px-6 py-5 border-b border-border">
+        <h2 class="text-base font-bold text-foreground">Profile Information</h2>
+        <p class="mt-1 text-sm text-muted-foreground">Update your name and email address.</p>
     </div>
     <form action="{{ route('profile.update') }}" method="POST" class="px-6 py-5 space-y-4">
         @csrf
         @method('PATCH')
 
         <div>
-            <label class="block mb-1 text-sm font-medium text-gray-700">Full Name</label>
+            <label class="block mb-1 text-sm font-medium text-foreground">Full Name</label>
             <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500
+                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg
                           @error('name') border-red-400 @enderror">
             @error('name')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
         </div>
 
         <div>
-            <label class="block mb-1 text-sm font-medium text-gray-700">Email Address</label>
+            <label class="block mb-1 text-sm font-medium text-foreground">Email Address</label>
             <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500
+                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg
                           @error('email') border-red-400 @enderror">
             @error('email')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
 
@@ -62,35 +62,35 @@
 </div>
 
 {{-- Change Password --}}
-<div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-2xl">
-    <div class="px-6 py-5 border-b border-gray-100">
-        <h2 class="text-base font-bold text-gray-900">Change Password</h2>
-        <p class="mt-1 text-sm text-gray-500">Use a strong password of at least 8 characters.</p>
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
+    <div class="px-6 py-5 border-b border-border">
+        <h2 class="text-base font-bold text-foreground">Change Password</h2>
+        <p class="mt-1 text-sm text-muted-foreground">Use a strong password of at least 8 characters.</p>
     </div>
     <form action="{{ route('password.update') }}" method="POST" class="px-6 py-5 space-y-4">
         @csrf
         @method('PUT')
 
         <div>
-            <label class="block mb-1 text-sm font-medium text-gray-700">Current Password</label>
+            <label class="block mb-1 text-sm font-medium text-foreground">Current Password</label>
             <input type="password" name="current_password" autocomplete="current-password" required
-                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500
+                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg
                           @error('current_password', 'updatePassword') border-red-400 @enderror">
             @error('current_password', 'updatePassword')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
         </div>
 
         <div>
-            <label class="block mb-1 text-sm font-medium text-gray-700">New Password</label>
+            <label class="block mb-1 text-sm font-medium text-foreground">New Password</label>
             <input type="password" name="password" autocomplete="new-password" required
-                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500
+                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg
                           @error('password', 'updatePassword') border-red-400 @enderror">
             @error('password', 'updatePassword')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
         </div>
 
         <div>
-            <label class="block mb-1 text-sm font-medium text-gray-700">Confirm New Password</label>
+            <label class="block mb-1 text-sm font-medium text-foreground">Confirm New Password</label>
             <input type="password" name="password_confirmation" autocomplete="new-password" required
-                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-cyan-500 focus:border-cyan-500">
+                   class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
         </div>
 
         <div class="flex justify-end">
@@ -106,7 +106,7 @@
 <div class="overflow-hidden bg-white border border-red-100 shadow-sm rounded-2xl" x-data="{ confirmDelete: false }">
     <div class="px-6 py-5 border-b border-red-100">
         <h2 class="text-base font-bold text-red-700">Delete Account</h2>
-        <p class="mt-1 text-sm text-gray-500">Permanently delete your account and all associated data.</p>
+        <p class="mt-1 text-sm text-muted-foreground">Permanently delete your account and all associated data.</p>
     </div>
     <div class="px-6 py-5">
         <button @click="confirmDelete = true"
@@ -117,23 +117,23 @@
         <div x-show="confirmDelete" x-transition
              class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
              style="display:none">
-            <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6" @click.outside="confirmDelete = false">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Are you sure?</h3>
-                <p class="text-sm text-gray-600 mb-5">This will permanently delete your account. This action cannot be undone.</p>
+            <div class="w-full max-w-md bg-card text-card-foreground rounded-2xl shadow-xl p-6" @click.outside="confirmDelete = false">
+                <h3 class="text-lg font-bold text-foreground mb-2">Are you sure?</h3>
+                <p class="text-sm text-muted-foreground mb-5">This will permanently delete your account. This action cannot be undone.</p>
 
                 <form action="{{ route('profile.destroy') }}" method="POST" class="space-y-4">
                     @csrf
                     @method('DELETE')
                     <div>
-                        <label class="block mb-1 text-sm font-medium text-gray-700">Confirm your password</label>
+                        <label class="block mb-1 text-sm font-medium text-foreground">Confirm your password</label>
                         <input type="password" name="password" required
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500
+                               class="w-full px-4 py-2.5 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg
                                       @error('password', 'userDeletion') border-red-400 @enderror">
                         @error('password', 'userDeletion')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                     </div>
                     <div class="flex justify-end gap-3">
                         <button type="button" @click="confirmDelete = false"
-                                class="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                class="px-4 py-2 text-sm font-semibold text-foreground bg-background border border-border rounded-lg hover:bg-muted transition-colors">
                             Cancel
                         </button>
                         <button type="submit"

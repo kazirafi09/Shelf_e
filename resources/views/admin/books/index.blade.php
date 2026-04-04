@@ -12,7 +12,7 @@
             </span>
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Search by title or author..."
-                   class="block w-full py-2.5 pl-10 pr-3 text-sm border-gray-200 rounded-xl bg-white shadow-sm focus:border-cyan-500 focus:ring-cyan-500 transition-all">
+                   class="block w-full py-2.5 pl-10 pr-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm transition-all">
         </form>
         
         <a href="{{ route('admin.books.create') }}" 
@@ -29,36 +29,36 @@
     @endif
 
     {{-- Inventory Table --}}
-    <div class="overflow-hidden bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+    <div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
         <div class="overflow-x-auto">
             <table class="w-full text-left whitespace-nowrap">
-                <thead class="bg-gray-50/50">
+                <thead class="bg-muted">
                     <tr>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Book Info</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Price</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Stock Status</th>
-                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-right text-gray-400 uppercase">Actions</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Book Info</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Price</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Stock Status</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-right text-muted-foreground uppercase">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-100">
+                <tbody class="bg-card divide-y divide-border">
                     @forelse($books as $book)
-                    <tr class="transition duration-150 hover:bg-gray-50/30 group">
+                    <tr class="transition duration-150 hover:bg-muted/30 group">
                         <td class="px-6 py-4">
                             <div class="flex items-center">
-                                <div class="flex-shrink-0 w-12 h-16 overflow-hidden bg-gray-100 border border-gray-100 rounded-lg shadow-sm">
+                                <div class="flex-shrink-0 w-12 h-16 overflow-hidden bg-muted border border-border rounded-lg shadow-sm">
                                     @if($book->image_path)
                                         <img class="object-cover w-full h-full" src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}">
                                     @else
-                                        <div class="flex items-center justify-center w-full h-full text-[10px] text-gray-400 uppercase font-bold text-center p-1">No Cover</div>
+                                        <div class="flex items-center justify-center w-full h-full text-[10px] text-muted-foreground uppercase font-bold text-center p-1">No Cover</div>
                                     @endif
                                 </div>
                                 <div class="ml-4">
-                                    <div class="text-sm font-bold text-gray-900 transition-colors group-hover:text-cyan-600">{{ $book->title }}</div>
-                                    <div class="text-xs text-gray-500">{{ $book->author }}</div>
+                                    <div class="text-sm font-bold text-foreground transition-colors group-hover:text-cyan-600">{{ $book->title }}</div>
+                                    <div class="text-xs text-muted-foreground">{{ $book->author }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-900">
+                        <td class="px-6 py-4 text-sm font-bold text-foreground">
                             ৳ {{ number_format($book->display_price, 0) }}
                         </td>
                         <td class="px-6 py-4">
@@ -96,8 +96,8 @@
                     <tr>
                         <td colspan="4" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center">
-                                <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                                <p class="font-medium text-gray-500">No books found in inventory.</p>
+                                <svg class="w-12 h-12 mb-3 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                <p class="font-medium text-muted-foreground">No books found in inventory.</p>
                             </div>
                         </td>
                     </tr>

@@ -54,7 +54,7 @@
 >
 
     {{-- Search Bar --}}
-    <div class="p-6 bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+    <div class="p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
         <form @submit.prevent="search()" class="flex gap-3">
             <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -68,7 +68,7 @@
                     x-model="query"
                     @keydown.enter.prevent="search()"
                     placeholder="Search by book title, e.g. 'The Great Gatsby'…"
-                    class="block w-full py-3 pl-10 pr-4 text-sm border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:ring-cyan-500 focus:border-cyan-500"
+                    class="block w-full py-3 pl-10 pr-4 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm"
                 >
             </div>
             <button
@@ -99,41 +99,41 @@
             <path class="opacity-75" fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
-        <p class="mt-3 text-sm font-medium text-gray-400">Searching Open Library…</p>
+        <p class="mt-3 text-sm font-medium text-muted-foreground">Searching Open Library…</p>
     </div>
 
     {{-- Empty State --}}
-    <div x-show="!isLoading && results.length === 0 && !error && query.length > 0" x-transition.opacity class="flex flex-col items-center justify-center py-20 bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5" style="display: none;">
+    <div x-show="!isLoading && results.length === 0 && !error && query.length > 0" x-transition.opacity class="flex flex-col items-center justify-center py-20 bg-card text-card-foreground border border-border rounded-2xl shadow-sm ring-1 ring-gray-900/5" style="display: none;">
         <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
         </svg>
-        <p class="text-sm font-medium text-gray-400">No results found. Try a different title.</p>
+        <p class="text-sm font-medium text-muted-foreground">No results found. Try a different title.</p>
     </div>
 
     {{-- Results Table --}}
-    <div x-show="results.length > 0" x-transition.opacity class="overflow-hidden bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5" style="display: none;">
+    <div x-show="results.length > 0" x-transition.opacity class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5" style="display: none;">
 
-        <div class="px-6 py-4 border-b border-gray-100">
-            <p class="text-sm font-semibold text-gray-700">
+        <div class="px-6 py-4 border-b border-border">
+            <p class="text-sm font-semibold text-foreground">
                 <span x-text="results.length"></span> results from Open Library
             </p>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left">
-                <thead class="bg-gray-50/50">
+                <thead class="bg-muted">
                     <tr>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Cover</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Title</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Author</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Year</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Action</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Cover</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Title</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Author</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Year</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-border">
                     <template x-for="(book, index) in results" :key="index">
-                        <tr class="transition hover:bg-gray-50/50">
+                        <tr class="transition hover:bg-muted/50">
 
                             {{-- Cover --}}
                             <td class="px-6 py-4">
@@ -143,7 +143,7 @@
                                          onerror="this.style.display='none'">
                                 </template>
                                 <template x-if="!book.cover_url">
-                                    <div class="flex items-center justify-center w-10 h-14 rounded-md bg-gray-100 ring-1 ring-gray-900/5">
+                                    <div class="flex items-center justify-center w-10 h-14 rounded-md bg-muted ring-1 ring-gray-900/5">
                                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -154,18 +154,18 @@
 
                             {{-- Title --}}
                             <td class="px-6 py-4 max-w-xs">
-                                <p class="text-sm font-semibold text-gray-900 line-clamp-2" x-text="book.title || '—'"></p>
-                                <p class="mt-0.5 text-xs text-gray-400" x-text="book.isbn ? 'ISBN: ' + book.isbn : ''"></p>
+                                <p class="text-sm font-semibold text-foreground line-clamp-2" x-text="book.title || '—'"></p>
+                                <p class="mt-0.5 text-xs text-muted-foreground" x-text="book.isbn ? 'ISBN: ' + book.isbn : ''"></p>
                             </td>
 
                             {{-- Author --}}
                             <td class="px-6 py-4">
-                                <p class="text-sm text-gray-600" x-text="book.author || '—'"></p>
+                                <p class="text-sm text-muted-foreground" x-text="book.author || '—'"></p>
                             </td>
 
                             {{-- Year --}}
                             <td class="px-6 py-4">
-                                <p class="text-sm text-gray-600" x-text="book.published_year || '—'"></p>
+                                <p class="text-sm text-muted-foreground" x-text="book.published_year || '—'"></p>
                             </td>
 
                             {{-- Import Form --}}

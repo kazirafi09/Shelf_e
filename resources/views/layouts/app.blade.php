@@ -31,7 +31,7 @@
 </head>
 
 
-<body class="flex flex-col min-h-screen font-sans antialiased text-gray-900 bg-resin selection:bg-cyan-100 selection:text-cyan-900">
+<body class="flex flex-col min-h-screen font-sans antialiased bg-background text-foreground selection:bg-cyan-100 selection:text-cyan-900">
 
     <div class="relative z-50 px-4 py-2 text-xs font-medium tracking-wide text-white bg-cyan-900 sm:text-sm">
         <div class="container flex items-center justify-between mx-auto">

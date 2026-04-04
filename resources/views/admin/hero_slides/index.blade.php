@@ -24,22 +24,22 @@
     @endif
 
     {{-- Table Container --}}
-    <div class="overflow-hidden bg-white border border-gray-100 shadow-xl rounded-2xl ring-1 ring-gray-900/5">
+    <div class="overflow-hidden bg-card text-card-foreground border border-border shadow-xl rounded-2xl ring-1 ring-gray-900/5">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100 bg-gray-50/50">
-                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Preview</th>
-                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Details</th>
-                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-center text-gray-400 uppercase">Order</th>
-                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-right text-gray-400 uppercase">Actions</th>
+                    <tr class="border-b border-border bg-muted">
+                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Preview</th>
+                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Details</th>
+                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-center text-muted-foreground uppercase">Order</th>
+                        <th class="px-8 py-4 text-xs font-bold tracking-wider text-right text-muted-foreground uppercase">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-border">
                     @forelse($slides as $slide)
-                    <tr class="transition-colors hover:bg-gray-50/30 group">
+                    <tr class="transition-colors hover:bg-muted/30 group">
                         <td class="px-8 py-4">
-                            <div class="w-20 h-24 overflow-hidden transition-transform border border-gray-100 rounded-lg shadow-md group-hover:scale-105">
+                            <div class="w-20 h-24 overflow-hidden transition-transform border border-border rounded-lg shadow-md group-hover:scale-105">
                                 <img src="{{ asset('storage/' . $slide->image_path) }}" class="object-cover w-full h-full">
                             </div>
                         </td>
@@ -47,11 +47,11 @@
                             <span class="inline-block px-2 py-0.5 mb-1 text-[10px] font-black tracking-widest text-orange-600 uppercase bg-orange-50 rounded">
                                 {{ $slide->tag }}
                             </span>
-                            <div class="text-base font-bold text-gray-900 transition-colors group-hover:text-cyan-600">{{ $slide->title }}</div>
+                            <div class="text-base font-bold text-foreground transition-colors group-hover:text-cyan-600">{{ $slide->title }}</div>
                         </td>
                         <td class="px-8 py-4">
                            <div class="flex items-center justify-center">
-                               <span class="flex items-center justify-center w-8 h-8 text-xs font-bold text-gray-600 bg-gray-100 rounded-full">
+                               <span class="flex items-center justify-center w-8 h-8 text-xs font-bold text-foreground bg-muted rounded-full">
                                    {{ $slide->order }}
                                </span>
                            </div>
@@ -76,7 +76,7 @@
                         <td colspan="4" class="px-8 py-16 text-center">
                             <div class="flex flex-col items-center">
                                 <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <p class="font-medium text-gray-500">No carousel slides found.</p>
+                                <p class="font-medium text-muted-foreground">No carousel slides found.</p>
                             </div>
                         </td>
                     </tr>

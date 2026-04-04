@@ -15,14 +15,14 @@
 <div class="flex flex-col items-start justify-between gap-4 mb-6 sm:flex-row sm:items-center">
     <form method="GET" action="{{ route('admin.authors.index') }}" class="flex flex-1 gap-2 sm:max-w-xs">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search authors..."
-               class="block w-full px-4 py-2.5 text-sm border-gray-200 rounded-lg shadow-sm bg-gray-50 focus:border-cyan-500 focus:ring-cyan-500">
+               class="block w-full px-4 py-2.5 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
         <button type="submit"
                 class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-white transition bg-cyan-600 rounded-lg hover:bg-cyan-700 active:scale-95 shrink-0">
             Search
         </button>
         @if(request('search'))
             <a href="{{ route('admin.authors.index') }}"
-               class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-gray-600 transition bg-gray-100 rounded-lg hover:bg-gray-200 shrink-0">
+               class="inline-flex items-center px-4 py-2.5 text-sm font-bold text-foreground transition bg-muted rounded-lg hover:bg-muted hover:opacity-80 shrink-0">
                 Clear
             </a>
         @endif
@@ -37,27 +37,27 @@
     </a>
 </div>
 
-<div class="overflow-hidden bg-white shadow-sm rounded-2xl ring-1 ring-gray-900/5">
+<div class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5">
     <table class="w-full text-left">
-        <thead class="bg-gray-50/50">
+        <thead class="bg-muted">
             <tr>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Author</th>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Biography</th>
-                <th class="px-6 py-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Actions</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Author</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Biography</th>
+                <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-border">
             @forelse($authors as $author)
-            <tr class="transition hover:bg-gray-50/50">
+            <tr class="transition hover:bg-muted/50">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 overflow-hidden bg-gray-100 rounded-full ring-1 ring-gray-900/5 shrink-0">
+                        <div class="w-10 h-10 overflow-hidden bg-muted rounded-full ring-1 ring-gray-900/5 shrink-0">
                             @if($author->photo_path)
                                 <img src="{{ asset('storage/' . $author->photo_path) }}"
                                      alt="{{ $author->name }}"
                                      class="object-cover w-full h-full">
                             @else
-                                <div class="flex items-center justify-center w-full h-full text-gray-400">
+                                <div class="flex items-center justify-center w-full h-full text-muted-foreground">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -66,12 +66,12 @@
                             @endif
                         </div>
                         <div>
-                            <p class="text-sm font-semibold text-gray-900">{{ $author->name }}</p>
-                            <p class="text-xs text-gray-400">{{ $author->products->count() }} book(s)</p>
+                            <p class="text-sm font-semibold text-foreground">{{ $author->name }}</p>
+                            <p class="text-xs text-muted-foreground">{{ $author->products->count() }} book(s)</p>
                         </div>
                     </div>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs">
+                <td class="px-6 py-4 text-sm text-muted-foreground max-w-xs">
                     <p class="line-clamp-2">{{ $author->bio ?? '—' }}</p>
                 </td>
                 <td class="px-6 py-4">
@@ -94,7 +94,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="3" class="px-6 py-16 text-sm font-medium text-center text-gray-400">
+                <td colspan="3" class="px-6 py-16 text-sm font-medium text-center text-muted-foreground">
                     No authors found.
                     <a href="{{ route('admin.authors.create') }}"
                        class="block mt-1 font-bold text-cyan-600 hover:underline">

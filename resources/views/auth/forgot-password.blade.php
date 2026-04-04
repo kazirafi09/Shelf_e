@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="flex items-center justify-center min-h-[calc(100vh-200px)] py-12 px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md p-8 space-y-8 bg-white border border-gray-100 shadow-2xl rounded-3xl md:p-10 ring-1 ring-gray-900/5">
+    <div class="w-full max-w-md p-8 space-y-8 bg-card text-card-foreground border border-border shadow-2xl rounded-3xl md:p-10">
         
         <div class="text-center">
             <div class="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-cyan-50 text-cyan-500">

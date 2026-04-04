@@ -26,38 +26,38 @@
 </div>
 
 {{-- Ledger Table --}}
-<div class="overflow-hidden bg-white rounded-2xl shadow-sm ring-1 ring-gray-900/5">
-    <div class="px-6 py-4 border-b border-gray-100">
-        <h2 class="text-base font-bold text-gray-900">Transaction History</h2>
+<div class="overflow-hidden bg-card text-card-foreground rounded-2xl shadow-sm ring-1 ring-border">
+    <div class="px-6 py-4 border-b border-border">
+        <h2 class="text-base font-bold text-foreground">Transaction History</h2>
     </div>
 
     @if($ledger->isEmpty())
         <div class="flex flex-col items-center justify-center py-16 text-center">
-            <svg class="w-12 h-12 mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-12 h-12 mb-3 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
-            <p class="font-semibold text-gray-700">No transactions yet.</p>
-            <p class="mt-1 text-sm text-gray-400">Earn coins by shopping or through promotions.</p>
+            <p class="font-semibold text-foreground">No transactions yet.</p>
+            <p class="mt-1 text-sm text-muted-foreground">Earn coins by shopping or through promotions.</p>
         </div>
     @else
         <div class="overflow-x-auto">
             <table class="w-full text-left">
-                <thead class="bg-gray-50/50">
+                <thead class="bg-muted">
                     <tr>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Date</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Type</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Description</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase text-right">Amount</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-gray-400 uppercase text-right">Balance After</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Date</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Type</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Description</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase text-right">Amount</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase text-right">Balance After</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-border">
                     @foreach($ledger as $entry)
-                    <tr class="hover:bg-gray-50/40 transition-colors">
+                    <tr class="hover:bg-muted/50 transition-colors">
                         <td class="px-6 py-4">
-                            <p class="text-sm text-gray-700">{{ $entry->created_at->format('M d, Y') }}</p>
-                            <p class="text-xs text-gray-400">{{ $entry->created_at->format('h:i A') }}</p>
+                            <p class="text-sm text-foreground">{{ $entry->created_at->format('M d, Y') }}</p>
+                            <p class="text-xs text-muted-foreground">{{ $entry->created_at->format('h:i A') }}</p>
                         </td>
                         <td class="px-6 py-4">
                             @if($entry->type === 'credit')
@@ -72,14 +72,14 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 max-w-xs">{{ $entry->description }}</td>
+                        <td class="px-6 py-4 text-sm text-muted-foreground max-w-xs">{{ $entry->description }}</td>
                         <td class="px-6 py-4 text-right">
                             <span class="text-sm font-bold {{ $entry->type === 'credit' ? 'text-emerald-600' : 'text-red-600' }}">
                                 {{ $entry->type === 'credit' ? '+' : '−' }}{{ number_format($entry->amount) }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <span class="text-sm font-semibold text-gray-900">{{ number_format($entry->balance_after) }}</span>
+                            <span class="text-sm font-semibold text-foreground">{{ number_format($entry->balance_after) }}</span>
                         </td>
                     </tr>
                     @endforeach
@@ -87,7 +87,7 @@
             </table>
         </div>
 
-        <div class="px-6 py-4 border-t border-gray-100">
+        <div class="px-6 py-4 border-t border-border">
             {{ $ledger->links() }}
         </div>
     @endif

@@ -16,7 +16,7 @@
     class="space-y-6"
 >
     {{-- Tab Bar --}}
-    <div class="flex space-x-1 bg-white rounded-xl shadow-sm ring-1 ring-gray-900/5 p-1 w-fit">
+    <div class="flex space-x-1 bg-background border border-border rounded-xl shadow-sm ring-1 ring-gray-900/5 p-1 w-fit">
         <button
             @click="activeTab = 'pending'"
             :class="activeTab === 'pending'
