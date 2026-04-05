@@ -338,7 +338,51 @@
 
     <footer class="mt-auto bg-white border-t border-gray-200">
         {{-- Newsletter --}}
-        <div id="newsletter" class="relative py-16 overflow-hidden bg-gray-900">
+        <div id="newsletter" class="relative py-16 overflow-hidden bg-gray-900"
+             x-data="{
+                 state: '{{ auth()->check() && \App\Models\Subscriber::where('email', auth()->user()->email)->exists() ? 'already' : (auth()->guest() ? 'guest' : 'form') }}',
+                 loading: false,
+                 error: '',
+                 discountCode: 'FIRST15',
+                 showModal: false,
+                 copied: false,
+
+                 async submit() {
+                     this.error   = '';
+                     this.loading = true;
+                     try {
+                         const res  = await fetch('{{ route('newsletter.subscribe') }}', {
+                             method:  'POST',
+                             headers: {
+                                 'Accept':       'application/json',
+                                 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                             },
+                         });
+                         const data = await res.json();
+                         if (data.already_subscribed) {
+                             this.state = 'already';
+                         } else if (res.ok) {
+                             this.discountCode = data.discount_code ?? 'FIRST15';
+                             this.state        = 'done';
+                             this.showModal    = true;
+                         } else {
+                             this.error = data.message ?? 'Something went wrong. Please try again.';
+                         }
+                     } catch {
+                         this.error = 'Network error. Please check your connection and try again.';
+                     } finally {
+                         this.loading = false;
+                     }
+                 },
+
+                 copy() {
+                     navigator.clipboard.writeText(this.discountCode).then(() => {
+                         this.copied = true;
+                         setTimeout(() => { this.copied = false; }, 2000);
+                     });
+                 },
+             }">
+
             <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-10">
                 <svg class="absolute transform rotate-45 w-96 h-96 -top-10 -right-10" fill="currentColor" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50"/></svg>
             </div>
@@ -346,13 +390,103 @@
             <div class="container relative z-10 px-4 mx-auto text-center">
                 <h2 class="mb-3 text-3xl font-extrabold tracking-tight text-white">Get your first discount!</h2>
                 <p class="mb-8 font-medium text-gray-300">Subscribe to our newsletter and get a 15% discount code</p>
-                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="flex max-w-md p-1.5 mx-auto bg-white/10 backdrop-blur-md rounded-full border border-white/20 focus-within:bg-white focus-within:ring-4 focus-within:ring-gray-500/30 transition-all duration-500">
+
+                {{-- Guest state --}}
+                <div x-show="state === 'guest'" x-cloak class="max-w-md mx-auto">
+                    <a href="{{ route('login') }}"
+                       class="inline-flex items-center gap-2 px-8 py-3 text-sm font-bold text-gray-900 uppercase tracking-wider bg-white rounded-full hover:bg-gray-100 transition-colors">
+                        Log in to subscribe
+                    </a>
+                </div>
+
+                {{-- Form state --}}
+                <form x-show="state === 'form'" x-cloak @submit.prevent="submit()"
+                      class="flex max-w-md p-1.5 mx-auto bg-white/10 backdrop-blur-md rounded-full border border-white/20 focus-within:bg-white focus-within:ring-4 focus-within:ring-gray-500/30 transition-all duration-500">
                     @csrf
-                    <input type="email" name="email" placeholder="Your email address" required class="flex-1 px-5 text-white transition-colors bg-transparent border-none placeholder-gray-400 focus:ring-0 focus:outline-none focus:text-gray-900 focus:placeholder-gray-400">
-                    <button type="submit" class="px-8 py-3 text-sm font-bold text-gray-900 uppercase tracking-wider transition-all duration-300 bg-white rounded-full hover:bg-gray-100 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
-                        Subscribe
+                    <span class="flex-1 px-5 py-3 text-sm text-gray-300 bg-transparent truncate text-left">
+                        {{ auth()->check() ? auth()->user()->email : '' }}
+                    </span>
+                    <button type="submit" :disabled="loading"
+                            class="px-8 py-3 text-sm font-bold text-gray-900 uppercase tracking-wider transition-all duration-300 bg-white rounded-full hover:bg-gray-100 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:translate-y-0">
+                        <span x-text="loading ? 'Sending…' : 'Subscribe'"></span>
                     </button>
                 </form>
+                <p x-show="error" x-cloak x-text="error" class="mt-3 text-sm font-medium text-red-400"></p>
+
+                {{-- Already subscribed state --}}
+                <div x-show="state === 'already'" x-cloak class="max-w-md mx-auto text-gray-300">
+                    <p class="text-base font-semibold text-white">You're already subscribed!</p>
+                    <p class="mt-1 text-sm">Use code <span class="font-bold text-white">FIRST15</span> at checkout for 15% off.</p>
+                </div>
+
+                {{-- Done state --}}
+                <div x-show="state === 'done'" x-cloak class="max-w-md mx-auto text-gray-300">
+                    <p class="text-base font-semibold text-white">You're subscribed! Check the popup for your discount code.</p>
+                </div>
+            </div>
+
+            {{-- Success Modal --}}
+            <div x-show="showModal"
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                 @click.self="showModal = false">
+
+                <div x-show="showModal"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                     class="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8 text-center">
+
+                    <button @click="showModal = false"
+                            class="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <div class="flex items-center justify-center w-14 h-14 mx-auto mb-5 bg-green-50 border border-green-200 rounded-full">
+                        <svg class="w-7 h-7 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+
+                    <h3 class="mb-1 text-xl font-extrabold text-gray-900">You're subscribed!</h3>
+                    <p class="mb-6 text-sm text-gray-500">Here is your exclusive discount code:</p>
+
+                    <div class="p-5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-6">
+                        <p class="mb-3 text-xs font-semibold tracking-widest text-gray-400 uppercase">Your discount code</p>
+                        <div class="flex items-center justify-between gap-3">
+                            <span x-text="discountCode" class="text-2xl font-black tracking-[0.2em] text-gray-900 select-all"></span>
+                            <button type="button" @click="copy()"
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold tracking-wide text-gray-700 uppercase bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors shrink-0">
+                                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                <svg x-show="copied" class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span x-text="copied ? 'Copied!' : 'Copy'"></span>
+                            </button>
+                        </div>
+                        <p class="mt-3 text-xs text-gray-500">
+                            Apply at checkout for <span class="font-semibold text-gray-700">15% off</span> your first order. Valid once.
+                        </p>
+                    </div>
+
+                    <button @click="showModal = false"
+                            class="w-full py-3 text-sm font-bold text-white bg-gray-900 rounded-xl hover:bg-gray-800 transition-colors">
+                        Start Shopping
+                    </button>
+                </div>
             </div>
         </div>
 

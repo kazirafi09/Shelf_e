@@ -292,7 +292,8 @@
                             <span>−৳ <span x-text="couponDiscount.toLocaleString()"></span></span>
                         </div>
 
-                        {{-- Discount code input ──────────────────────────────── --}}
+                        {{-- Discount code — logged-in users only ────────────── --}}
+                        @auth
                         <div class="pt-3 mt-1 border-t border-dashed border-border">
                             <label class="block mb-1.5 text-xs font-semibold text-foreground">
                                 Discount Code
@@ -304,20 +305,19 @@
                                 maxlength="50"
                                 class="w-full px-3 py-2.5 text-sm font-mono uppercase tracking-widest bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg transition-colors"
                             >
-                            {{-- Live hint: shown only when the code looks correct --}}
+                            {{-- Live hint: shown only when the typed code matches FIRST15 --}}
                             <p
                                 x-show="couponDiscount > 0"
-                                x-transition:enter="transition ease-out duration-150"
-                                x-transition:enter-start="opacity-0 -translate-y-1"
-                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-cloak
                                 class="mt-1.5 text-xs font-medium text-green-600"
                             >
-                                ✓ 15% discount applied (if your email is eligible)
+                                ✓ 15% discount will be applied to your order
                             </p>
                             @error('coupon_code')
                                 <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
+                        @endauth
                         {{-- ─────────────────────────────────────────────────── --}}
 
                         {{-- Redeem Coins (authenticated users only) --}}

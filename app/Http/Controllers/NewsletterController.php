@@ -4,31 +4,40 @@ namespace App\Http\Controllers;
 
 use App\Models\Subscriber;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class NewsletterController extends Controller
 {
     public function subscribe(Request $request)
     {
-        $request->validate(
-            [
-                'email' => [
-                    'required',
-                    'email',
-                    'max:255',
-                    Rule::unique('subscribers', 'email'),
-                ],
-            ],
-            [
-                'email.unique' => 'This email address is already subscribed to our newsletter.',
-            ]
-        );
+        // Route is protected by auth middleware, so auth()->user() is always present.
+        $email = auth()->user()->email;
 
-        Subscriber::create(['email' => $request->email]);
+        // If the account email is already in the subscribers table, tell the
+        // client — but treat it as a soft state, not an error (200, not 422).
+        $existing = Subscriber::where('email', $email)->first();
 
-        return response()->json([
-            'message'       => 'You have successfully subscribed!',
-            'discount_code' => 'FIRST15',
-        ]);
+        if ($existing) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'already_subscribed' => true,
+                    'message'            => 'You are already subscribed!',
+                ]);
+            }
+
+            return back()->with('newsletter_already_subscribed', true);
+        }
+
+        Subscriber::create(['email' => $email]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message'       => 'You have successfully subscribed!',
+                'discount_code' => 'FIRST15',
+            ]);
+        }
+
+        return back()
+            ->with('newsletter_success', true)
+            ->with('newsletter_discount', 'FIRST15');
     }
 }

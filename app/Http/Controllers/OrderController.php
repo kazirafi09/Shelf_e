@@ -109,13 +109,23 @@ class OrderController extends Controller
                     ->withInput();
             }
 
-            $subscriberForCoupon = Subscriber::where('email', $validatedData['email'])
+            // Discount codes require a logged-in account so we can verify
+            // the subscriber email and prevent guest abuse.
+            if (! auth()->check()) {
+                return back()
+                    ->withErrors(['coupon_code' => 'You must be logged in to apply a discount code.'])
+                    ->withInput();
+            }
+
+            // Match against the authenticated user's account email, not the
+            // billing address field (which an unauthenticated user could spoof).
+            $subscriberForCoupon = Subscriber::where('email', auth()->user()->email)
                 ->where('discount_used', false)
                 ->first();
 
             if (! $subscriberForCoupon) {
                 return back()
-                    ->withErrors(['coupon_code' => 'This code is not valid for your email address, or has already been used.'])
+                    ->withErrors(['coupon_code' => 'This code is not valid for your account, or has already been used.'])
                     ->withInput();
             }
 
