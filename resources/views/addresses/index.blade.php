@@ -14,13 +14,13 @@
 @if($addresses->isNotEmpty())
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         @foreach($addresses as $addr)
-        <div class="relative p-5 bg-card text-card-foreground border rounded-2xl shadow-sm {{ $addr->is_default ? 'border-cyan-300 ring-1 ring-cyan-200' : 'border-border' }}"
+        <div class="relative p-5 bg-card text-card-foreground border rounded-2xl shadow-sm {{ $addr->is_default ? 'border-gray-300 ring-1 ring-gray-200' : 'border-border' }}"
              x-data="{ editOpen: false }" 
              @keydown.escape.window="if(editOpen) { editOpen = false; document.body.style.overflow = 'auto'; }">
 
             {{-- Default badge --}}
             @if($addr->is_default)
-                <span class="absolute top-4 right-4 text-[10px] font-bold tracking-wider uppercase text-cyan-700 bg-cyan-100 px-2 py-0.5 rounded-full">Default</span>
+                <span class="absolute top-4 right-4 text-[10px] font-bold tracking-wider uppercase text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">Default</span>
             @endif
 
             <div class="flex items-center gap-2 mb-3">
@@ -37,7 +37,7 @@
                     <form action="{{ route('addresses.default', $addr) }}" method="POST">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" class="text-xs font-semibold transition-colors text-cyan-700 hover:text-cyan-900">
+                        <button type="submit" class="text-xs font-semibold transition-colors text-gray-800 hover:text-gray-900">
                             Set as Default
                         </button>
                     </form>
@@ -124,7 +124,7 @@
                             </div>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="is_default" value="1" {{ $addr->is_default ? 'checked' : '' }}
-                                       class="w-4 h-4 rounded text-cyan-600 border-input focus:ring-2 focus:ring-ring">
+                                       class="w-4 h-4 rounded text-gray-700 border-input focus:ring-2 focus:ring-ring">
                                 <span class="text-sm font-medium text-foreground">Set as default address</span>
                             </label>
 
@@ -134,7 +134,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit"
-                                        class="px-5 py-2 text-sm font-bold text-white transition-colors rounded-lg bg-cyan-600 hover:bg-cyan-700">
+                                        class="px-5 py-2 text-sm font-bold text-white transition-colors rounded-lg bg-gray-700 hover:bg-gray-800">
                                     Save Changes
                                 </button>
                             </div>
@@ -147,7 +147,7 @@
     </div>
 @else
     <div class="py-16 text-center bg-white border shadow-sm text-card-foreground border-border rounded-2xl">
-        <div class="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-full text-cyan-500 bg-cyan-50">
+        <div class="inline-flex items-center justify-center w-16 h-16 mb-5 rounded-full text-gray-500 bg-gray-50">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -161,7 +161,7 @@
 {{-- Add Address --}}
 <div x-data="{ open: false }" @keydown.escape.window="if(open) { open = false; document.body.style.overflow = 'auto'; }">
     <button @click="open = true; document.body.style.overflow = 'hidden';"
-            class="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-cyan-600 rounded-xl hover:bg-cyan-700 transition-colors shadow-sm">
+            class="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gray-700 rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
@@ -231,7 +231,7 @@
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="is_default" value="1"
-                           class="w-4 h-4 rounded text-cyan-600 border-input focus:ring-2 focus:ring-ring">
+                           class="w-4 h-4 rounded text-gray-700 border-input focus:ring-2 focus:ring-ring">
                     <span class="text-sm font-medium text-foreground">Set as default address</span>
                 </label>
 
@@ -241,7 +241,7 @@
                         Cancel
                     </button>
                     <button type="submit"
-                            class="px-5 py-2 text-sm font-bold text-white transition-colors rounded-lg bg-cyan-600 hover:bg-cyan-700">
+                            class="px-5 py-2 text-sm font-bold text-white transition-colors rounded-lg bg-gray-700 hover:bg-gray-800">
                         Save Address
                     </button>
                 </div>

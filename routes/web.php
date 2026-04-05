@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\CoinController as AdminCoinController;
 use App\Http\Controllers\Admin\ProductPreviewController;
 use App\Http\Controllers\Admin\BookScraperController;
+use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -178,6 +179,10 @@ Route::prefix('admin')
         Route::get('/scraper', [BookScraperController::class, 'index'])->name('scraper.index');
         Route::post('/scraper/search', [BookScraperController::class, 'search'])->name('scraper.search');
         Route::post('/scraper/import', [BookScraperController::class, 'import'])->name('scraper.import');
+
+        // Store Settings
+        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
     });
 
 require __DIR__.'/auth.php';

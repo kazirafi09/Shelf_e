@@ -5,11 +5,11 @@
     
     <div class="flex items-center justify-between mb-8">
         <div>
-            <a href="{{ route('dashboard') }}" class="text-sm font-bold text-muted-foreground hover:text-cyan-600">&larr; Back to Dashboard</a>
+            <a href="{{ route('dashboard') }}" class="text-sm font-bold text-muted-foreground hover:text-gray-700">&larr; Back to Dashboard</a>
             <h1 class="mt-2 text-3xl font-extrabold text-foreground">Order #{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</h1>
             <p class="text-muted-foreground">Placed on {{ $order->created_at->format('F j, Y \a\t g:i A') }}</p>
         </div>
-        <span class="px-4 py-2 text-sm font-bold text-orange-700 uppercase bg-orange-100 rounded-full">
+        <span class="px-4 py-2 text-sm font-bold text-gray-800 uppercase bg-gray-100 rounded-full">
             Status: {{ $order->status }}
         </span>
     </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="flex justify-between pt-3 mt-3 font-bold text-foreground border-t border-border">
                     <span>Total</span>
-                    <span class="text-cyan-600">৳{{ number_format($order->total_amount, 2) }}</span>
+                    <span class="text-gray-700">৳{{ number_format($order->total_amount, 2) }}</span>
                 </div>
             </div>
 

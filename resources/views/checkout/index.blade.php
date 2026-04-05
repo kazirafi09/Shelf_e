@@ -6,11 +6,17 @@
     subtotal: {{ $subtotal }},
     availableCoins: {{ auth()->check() ? auth()->user()->coin_balance : 0 }},
     redeemCoins: false,
+    couponCode: '{{ old('coupon_code', '') }}',
+    get couponDiscount() {
+        return this.couponCode.trim().toUpperCase() === 'FIRST15'
+            ? Math.round(this.subtotal * 0.15)
+            : 0;
+    },
     get coinsToApply() {
-        return Math.min(this.availableCoins, this.subtotal + this.shipping);
+        return Math.min(this.availableCoins, this.subtotal + this.shipping - this.couponDiscount);
     },
     get grandTotal() {
-        return this.subtotal + this.shipping - (this.redeemCoins ? this.coinsToApply : 0);
+        return this.subtotal + this.shipping - this.couponDiscount - (this.redeemCoins ? this.coinsToApply : 0);
     },
     fillAddress(addr) {
         this.$refs.fieldName.value      = addr.name;
@@ -25,8 +31,8 @@
 }">
     
     <div class="mb-8 text-sm text-muted-foreground">
-        <a href="/" class="hover:text-orange-500">Home</a> <span class="mx-2">></span>
-        <a href="/categories" class="hover:text-orange-500">Categories</a> <span class="mx-2">></span>
+        <a href="/" class="hover:text-gray-700">Home</a> <span class="mx-2">></span>
+        <a href="/categories" class="hover:text-gray-700">Categories</a> <span class="mx-2">></span>
         <span class="text-foreground">Checkout</span>
     </div>
 
@@ -91,7 +97,7 @@
                         <div class="mb-6">
                             <p class="text-sm text-muted-foreground">
                                 No saved addresses yet.
-                                <a href="{{ route('addresses.index') }}" class="font-semibold text-cyan-600 hover:underline">Add one</a>
+                                <a href="{{ route('addresses.index') }}" class="font-semibold text-gray-700 hover:underline">Add one</a>
                                 to speed up checkout next time.
                             </p>
                         </div>
@@ -171,7 +177,7 @@
                         <span class="font-bold text-foreground">Standard Delivery</span>
                         <span class="text-sm text-muted-foreground">(3-5 days)</span>
                         <span class="mt-2 font-bold text-foreground">৳ 60</span>
-                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-cyan-500"></div>
+                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-gray-500"></div>
                     </label>
                     
                     <label class="relative flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer hover:bg-muted">
@@ -179,7 +185,7 @@
                         <span class="font-bold text-foreground">Express Delivery</span>
                         <span class="text-sm text-muted-foreground">(1-2 days)</span>
                         <span class="mt-2 font-bold text-foreground">৳ 150</span>
-                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-cyan-500"></div>
+                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-gray-500"></div>
                     </label>
                 </div>
 
@@ -187,7 +193,7 @@
                 <div class="p-6 mb-8 border border-border rounded-xl bg-muted">
                     <div class="flex flex-wrap gap-6 mb-6">
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payment" value="cod" checked class="w-4 h-4 text-cyan-600 focus:ring-cyan-500">
+                            <input type="radio" name="payment" value="cod" checked class="w-4 h-4 text-gray-700 focus:ring-gray-500">
                             <span class="font-medium text-foreground">Cash on Delivery</span>
                         </label>
                     </div>
@@ -196,13 +202,16 @@
 
                 <div class="flex items-center mb-8 space-x-2">
                     <input type="checkbox" id="terms" class="w-4 h-4 border-input rounded text-primary focus:ring-ring" required>
-                    <label for="terms" class="text-sm text-muted-foreground">I accept the terms of <a href="#" class="underline text-cyan-600">Privacy Policy</a></label>
+                    <label for="terms" class="text-sm text-muted-foreground">I accept the terms of <a href="#" class="underline text-gray-700">Privacy Policy</a></label>
                 </div>
 
                 {{-- Hidden redeem_coins flag — only submitted when the toggle is on --}}
                 <template x-if="redeemCoins">
                     <input type="hidden" name="redeem_coins" value="1">
                 </template>
+
+                {{-- Coupon code — bound to the shared Alpine couponCode variable --}}
+                <input type="hidden" name="coupon_code" :value="couponCode">
 
                 <button type="submit" class="w-full px-12 py-4 font-bold transition bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90 md:w-auto">
                     Confirm Order
@@ -231,7 +240,7 @@
                                 <div class="flex items-center mt-1 space-x-2">
                                     <form action="{{ route('cart.decrement', $id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-orange-500">
+                                        <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-gray-700">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
                                         </button>
                                     </form>
@@ -240,7 +249,7 @@
 
                                     <form action="{{ route('cart.increment', $id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-cyan-500">
+                                        <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-gray-500">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                         </button>
                                     </form>
@@ -268,8 +277,48 @@
                         </div>
                         <div class="flex justify-between text-sm text-muted-foreground">
                             <span>Shipping</span>
-                            <span class="font-medium text-cyan-600">+৳ <span x-text="shipping"></span></span>
+                            <span class="font-medium text-gray-700">+৳ <span x-text="shipping"></span></span>
                         </div>
+
+                        {{-- Coupon discount row (visible only when a valid-looking code is entered) --}}
+                        <div
+                            x-show="couponDiscount > 0"
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="flex justify-between text-sm font-semibold text-green-700"
+                        >
+                            <span>Discount (FIRST15)</span>
+                            <span>−৳ <span x-text="couponDiscount.toLocaleString()"></span></span>
+                        </div>
+
+                        {{-- Discount code input ──────────────────────────────── --}}
+                        <div class="pt-3 mt-1 border-t border-dashed border-border">
+                            <label class="block mb-1.5 text-xs font-semibold text-foreground">
+                                Discount Code
+                            </label>
+                            <input
+                                type="text"
+                                x-model="couponCode"
+                                placeholder="e.g. FIRST15"
+                                maxlength="50"
+                                class="w-full px-3 py-2.5 text-sm font-mono uppercase tracking-widest bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg transition-colors"
+                            >
+                            {{-- Live hint: shown only when the code looks correct --}}
+                            <p
+                                x-show="couponDiscount > 0"
+                                x-transition:enter="transition ease-out duration-150"
+                                x-transition:enter-start="opacity-0 -translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                class="mt-1.5 text-xs font-medium text-green-600"
+                            >
+                                ✓ 15% discount applied (if your email is eligible)
+                            </p>
+                            @error('coupon_code')
+                                <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        {{-- ─────────────────────────────────────────────────── --}}
 
                         {{-- Redeem Coins (authenticated users only) --}}
                         @auth
@@ -324,13 +373,13 @@
 
                         <div class="flex justify-between pt-4 mt-2 text-xl font-bold text-foreground border-t border-border">
                             <span>Total</span>
-                            <span class="text-orange-600">৳ <span x-text="grandTotal.toLocaleString()"></span></span>
+                            <span class="text-gray-800">৳ <span x-text="grandTotal.toLocaleString()"></span></span>
                         </div>
                     </div>
                 @else
                     <div class="py-8 text-center">
                         <p class="text-muted-foreground">Cart is empty.</p>
-                        <a href="/categories" class="inline-block mt-2 text-sm font-bold text-cyan-600">Browse Books</a>
+                        <a href="/categories" class="inline-block mt-2 text-sm font-bold text-gray-700">Browse Books</a>
                     </div>
                 @endif
             </div>

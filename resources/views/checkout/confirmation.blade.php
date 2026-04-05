@@ -26,7 +26,7 @@
             </div>
             <div class="flex justify-between pt-2 mt-2 border-t border-border">
                 <span class="font-bold text-foreground">Total Paid:</span>
-                <span class="font-bold text-cyan-600">৳{{ number_format($order->total_amount, 2) }}</span>
+                <span class="font-bold text-gray-700">৳{{ number_format($order->total_amount, 2) }}</span>
             </div>
         </div>
 

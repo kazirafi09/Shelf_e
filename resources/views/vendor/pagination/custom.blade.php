@@ -8,7 +8,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center justify-center w-10 h-10 text-gray-500 transition bg-white border border-gray-200 rounded-full hover:border-cyan-400 hover:text-cyan-600">
+                <a href="{{ $paginator->previousPageUrl() }}" class="inline-flex items-center justify-center w-10 h-10 text-gray-500 transition bg-white border border-gray-200 rounded-full hover:border-gray-400 hover:text-gray-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 </a>
             @endif
@@ -22,11 +22,11 @@
                 @if (is_array($element))
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
-                            <span aria-current="page" class="inline-flex items-center justify-center w-10 h-10 text-sm font-bold text-white bg-cyan-600 border border-cyan-600 rounded-full shadow-sm shadow-cyan-500/30">
+                            <span aria-current="page" class="inline-flex items-center justify-center w-10 h-10 text-sm font-bold text-white bg-gray-700 border border-gray-700 rounded-full shadow-sm shadow-gray-500/30">
                                 {{ $page }}
                             </span>
                         @else
-                            <a href="{{ $url }}" class="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-600 transition bg-white border border-gray-200 rounded-full hover:border-cyan-400 hover:text-cyan-600">
+                            <a href="{{ $url }}" class="inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-gray-600 transition bg-white border border-gray-200 rounded-full hover:border-gray-400 hover:text-gray-700">
                                 {{ $page }}
                             </a>
                         @endif
@@ -36,7 +36,7 @@
 
             {{-- Next --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center justify-center w-10 h-10 text-gray-500 transition bg-white border border-gray-200 rounded-full hover:border-cyan-400 hover:text-cyan-600">
+                <a href="{{ $paginator->nextPageUrl() }}" class="inline-flex items-center justify-center w-10 h-10 text-gray-500 transition bg-white border border-gray-200 rounded-full hover:border-gray-400 hover:text-gray-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
             @else

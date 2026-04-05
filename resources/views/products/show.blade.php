@@ -4,8 +4,8 @@
 <div class="container px-4 py-8 mx-auto">
 
     <div class="mb-8 text-sm text-muted-foreground">
-        <a href="/" class="transition hover:text-orange-500">Home</a> <span class="mx-2">></span>
-        <a href="{{ route('categories.index') }}" class="transition hover:text-orange-500">Categories</a> <span class="mx-2">></span>
+        <a href="/" class="transition hover:text-gray-700">Home</a> <span class="mx-2">></span>
+        <a href="{{ route('categories.index') }}" class="transition hover:text-gray-700">Categories</a> <span class="mx-2">></span>
         <span class="text-foreground">{{ $product->title }}</span>
     </div>
 
@@ -20,30 +20,30 @@
                 @endphp
                 <form action="{{ route('wishlist.toggle', $product->id) }}" method="POST" class="inline-block mb-4">
                     @csrf
-                    <button type="submit" class="flex items-center transition {{ $isWishlisted ? 'text-orange-500 font-bold' : 'text-muted-foreground hover:text-orange-500' }}">
+                    <button type="submit" class="flex items-center transition {{ $isWishlisted ? 'text-gray-700 font-bold' : 'text-muted-foreground hover:text-gray-700' }}">
                         <svg class="w-5 h-5 mr-2 {{ $isWishlisted ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                         {{ $isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist' }}
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="flex items-center mb-4 text-muted-foreground transition hover:text-orange-500">
+                <a href="{{ route('login') }}" class="flex items-center mb-4 text-muted-foreground transition hover:text-gray-700">
                     <svg class="w-5 h-5 mr-2 fill-none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     Log in to Wishlist
                 </a>
             @endauth
 
-            <div class="w-full aspect-[2/3] bg-muted rounded-2xl flex items-center justify-center text-muted-foreground mb-4 shadow-xl overflow-hidden border border-border">
-                @if($product->image_path)
-                    <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}" class="object-cover w-full h-full transition-transform duration-500 hover:scale-105">
-                @else
-                    Cover Image
-                @endif
+            <div class="mb-4">
+                <x-image-magnifier
+                    :src="$product->image_path ? asset('storage/' . $product->image_path) : null"
+                    :zoom-src="$product->image_path ? asset('storage/' . $product->image_path) : null"
+                    :alt="$product->title"
+                />
             </div>
 
             @if($product->previews->isNotEmpty())
                 <button
                     @click="openPeekInside = true; currentIndex = 0"
-                    class="flex items-center justify-center w-full gap-2 py-2.5 text-sm font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-xl transition-colors active:scale-95 mb-4"
+                    class="flex items-center justify-center w-full gap-2 py-2.5 text-sm font-bold text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors active:scale-95 mb-4"
                 >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -52,7 +52,7 @@
                               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
                     Peek Inside
-                    <span class="px-1.5 py-0.5 text-xs bg-cyan-100 rounded-md">{{ $product->previews->count() }}</span>
+                    <span class="px-1.5 py-0.5 text-xs bg-gray-100 rounded-md">{{ $product->previews->count() }}</span>
                 </button>
 
                 {{-- ======================================================
@@ -218,7 +218,7 @@
                         <p>Learn more about {{ $product->author }}...</p>
                     </div>
                     <div x-show="activeTab === 'reviews'" x-cloak x-transition.opacity>
-                        <p class="text-sm text-muted-foreground">See the <a href="#customer-reviews" class="text-cyan-600 hover:underline font-medium">Customer Reviews</a> section below.</p>
+                        <p class="text-sm text-muted-foreground">See the <a href="#customer-reviews" class="text-gray-700 hover:underline font-medium">Customer Reviews</a> section below.</p>
                     </div>
                 </div>
             </div>
@@ -291,9 +291,9 @@
 
                     <div class="flex items-center justify-center mb-8">
                         <div class="flex items-center bg-background border border-border rounded-lg shadow-sm">
-                            <button @click="if(quantity > 1) quantity--" type="button" class="px-5 py-2 text-muted-foreground transition rounded-l-lg hover:text-orange-500 hover:bg-muted">-</button>
+                            <button @click="if(quantity > 1) quantity--" type="button" class="px-5 py-2 text-muted-foreground transition rounded-l-lg hover:text-gray-700 hover:bg-muted">-</button>
                             <span class="px-6 py-2 font-medium text-foreground border-border border-x" x-text="quantity"></span>
-                            <button @click="quantity++" type="button" class="px-5 py-2 text-muted-foreground transition rounded-r-lg hover:text-orange-500 hover:bg-muted">+</button>
+                            <button @click="quantity++" type="button" class="px-5 py-2 text-muted-foreground transition rounded-r-lg hover:text-gray-700 hover:bg-muted">+</button>
                         </div>
                     </div>
 
@@ -339,7 +339,6 @@
 
         <div
             x-data="{ showReviewForm: false }"
-            class="max-w-3xl"
         >
             {{-- Section header --}}
             <div class="flex items-center justify-between mb-8">
@@ -367,7 +366,7 @@
                     </button>
                 @else
                     <a href="{{ route('login') }}"
-                       class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-cyan-600 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 rounded-xl transition-colors">
+                       class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors">
                         Log in to review
                     </a>
                 @endauth
@@ -385,7 +384,34 @@
             >
                 <h3 class="mb-5 text-base font-bold text-foreground">Your Review</h3>
 
-                <form action="{{ route('reviews.store', $product) }}" method="POST" class="space-y-5">
+                <form
+                    action="{{ route('reviews.store', $product) }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="space-y-5"
+                    x-data="{
+                        previews: [],
+                        dragging: false,
+                        addFiles(files) {
+                            Array.from(files).forEach(file => {
+                                if (!file.type.startsWith('image/')) return;
+                                if (this.previews.length >= 5) return;
+                                const reader = new FileReader();
+                                reader.onload = e => this.previews.push({ src: e.target.result, file });
+                                reader.readAsDataURL(file);
+                            });
+                        },
+                        removeImage(index) {
+                            this.previews.splice(index, 1);
+                            this.$nextTick(() => this.syncFileInput());
+                        },
+                        syncFileInput() {
+                            const dt = new DataTransfer();
+                            this.previews.forEach(p => dt.items.add(p.file));
+                            this.$refs.fileInput.files = dt.files;
+                        }
+                    }"
+                >
                     @csrf
 
                     <div>
@@ -422,6 +448,68 @@
                                   placeholder="What did you think of this book?"
                                   class="block w-full text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">{{ old('body') }}</textarea>
                         @error('body')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Image upload --}}
+                    <div>
+                        <label class="block mb-1 text-sm font-semibold text-foreground">
+                            Photos <span class="font-normal text-muted-foreground">(optional, up to 5)</span>
+                        </label>
+
+                        {{-- Drop zone --}}
+                        <div
+                            @dragover.prevent="dragging = true"
+                            @dragleave.prevent="dragging = false"
+                            @drop.prevent="dragging = false; addFiles($event.dataTransfer.files); syncFileInput()"
+                            @click="$refs.fileInput.click()"
+                            :class="dragging ? 'border-primary bg-primary/5' : 'border-input bg-background hover:bg-muted/40'"
+                            class="flex flex-col items-center justify-center gap-2 w-full py-8 px-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors"
+                        >
+                            <svg class="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="text-sm text-muted-foreground">
+                                <span class="font-semibold text-foreground">Click to upload</span> or drag &amp; drop
+                            </p>
+                            <p class="text-xs text-muted-foreground">JPEG, PNG, WebP — max 4 MB each</p>
+                        </div>
+
+                        <input
+                            x-ref="fileInput"
+                            type="file"
+                            name="images[]"
+                            multiple
+                            accept="image/jpeg,image/png,image/webp"
+                            class="hidden"
+                            @change="addFiles($event.target.files); syncFileInput()"
+                        >
+
+                        {{-- Previews --}}
+                        <div x-show="previews.length > 0" class="flex flex-wrap gap-3 mt-3">
+                            <template x-for="(item, index) in previews" :key="index">
+                                <div class="relative w-20 h-20 rounded-lg overflow-hidden border border-border group">
+                                    <img :src="item.src" class="w-full h-full object-cover">
+                                    <button
+                                        type="button"
+                                        @click.stop="removeImage(index)"
+                                        class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        aria-label="Remove image"
+                                    >
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        @error('images')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                        @error('images.*')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
@@ -492,6 +580,17 @@
                             <p class="mb-1 text-sm font-bold text-foreground">{{ $review->title }}</p>
                         @endif
                         <p class="text-sm leading-relaxed text-muted-foreground">{{ $review->body }}</p>
+
+                        {{-- Review images --}}
+                        @if(!empty($review->images))
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                @foreach($review->images as $imagePath)
+                                    <a href="{{ asset('storage/' . $imagePath) }}" target="_blank" class="block w-20 h-20 rounded-lg overflow-hidden border border-border hover:opacity-90 transition-opacity">
+                                        <img src="{{ asset('storage/' . $imagePath) }}" alt="Review image" class="w-full h-full object-cover">
+                                    </a>
+                                @endforeach
+                            </div>
+                        @endif
 
                     </article>
                     @endforeach

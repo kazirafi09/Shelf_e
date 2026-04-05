@@ -5,20 +5,20 @@
 @section('dashboard-content')
 
 {{-- Balance Card --}}
-<div class="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-cyan-600 to-cyan-800 shadow-xl shadow-cyan-700/20 text-white">
+<div class="relative overflow-hidden p-8 rounded-2xl bg-gradient-to-br from-gray-700 to-gray-900 shadow-xl shadow-gray-800/20 text-white">
     <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
     <div class="absolute -bottom-12 -left-8 w-56 h-56 rounded-full bg-white/5"></div>
 
-    <p class="text-sm font-semibold tracking-widest uppercase text-cyan-200 mb-1">Current Balance</p>
+    <p class="text-sm font-semibold tracking-widest uppercase text-gray-200 mb-1">Current Balance</p>
     <div class="flex items-end gap-3 relative">
         <span class="text-6xl font-extrabold tracking-tight">{{ number_format($coin_balance) }}</span>
-        <span class="mb-2 text-xl font-semibold text-cyan-300">coins</span>
+        <span class="mb-2 text-xl font-semibold text-gray-300">coins</span>
     </div>
-    <p class="mt-3 text-sm text-cyan-200 relative">1 coin = ৳1 off your next order.</p>
+    <p class="mt-3 text-sm text-gray-200 relative">1 coin = ৳1 off your next order.</p>
 
     @if($coin_balance > 0)
         <a href="/checkout"
-           class="relative inline-flex items-center gap-2 mt-5 px-5 py-2.5 text-sm font-bold text-cyan-800 bg-white rounded-xl hover:bg-cyan-50 transition-colors active:scale-95">
+           class="relative inline-flex items-center gap-2 mt-5 px-5 py-2.5 text-sm font-bold text-gray-900 bg-white rounded-xl hover:bg-gray-50 transition-colors active:scale-95">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             Use Coins at Checkout
         </a>

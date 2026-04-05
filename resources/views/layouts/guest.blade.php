@@ -13,11 +13,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased bg-background text-foreground">
-        <div class="flex flex-col items-center pt-16 pb-12 bg-white sm:justify-center">
-            
+        <div class="flex flex-col items-center pt-16 pb-12 bg-gray-50 sm:justify-center">
+
             <div class="mb-8">
                 <a href="/" class="text-3xl font-bold text-gray-900">
-                    <span class="text-cyan-500">Shelf</span>-E
+                    Shelf-E
                 </a>
             </div>
 
@@ -29,31 +29,29 @@
         <footer class="mt-auto border-t border-gray-100 bg-gray-50">
             <div class="container grid grid-cols-1 gap-8 px-4 py-12 mx-auto md:grid-cols-4">
                 <div>
-                    <a href="/" class="text-2xl font-bold text-gray-900">
-                        <span class="text-cyan-500">Shelf</span>-E
-                    </a>
+                    <a href="/" class="text-2xl font-bold text-gray-900">Shelf-E</a>
                     <p class="mt-4 text-sm text-gray-500">Your favorite books, delivered to your doorstep.</p>
                 </div>
                 <div>
                     <h4 class="mb-4 font-bold text-gray-900">Browse</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
-                        <li><a href="/categories" class="transition hover:text-orange-500">Categories</a></li>
-                        <li><a href="#" class="transition hover:text-orange-500">Authors</a></li>
-                        <li><a href="#" class="transition hover:text-orange-500">Blog</a></li>
+                        <li><a href="/categories" class="transition hover:text-gray-900">Categories</a></li>
+                        <li><a href="#" class="transition hover:text-gray-900">Authors</a></li>
+                        <li><a href="#" class="transition hover:text-gray-900">Blog</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="mb-4 font-bold text-gray-900">Social</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
-                        <li><a href="#" class="transition hover:text-orange-500">Facebook</a></li>
-                        <li><a href="#" class="transition hover:text-orange-500">Instagram</a></li>
-                        <li><a href="#" class="transition hover:text-orange-500">Twitter</a></li>
+                        <li><a href="#" class="transition hover:text-gray-900">Facebook</a></li>
+                        <li><a href="#" class="transition hover:text-gray-900">Instagram</a></li>
+                        <li><a href="#" class="transition hover:text-gray-900">Twitter</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="mb-4 font-bold text-gray-900">Contact</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
-                        <li>+880 1234 567890</li> 
+                        <li>+880 1234 567890</li>
                         <li>support@shelf-e.com</li>
                         <li>Dhaka, Bangladesh</li>
                     </ul>

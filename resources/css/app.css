@@ -78,6 +78,12 @@
   --sidebar-primary-foreground: #0a0a0a;
 }
 
+
+@keyframes testimonial-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
 @theme inline {
   --color-card: var(--card);
   --color-ring: var(--ring);

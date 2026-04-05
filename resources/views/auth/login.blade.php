@@ -23,7 +23,7 @@
                         <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
                         </div>
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required autofocus class="block w-full py-3.5 pl-11 pr-4 text-sm text-foreground placeholder-muted-foreground transition-colors border-input rounded-xl shadow-sm bg-background focus:ring-2 focus:ring-ring focus:outline-none" />
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required autofocus class="block w-full py-3.5 pl-11 pr-4 text-sm text-foreground placeholder-muted-foreground transition-colors border-input rounded-xl shadow-sm bg-background focus:ring-2 focus:ring-gray-500/20 focus:border-gray-500 focus:outline-none" />
                     </div>
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
@@ -34,10 +34,10 @@
                         <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
-                        <input id="password" :type="show ? 'text' : 'password'" name="password" placeholder="••••••••" required class="block w-full py-3.5 pl-11 pr-12 text-sm text-foreground placeholder-muted-foreground transition-colors border-input rounded-xl shadow-sm bg-background focus:ring-2 focus:ring-ring focus:outline-none" />
+                        <input id="password" :type="show ? 'text' : 'password'" name="password" placeholder="••••••••" required class="block w-full py-3.5 pl-11 pr-12 text-sm text-foreground placeholder-muted-foreground transition-colors border-input rounded-xl shadow-sm bg-background focus:ring-2 focus:ring-gray-500/20 focus:border-gray-500 focus:outline-none" />
                         
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                            <button type="button" @click="show = !show" class="p-1 text-muted-foreground transition-colors rounded-lg focus:outline-none hover:text-cyan-600 focus:bg-muted">
+                            <button type="button" @click="show = !show" class="p-1 text-muted-foreground transition-colors rounded-lg focus:outline-none hover:text-gray-700 focus:bg-muted">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -53,18 +53,18 @@
             <div class="flex items-center justify-between">
                 <label class="flex items-center cursor-pointer group">
                     <div class="relative flex items-center justify-center w-5 h-5">
-                        <input type="checkbox" name="remember" class="w-full h-full transition-colors border-input rounded cursor-pointer text-cyan-600 focus:ring-2 focus:ring-ring group-hover:border-cyan-500">
+                        <input type="checkbox" name="remember" class="w-full h-full transition-colors border-input rounded cursor-pointer text-gray-900 focus:ring-2 focus:ring-ring group-hover:border-gray-500">
                     </div>
                     <span class="ml-2 text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">Remember me</span>
                 </label>
                 
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-sm font-bold transition-colors text-cyan-600 hover:text-cyan-700">Forgot Password?</a>
+                    <a href="{{ route('password.request') }}" class="text-sm font-bold transition-colors text-gray-700 hover:text-gray-900">Forgot Password?</a>
                 @endif
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-cyan-600 rounded-xl shadow-lg hover:bg-cyan-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95 flex justify-center items-center">
+                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-gray-900 rounded-xl shadow-lg hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95 flex justify-center items-center">
                     <span>Sign In</span>
                     <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
@@ -73,15 +73,15 @@
             <div class="pt-6 mt-6 border-t border-border">
                 <p class="text-sm text-center text-muted-foreground">
                     New to Shelf-E? 
-                    <a href="{{ route('register') }}" class="font-bold text-orange-500 transition-colors hover:text-orange-600 hover:underline">Create an account</a>
+                    <a href="{{ route('register') }}" class="font-bold text-gray-700 transition-colors hover:text-gray-900 hover:underline">Create an account</a>
                 </p>
             </div>
         </form>
 
         <div class="pt-6 mt-8 text-xs text-center text-muted-foreground">
             By signing in, you agree to our <br class="sm:hidden">
-            <a href="{{ Route::has('terms') ? route('terms') : '#' }}" class="transition-colors hover:text-cyan-600 hover:underline">Terms of Service</a> and 
-            <a href="{{ Route::has('privacy') ? route('privacy') : '#' }}" class="transition-colors hover:text-cyan-600 hover:underline">Privacy Policy</a>.
+            <a href="{{ Route::has('terms') ? route('terms') : '#' }}" class="transition-colors hover:text-gray-700 hover:underline">Terms of Service</a> and 
+            <a href="{{ Route::has('privacy') ? route('privacy') : '#' }}" class="transition-colors hover:text-gray-700 hover:underline">Privacy Policy</a>.
         </div>
     </div>
 </div>

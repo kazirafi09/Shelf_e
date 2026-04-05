@@ -5,7 +5,7 @@
 
     <!-- Breadcrumb -->
     <div class="flex items-center mb-8 text-sm text-muted-foreground">
-        <a href="/" class="hover:text-cyan-600">Home</a>
+        <a href="/" class="hover:text-gray-700">Home</a>
         <span class="mx-2">/</span>
         <span class="font-medium text-foreground">Authors</span>
     </div>
@@ -30,7 +30,7 @@
                 placeholder="Search authors..."
                 class="w-full py-2 pl-10 pr-4 transition bg-background border border-input text-foreground rounded-lg focus:ring-2 focus:ring-ring focus:outline-none"
             >
-            <button type="submit" class="absolute left-3 top-2.5 text-gray-400 hover:text-cyan-500">
+            <button type="submit" class="absolute left-3 top-2.5 text-gray-400 hover:text-gray-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3m1.3-5.2a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
@@ -53,14 +53,14 @@
                          alt="{{ $author->author }}"
                          class="object-cover w-full h-full">
                 @else
-                    <div class="flex items-center justify-center w-full h-full text-3xl font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-500">
+                    <div class="flex items-center justify-center w-full h-full text-3xl font-bold text-white bg-gradient-to-br from-gray-500 to-blue-500">
                         {{ strtoupper(substr($author->author, 0, 1)) }}
                     </div>
                 @endif
             </div>
 
             <!-- Author Name -->
-            <h3 class="text-lg font-bold text-foreground transition-colors group-hover:text-cyan-600">
+            <h3 class="text-lg font-bold text-foreground transition-colors group-hover:text-gray-700">
                 {{ $author->author }}
             </h3>
 
@@ -70,7 +70,7 @@
             </p>
 
             <!-- Hover CTA -->
-            <div class="absolute text-sm font-semibold transition-opacity opacity-0 text-cyan-600 bottom-5 right-6 group-hover:opacity-100">
+            <div class="absolute text-sm font-semibold transition-opacity opacity-0 text-gray-700 bottom-5 right-6 group-hover:opacity-100">
                 View Books →
             </div>
 

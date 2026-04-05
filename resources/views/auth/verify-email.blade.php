@@ -5,7 +5,7 @@
     <div class="w-full max-w-md p-8 space-y-8 bg-white border border-gray-100 shadow-2xl rounded-3xl md:p-10 ring-1 ring-gray-900/5">
         
         <div class="text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-cyan-50 text-cyan-500">
+            <div class="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gray-50 text-gray-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
             </div>
             
@@ -26,9 +26,9 @@
         <div class="flex flex-col items-center justify-between mt-8 space-y-5">
             <form method="POST" action="{{ route('verification.send') }}" class="w-full">
                 @csrf
-                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-cyan-600 rounded-xl shadow-lg hover:bg-cyan-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95 flex justify-center items-center">
+                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-gray-700 rounded-xl shadow-lg hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95 flex justify-center items-center">
                     <span>Resend Verification Email</span>
-                    <svg class="w-4 h-4 ml-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    <svg class="w-4 h-4 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </form>
 

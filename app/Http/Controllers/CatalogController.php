@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\HeroSlide;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache; // NEW: Added for caching
 
@@ -69,7 +68,6 @@ class CatalogController extends Controller
                                 ->get(),
                 'globalCategories' => Category::all(),
                 'quote' => Quote::inRandomOrder()->first(),
-                'heroSlides' => HeroSlide::orderBy('order', 'asc')->get()
             ];
         });
 
@@ -211,20 +209,21 @@ class CatalogController extends Controller
         return view('authors.index', compact('authors'));
     }
 
-    // 5. Bestsellers Page
-    public function bestsellers(Request $request)
+    // 5. Bestsellers Page — sorted by total units sold, highest to lowest
+    public function bestsellers()
     {
-        // Added withQueryString() here too just in case filters are ever added
         $products = Product::withAvg('approvedReviews', 'rating')
-                           ->withCount('approvedReviews')
-                           ->where('rating', '>=', 4)
-                           ->orderBy('rating', 'desc')
-                           ->paginate(12)
-                           ->withQueryString();
+            ->withCount('approvedReviews')
+            ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+            ->select('products.*')
+            ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
+            ->groupBy('products.id')
+            ->orderByDesc('total_sold')
+            ->paginate(24)
+            ->withQueryString();
 
         $genres = Category::all();
 
-        // FIX 3.4 (Applied here as well)
         $authors = Product::selectRaw('author, MIN(id) as min_id')
             ->whereNotNull('author')
             ->where('author', '!=', '')
@@ -232,9 +231,10 @@ class CatalogController extends Controller
             ->orderBy('author')
             ->pluck('author');
 
-        $pageTitle = 'Bestsellers & Top Rated';
+        $pageTitle    = 'Bestsellers';
+        $isBestsellers = true;
 
-        return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
+        return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle', 'isBestsellers'));
     }
 
     // 3. Load Single Product Page

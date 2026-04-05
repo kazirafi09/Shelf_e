@@ -5,7 +5,7 @@
     <div class="w-full max-w-md p-8 space-y-8 bg-white border border-gray-100 shadow-2xl rounded-3xl md:p-10 ring-1 ring-gray-900/5">
         
         <div class="text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-cyan-50 text-cyan-500">
+            <div class="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-full bg-gray-50 text-gray-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
             </div>
             
@@ -39,10 +39,10 @@
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <input id="password" :type="show ? 'text' : 'password'" name="password" placeholder="Min. 8 characters" required autocomplete="new-password" class="block w-full py-3.5 pl-11 pr-12 text-sm placeholder-gray-400 transition-colors border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" />
+                    <input id="password" :type="show ? 'text' : 'password'" name="password" placeholder="Min. 8 characters" required autocomplete="new-password" class="block w-full py-3.5 pl-11 pr-12 text-sm placeholder-gray-400 transition-colors border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:bg-white focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20" />
                     
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <button type="button" @click="show = !show" class="p-1 text-gray-400 transition-colors rounded-lg focus:outline-none hover:text-cyan-600 focus:bg-gray-100">
+                        <button type="button" @click="show = !show" class="p-1 text-gray-400 transition-colors rounded-lg focus:outline-none hover:text-gray-700 focus:bg-gray-100">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -60,10 +60,10 @@
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <input id="password_confirmation" :type="show ? 'text' : 'password'" name="password_confirmation" placeholder="Repeat New Password" required autocomplete="new-password" class="block w-full py-3.5 pl-11 pr-12 text-sm placeholder-gray-400 transition-colors border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" />
+                    <input id="password_confirmation" :type="show ? 'text' : 'password'" name="password_confirmation" placeholder="Repeat New Password" required autocomplete="new-password" class="block w-full py-3.5 pl-11 pr-12 text-sm placeholder-gray-400 transition-colors border-gray-200 rounded-xl shadow-sm bg-gray-50 focus:bg-white focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20" />
                     
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <button type="button" @click="show = !show" class="p-1 text-gray-400 transition-colors rounded-lg focus:outline-none hover:text-cyan-600 focus:bg-gray-100">
+                        <button type="button" @click="show = !show" class="p-1 text-gray-400 transition-colors rounded-lg focus:outline-none hover:text-gray-700 focus:bg-gray-100">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 <path x-show="!show" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -76,7 +76,7 @@
             </div>
 
             <div class="pt-2">
-                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-cyan-600 rounded-xl shadow-lg hover:bg-cyan-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
+                <button type="submit" class="w-full px-6 py-3.5 text-sm font-bold text-white transition-all bg-gray-700 rounded-xl shadow-lg hover:bg-gray-800 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-95">
                     Reset Password
                 </button>
             </div>

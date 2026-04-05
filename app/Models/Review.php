@@ -15,6 +15,7 @@ class Review extends Model
         'rating',
         'title',
         'body',
+        'images',
         'status',
         'is_verified_purchase',
     ];
@@ -22,6 +23,7 @@ class Review extends Model
     protected $casts = [
         'is_verified_purchase' => 'boolean',
         'rating' => 'integer',
+        'images' => 'array',
     ];
 
     public function scopeApproved($query)

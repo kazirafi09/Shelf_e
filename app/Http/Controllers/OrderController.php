@@ -6,6 +6,7 @@ use App\Exceptions\InsufficientCoinsException;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Subscriber;
 use App\Models\UserAddress;
 use App\Services\CoinService;
 use Illuminate\Http\Request;
@@ -86,11 +87,43 @@ class OrderController extends Controller
             'delivery'     => 'required|string',
             'payment'      => 'required|string',
             'redeem_coins' => 'nullable|boolean',
+            'coupon_code'  => 'nullable|string|max:50',
         ]);
 
         $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['quantity']);
         $shipping = ($request->delivery === 'express') ? 150 : 60;
-        $total = $subtotal + $shipping;
+        $total    = $subtotal + $shipping;
+
+        // ── Coupon validation ──────────────────────────────────────────────────
+        // FIRST15: 15% off subtotal, one-time use, tied to the subscriber's email.
+        // We resolve the subscriber here (outside the transaction) so we can return
+        // an early validation error before any DB writes occur.
+        $couponCode          = strtoupper(trim($request->input('coupon_code', '')));
+        $discountAmount      = 0;
+        $subscriberForCoupon = null;
+
+        if ($couponCode !== '') {
+            if ($couponCode !== 'FIRST15') {
+                return back()
+                    ->withErrors(['coupon_code' => 'Invalid discount code.'])
+                    ->withInput();
+            }
+
+            $subscriberForCoupon = Subscriber::where('email', $validatedData['email'])
+                ->where('discount_used', false)
+                ->first();
+
+            if (! $subscriberForCoupon) {
+                return back()
+                    ->withErrors(['coupon_code' => 'This code is not valid for your email address, or has already been used.'])
+                    ->withInput();
+            }
+
+            // 15% off the subtotal (shipping is excluded from the discount)
+            $discountAmount = (int) round($subtotal * 0.15);
+            $total         -= $discountAmount;
+        }
+        // ──────────────────────────────────────────────────────────────────────
 
         $user = auth()->user();
         $coinsToRedeem = 0;
@@ -104,7 +137,7 @@ class OrderController extends Controller
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
         try {
-            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user) {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon) {
 
                 // Re-verify stock for every cart item before committing
                 $productIds = array_keys($cart);
@@ -119,20 +152,22 @@ class OrderController extends Controller
 
                 // Inside the transaction, we create the order
                 $newOrder = Order::create([
-                    'user_id' => auth()->id(),
-                    'name' => $validatedData['name'] ?? (auth()->check() ? auth()->user()->name : 'Guest'),
-                    'email' => $validatedData['email'],
-                    'phone' => $standardizedPhone,
-                    'address' => $validatedData['address'],
-                    'division' => $validatedData['division'],
-                    'district' => $validatedData['district'],
-                    'postal_code' => $validatedData['postal_code'],
+                    'user_id'         => auth()->id(),
+                    'name'            => $validatedData['name'] ?? (auth()->check() ? auth()->user()->name : 'Guest'),
+                    'email'           => $validatedData['email'],
+                    'phone'           => $standardizedPhone,
+                    'address'         => $validatedData['address'],
+                    'division'        => $validatedData['division'],
+                    'district'        => $validatedData['district'],
+                    'postal_code'     => $validatedData['postal_code'],
                     'delivery_method' => $validatedData['delivery'],
-                    'payment_method' => $validatedData['payment'],
-                    'subtotal' => $subtotal,
-                    'shipping_cost' => $shipping,
-                    'total_amount' => $finalTotal,
-                    'status' => 'pending',
+                    'payment_method'  => $validatedData['payment'],
+                    'subtotal'        => $subtotal,
+                    'shipping_cost'   => $shipping,
+                    'discount_amount' => $discountAmount,
+                    'coupon_code'     => $couponCode ?: null,
+                    'total_amount'    => $finalTotal,
+                    'status'          => 'pending',
                 ]);
 
                 $orderItems = collect($cart)->map(function ($item, $id) use ($newOrder) {
@@ -147,6 +182,14 @@ class OrderController extends Controller
                 })->values()->toArray();
 
                 OrderItem::insert($orderItems);
+
+                // ── Mark newsletter discount as used ──────────────────────────
+                // Runs inside the transaction: if anything fails and the
+                // transaction rolls back, the subscriber stays eligible.
+                if ($subscriberForCoupon) {
+                    $subscriberForCoupon->update(['discount_used' => true]);
+                }
+                // ─────────────────────────────────────────────────────────────
 
                 if ($coinsToRedeem > 0) {
                     $this->coinService->debit($user, $coinsToRedeem, "Coins redeemed on order #{$newOrder->id}");

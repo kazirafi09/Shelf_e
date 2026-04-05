@@ -7,7 +7,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
     <div class="relative p-5 overflow-hidden transition-all duration-300 bg-card text-card-foreground border border-border shadow-sm md:p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 group">
         <div class="absolute top-0 right-0 p-4 transition-transform duration-500 opacity-10 group-hover:scale-110 group-hover:-rotate-6">
-            <svg class="w-16 h-16 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            <svg class="w-16 h-16 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
         <div class="relative z-10">
             <p class="text-xs font-semibold tracking-wider text-muted-foreground uppercase md:text-sm">Total Orders</p>
@@ -57,19 +57,19 @@
                             ৳{{ number_format($order->total_amount, 2) }}
                         </td>
                         <td class="px-6 py-4 text-sm whitespace-nowrap">
-                            <span class="px-3 py-1 text-xs font-bold text-orange-700 uppercase bg-orange-100 rounded-full">
+                            <span class="px-3 py-1 text-xs font-bold text-gray-800 uppercase bg-gray-100 rounded-full">
                                 {{ $order->status }}
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm text-right whitespace-nowrap">
-                            <a href="{{ route('order.show', $order->id) }}" class="font-bold text-cyan-600 group-hover:text-cyan-800">View Details &rarr;</a>
+                            <a href="{{ route('order.show', $order->id) }}" class="font-bold text-gray-700 group-hover:text-gray-900">View Details &rarr;</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="5" class="px-6 py-8 text-center text-muted-foreground">
                             You haven't placed any orders yet. <br>
-                            <a href="{{ route('home') }}" class="inline-block mt-2 font-bold text-cyan-600 hover:underline">Browse Books</a>
+                            <a href="{{ route('home') }}" class="inline-block mt-2 font-bold text-gray-700 hover:underline">Browse Books</a>
                         </td>
                     </tr>
                 @endforelse

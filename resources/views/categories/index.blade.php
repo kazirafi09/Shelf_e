@@ -4,12 +4,12 @@
 <div class="container px-4 py-8 mx-auto" x-data="{ mobileFiltersOpen: false }">
     
     <div class="mb-6 text-sm text-muted-foreground">
-        <a href="/" class="transition-colors hover:text-orange-500">Home</a>
+        <a href="/" class="transition-colors hover:text-gray-700">Home</a>
         <span class="mx-2">&gt;</span>
 
         {{-- If the title is anything other than 'All Books', we show the expanded breadcrumb --}}
         @if($pageTitle !== 'All Books')
-            <a href="/categories" class="transition-colors hover:text-orange-500">Books</a>
+            <a href="/categories" class="transition-colors hover:text-gray-700">Books</a>
             <span class="mx-2">&gt;</span>
             <span class="font-medium text-foreground">{{ $pageTitle }}</span>
         @else
@@ -27,7 +27,7 @@
     {{-- NEW: Floating Mobile Filter Button --}}
     <button @click="mobileFiltersOpen = true" 
             class="fixed z-40 flex items-center px-6 py-3.5 text-sm font-bold text-white transition-transform transform -translate-x-1/2 bg-gray-900 rounded-full shadow-2xl bottom-8 left-1/2 lg:hidden active:scale-95">
-        <svg class="w-5 h-5 mr-2 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+        <svg class="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
         Filters
     </button>
 
@@ -65,7 +65,7 @@
                         @foreach($genres as $genre)
                             <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
                                 <input type="checkbox" name="genres[]" value="{{ $genre->id }}"
-                                    class="w-4 h-4 border-border rounded text-cyan-500 focus:ring-cyan-500"
+                                    class="w-4 h-4 border-border rounded text-gray-500 focus:ring-gray-500"
                                     @if(is_array(request('genres')) && in_array($genre->id, request('genres'))) checked @endif>
                                 <span class="capitalize">{{ $genre->name }}</span>
                             </label>
@@ -105,7 +105,7 @@
                         @foreach($authors as $author)
                             <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
                                 <input type="checkbox" name="authors[]" value="{{ $author }}"
-                                    class="w-4 h-4 border-border rounded text-cyan-500 focus:ring-cyan-500"
+                                    class="w-4 h-4 border-border rounded text-gray-500 focus:ring-gray-500"
                                     @if(is_array(request('authors')) && in_array($author, request('authors'))) checked @endif>
                                 <span class="capitalize">{{ $author }}</span>
                             </label>
@@ -122,7 +122,7 @@
                         @foreach([4, 3, 2, 1] as $rating)
                             <label class="flex items-center space-x-3 text-sm text-foreground cursor-pointer">
                                 <input type="radio" name="min_rating" value="{{ $rating }}"
-                                    class="w-4 h-4 border-border text-cyan-500 focus:ring-cyan-500"
+                                    class="w-4 h-4 border-border text-gray-500 focus:ring-gray-500"
                                     @if(request('min_rating') == $rating) checked @endif>
                                 <span class="flex items-center">
                                     @for($i = 0; $i < $rating; $i++)
@@ -135,8 +135,8 @@
                     </div>
                 </div>
                 <div class="flex flex-col space-y-3">
-                    <button type="submit" class="w-full py-3 font-medium text-white transition bg-orange-500 rounded-md hover:bg-orange-600">Apply Changes</button>
-                    <a href="/categories" class="w-full py-3 font-medium text-center text-orange-500 transition bg-white border border-orange-500 rounded-md hover:bg-orange-50">Clear Filters</a>
+                    <button type="submit" class="w-full py-3 font-medium text-white transition bg-gray-700 rounded-md hover:bg-gray-800">Apply Changes</button>
+                    <a href="/categories" class="w-full py-3 font-medium text-center text-gray-700 transition bg-white border border-gray-700 rounded-md hover:bg-gray-50">Clear Filters</a>
                 </div>
 
 
@@ -146,13 +146,29 @@
         <div class="flex-1">
             <div class="flex items-center justify-between p-4 mb-6 bg-card text-card-foreground border border-border rounded-lg">
                 <div class="text-sm font-medium text-muted-foreground">
-                    Showing all <span class="font-bold text-foreground">{{ $products->count() }}</span> results
+                    Showing <span class="font-bold text-foreground">{{ $products->total() }}</span>
+                    @if(isset($isBestsellers) && $isBestsellers) books sorted by most sold @else results @endif
                 </div>
+                @if(isset($isBestsellers) && $isBestsellers)
+                    <div class="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                        Most sold first
+                    </div>
+                @endif
             </div>
 
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
+                    @php $rank = $products->firstItem() + $loop->index; @endphp
                     <div class="relative flex flex-col p-3 transition duration-300 border border-border bg-card text-card-foreground rounded-xl group hover:shadow-lg">
+                        @if(isset($isBestsellers) && $isBestsellers)
+                            <div class="absolute top-2 left-2 z-10 flex items-center justify-center w-7 h-7 rounded-full text-xs font-black
+                                {{ $rank === 1 ? 'bg-yellow-400 text-yellow-900' : ($rank === 2 ? 'bg-gray-300 text-gray-700' : ($rank === 3 ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-500')) }}">
+                                {{ $rank }}
+                            </div>
+                        @endif
                         @auth
                             @php
                                 $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
@@ -194,7 +210,7 @@
                                 <span class="text-sm font-bold text-foreground">{{ number_format($product->approved_reviews_avg_rating ?? 0, 1) }}</span>
                             </div>
                             
-                            <h3 class="font-bold text-foreground truncate transition group-hover:text-cyan-500" title="{{ $product->title }}">{{ $product->title }}</h3>
+                            <h3 class="font-bold text-foreground truncate transition group-hover:text-gray-500" title="{{ $product->title }}">{{ $product->title }}</h3>
                             <p class="mb-2 text-xs text-muted-foreground truncate">{{ $product->author }}</p>
                         </a>
                         
@@ -204,7 +220,7 @@
                             {{-- THE FIX: Wrap the button in a secure POST form --}}
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
                                 @csrf
-                                <button type="submit" class="w-full py-2 font-bold text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 active:scale-[0.98]">
+                                <button type="submit" class="w-full py-2 font-bold text-white transition-colors bg-gray-700 rounded-md hover:bg-gray-800 active:scale-[0.98]">
                                     Add to Cart
                                 </button>
                             </form>

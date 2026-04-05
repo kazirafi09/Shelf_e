@@ -26,6 +26,8 @@ class Order extends Model
         'payment_method',
         'subtotal',
         'shipping_cost',
+        'discount_amount',
+        'coupon_code',
         'total_amount',
         'status',
     ];

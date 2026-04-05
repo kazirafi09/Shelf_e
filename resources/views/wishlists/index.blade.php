@@ -16,7 +16,7 @@
             @php $book = $wishlist->product; @endphp
 
             @if($book)
-            <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 bg-card text-card-foreground border border-border rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-cyan-100">
+            <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 bg-card text-card-foreground border border-border rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-gray-100">
 
                 <div class="absolute z-20 top-3 right-3">
                     <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST">
@@ -42,7 +42,7 @@
                         <span class="text-xs font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
                     </div>
 
-                    <h3 class="font-bold text-foreground truncate transition-colors duration-300 group-hover:text-cyan-600" title="{{ $book->title }}">{{ $book->title }}</h3>
+                    <h3 class="font-bold text-foreground truncate transition-colors duration-300 group-hover:text-gray-700" title="{{ $book->title }}">{{ $book->title }}</h3>
                     <p class="mb-3 text-xs font-medium text-muted-foreground truncate">{{ $book->author }}</p>
                 </a>
 
@@ -53,7 +53,7 @@
 
                     <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
                         @csrf
-                        <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-orange-500 shadow-md rounded-lg hover:bg-orange-600 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                        <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-gray-700 shadow-md rounded-lg hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
                             Add to Cart
                         </button>
                     </form>
@@ -69,7 +69,7 @@
         </div>
         <h2 class="mb-2 text-2xl font-bold text-foreground">Your wishlist is empty</h2>
         <p class="mb-6 text-muted-foreground">Save items you love so you don't lose sight of them.</p>
-        <a href="/categories" class="px-6 py-3 font-bold text-white transition-colors bg-cyan-600 rounded-xl hover:bg-cyan-700">Explore Books</a>
+        <a href="/categories" class="px-6 py-3 font-bold text-white transition-colors bg-gray-700 rounded-xl hover:bg-gray-800">Explore Books</a>
     </div>
 @endif
 

@@ -48,6 +48,11 @@ class Product extends Model
     {
         return $this->hasMany(ProductPreview::class)->orderBy('sort_order');
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
     public function getDisplayPriceAttribute()
     {
         // If both exist, show the lowest price

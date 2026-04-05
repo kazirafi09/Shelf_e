@@ -6,7 +6,7 @@
     <div class="mb-6 transition-all duration-700 ease-out transform md:mb-8"
          :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'">
         <h1 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">@yield('page-title', 'My Dashboard')</h1>
-        <p class="mt-1 text-sm font-medium text-muted-foreground">Welcome back, <span class="text-cyan-700">{{ auth()->user()->name }}</span>!</p>
+        <p class="mt-1 text-sm font-medium text-muted-foreground">Welcome back, <span class="text-gray-900">{{ auth()->user()->name }}</span>!</p>
     </div>
 
     <div class="flex flex-col gap-6 md:flex-row md:gap-8">

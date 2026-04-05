@@ -54,7 +54,7 @@
 
         <div class="flex justify-end">
             <button type="submit"
-                    class="px-5 py-2.5 text-sm font-bold text-white bg-cyan-600 rounded-xl hover:bg-cyan-700 transition-colors">
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-gray-700 rounded-xl hover:bg-gray-800 transition-colors">
                 Save Changes
             </button>
         </div>
@@ -95,7 +95,7 @@
 
         <div class="flex justify-end">
             <button type="submit"
-                    class="px-5 py-2.5 text-sm font-bold text-white bg-cyan-600 rounded-xl hover:bg-cyan-700 transition-colors">
+                    class="px-5 py-2.5 text-sm font-bold text-white bg-gray-700 rounded-xl hover:bg-gray-800 transition-colors">
                 Update Password
             </button>
         </div>

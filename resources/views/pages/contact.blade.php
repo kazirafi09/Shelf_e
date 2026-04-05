@@ -10,7 +10,7 @@
             
             <div class="space-y-6">
                 <div class="flex items-start p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
-                    <div class="p-3 rounded-full bg-cyan-50 text-cyan-600">
+                    <div class="p-3 rounded-full bg-gray-50 text-gray-700">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                     </div>
                     <div class="ml-5">
@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="flex items-start p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl">
-                    <div class="p-3 text-orange-500 rounded-full bg-orange-50">
+                    <div class="p-3 text-gray-700 rounded-full bg-gray-50">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                     </div>
                     <div class="ml-5">
@@ -61,7 +61,7 @@
                     <textarea name="message" rows="4" class="w-full px-4 py-3 bg-background border @error('message') border-red-500 @else border-input @enderror rounded-xl focus:ring-2 focus:ring-ring focus:outline-none text-foreground" required>{{ old('message') }}</textarea>
                     @error('message') <span class="mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
                 </div>
-                <button type="submit" class="w-full py-3.5 text-base font-bold text-white transition-colors bg-cyan-600 rounded-xl hover:bg-cyan-700 shadow-md">
+                <button type="submit" class="w-full py-3.5 text-base font-bold text-white transition-colors bg-gray-700 rounded-xl hover:bg-gray-800 shadow-md">
                     Send Message
                 </button>
             </form>
