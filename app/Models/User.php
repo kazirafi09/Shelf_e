@@ -25,6 +25,9 @@ class User extends Authenticatable
         'email',
         'password',
         'coin_balance',
+        'google_id',
+        'google_token',
+        'avatar',
     ];
 
     public function isAdmin()
