@@ -29,9 +29,12 @@
                 <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Actions</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-border">
-            @forelse($users as $user)
-            <tr x-data="{ showAdjustForm: false }" class="group">
+
+        @forelse($users as $user)
+        {{-- Each user gets its own tbody so Alpine x-data scopes both rows correctly --}}
+        <tbody x-data="{ showAdjustForm: false }" class="divide-y divide-border border-t border-border">
+
+            <tr>
                 <td class="px-6 py-4 text-sm font-semibold text-foreground">{{ $user->name }}</td>
                 <td class="px-6 py-4 text-sm text-muted-foreground">{{ $user->email }}</td>
                 <td class="px-6 py-4">
@@ -49,16 +52,19 @@
                         :class="showAdjustForm ? 'bg-muted text-muted-foreground' : 'bg-cyan-50 text-cyan-700 hover:bg-cyan-100'"
                         class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold border border-border rounded-lg transition-colors"
                     >
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg x-show="!showAdjustForm" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                         </svg>
-                        <span x-text="showAdjustForm ? 'Cancel' : 'Adjust'"></span>
+                        <svg x-show="showAdjustForm" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span x-text="showAdjustForm ? 'Cancel' : 'Adjust Balance'"></span>
                     </button>
                 </td>
             </tr>
 
-            {{-- Inline Adjust Form Row --}}
+            {{-- Adjust Form Row — sibling tr inside the same tbody, so x-data scope is shared --}}
             <tr x-show="showAdjustForm"
                 x-transition:enter="transition ease-out duration-150"
                 x-transition:enter-start="opacity-0 -translate-y-1"
@@ -73,22 +79,22 @@
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Type</label>
                             <select name="type"
-                                    class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
-                                <option value="credit">Credit</option>
-                                <option value="debit">Debit</option>
+                                    class="px-3 py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg shadow-sm">
+                                <option value="credit">Credit (Add)</option>
+                                <option value="debit">Debit (Deduct)</option>
                             </select>
                         </div>
 
                         <div class="flex flex-col gap-1">
                             <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Amount</label>
                             <input type="number" name="amount" min="1" placeholder="e.g. 100"
-                                   class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm w-32">
+                                   class="px-3 py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg shadow-sm w-32">
                         </div>
 
                         <div class="flex flex-col flex-1 gap-1 min-w-48">
                             <label class="text-xs font-bold text-muted-foreground uppercase tracking-wider">Description</label>
                             <input type="text" name="description" placeholder="e.g. Loyalty reward"
-                                   class="py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
+                                   class="px-3 py-2 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg shadow-sm">
                         </div>
 
                         <button type="submit"
@@ -99,14 +105,17 @@
                 </td>
             </tr>
 
-            @empty
+        </tbody>
+        @empty
+        <tbody>
             <tr>
                 <td colspan="4" class="px-6 py-16 text-sm font-medium text-center text-muted-foreground">
                     No users found.
                 </td>
             </tr>
-            @endforelse
         </tbody>
+        @endforelse
+
     </table>
 </div>
 

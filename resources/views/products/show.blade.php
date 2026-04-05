@@ -228,6 +228,10 @@
             <div class="sticky top-6" x-data="{
                 paperbackPrice: {{ $product->paperback_price ? $product->paperback_price : 'null' }},
                 hardcoverPrice: {{ $product->hardcover_price ? $product->hardcover_price : 'null' }},
+                salePrice: {{ $product->sale_price ?? 'null' }},
+                saleEndsAt: {{ $product->sale_ends_at ? "'" . $product->sale_ends_at->toISOString() . "'" : 'null' }},
+                saleActive: @json((bool) ($product->sale_price && $product->sale_ends_at && $product->sale_ends_at->isFuture())),
+                countdown: '',
                 quantity: 1,
                 actionType: 'add_to_cart',
                 loading: false,
@@ -235,14 +239,34 @@
                 // Intelligently set default format based on what is available
                 format: '{{ $product->paperback_price ? 'paperback' : ($product->hardcover_price ? 'hardcover' : '') }}',
 
+                init() {
+                    if (this.saleEndsAt) {
+                        this.updateCountdown();
+                        setInterval(() => this.updateCountdown(), 1000);
+                    }
+                },
+
+                updateCountdown() {
+                    const diff = Math.max(0, Math.floor((new Date(this.saleEndsAt) - new Date()) / 1000));
+                    if (diff === 0) { this.saleActive = false; this.countdown = ''; return; }
+                    this.saleActive = true;
+                    const h = Math.floor(diff / 3600);
+                    const m = Math.floor((diff % 3600) / 60);
+                    const s = diff % 60;
+                    this.countdown = [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+                },
+
                 get hasPaperback() { return this.paperbackPrice !== null; },
                 get hasHardcover() { return this.hardcoverPrice !== null; },
 
                 get currentPrice() {
                     return this.format === 'paperback' ? this.paperbackPrice : this.hardcoverPrice;
                 },
+                get effectivePrice() {
+                    return (this.saleActive && this.salePrice) ? this.salePrice : this.currentPrice;
+                },
                 get totalPrice() {
-                    return this.currentPrice * this.quantity;
+                    return this.effectivePrice * this.quantity;
                 },
                 formatPrice(price) {
                     if (!price) return '0';
@@ -297,8 +321,32 @@
                         </div>
                     </div>
 
-                    <div class="mb-8 text-4xl font-extrabold text-center text-foreground transition-all duration-300" x-text="'৳ ' + formatPrice(totalPrice)">
-                        ৳ {{ number_format($product->paperback_price ?? $product->hardcover_price ?? 0, 0) }}
+                    {{-- Sale countdown timer --}}
+                    <div x-show="saleActive && countdown" x-cloak
+                         class="flex items-center justify-center gap-1.5 mb-4 text-sm text-gray-500">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Sale ends in <span class="font-mono font-bold text-foreground tracking-tight" x-text="countdown"></span></span>
+                    </div>
+
+                    {{-- Price display --}}
+                    <div class="mb-8 text-center transition-all duration-300">
+                        <template x-if="saleActive">
+                            <div>
+                                <span class="block text-sm line-through text-gray-400"
+                                      x-text="'৳ ' + formatPrice(currentPrice * quantity)"></span>
+                                <span class="text-4xl font-extrabold text-foreground"
+                                      x-text="'৳ ' + formatPrice(totalPrice)"></span>
+                            </div>
+                        </template>
+                        <template x-if="!saleActive">
+                            <div class="text-4xl font-extrabold text-foreground"
+                                 x-text="'৳ ' + formatPrice(totalPrice)">
+                                ৳ {{ number_format($product->paperback_price ?? $product->hardcover_price ?? 0, 0) }}
+                            </div>
+                        </template>
                     </div>
 
                     <form action="{{ route('cart.add', $product->id) }}" method="POST" @submit="loading = true">

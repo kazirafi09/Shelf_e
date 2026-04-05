@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Store Settings')
-@section('subtitle', 'Manage the announcement banner and FOMO deal countdown.')
+@section('subtitle', 'Manage the announcement banner, FOMO countdown, and delivery prices.')
 
 @section('admin-content')
 
@@ -76,6 +76,92 @@
                     Visitors will see a countdown like:
                     <span class="px-2 py-0.5 font-mono font-bold text-white bg-gray-900 rounded">Deal ends in: 04:32:18</span>
                 </div>
+            </div>
+
+            {{-- Delivery Prices --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Delivery Prices</h2>
+                <p class="mb-5 text-sm text-muted-foreground">Set the shipping cost charged at checkout for each delivery method.</p>
+
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="shipping_inside_dhaka" class="block mb-2 text-sm font-semibold text-foreground">
+                            Inside Dhaka (৳)
+                        </label>
+                        <input
+                            type="number"
+                            id="shipping_inside_dhaka"
+                            name="shipping_inside_dhaka"
+                            value="{{ old('shipping_inside_dhaka', $shippingInsideDhaka) }}"
+                            min="0"
+                            class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
+                        >
+                        @error('shipping_inside_dhaka')
+                            <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1.5 text-xs text-muted-foreground">Applied when the customer's division is Dhaka.</p>
+                    </div>
+
+                    <div>
+                        <label for="shipping_outside_dhaka" class="block mb-2 text-sm font-semibold text-foreground">
+                            Outside Dhaka (৳)
+                        </label>
+                        <input
+                            type="number"
+                            id="shipping_outside_dhaka"
+                            name="shipping_outside_dhaka"
+                            value="{{ old('shipping_outside_dhaka', $shippingOutsideDhaka) }}"
+                            min="0"
+                            class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
+                        >
+                        @error('shipping_outside_dhaka')
+                            <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1.5 text-xs text-muted-foreground">Applied for all other divisions (Chattogram, Khulna, Rajshahi, etc.).</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Returns Policy --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Returns Policy</h2>
+                <p class="mb-5 text-sm text-muted-foreground">This content is shown on the public Returns Policy page.</p>
+
+                <label for="returns_policy" class="block mb-2 text-sm font-semibold text-foreground">
+                    Policy Content
+                </label>
+                <textarea
+                    id="returns_policy"
+                    name="returns_policy"
+                    rows="8"
+                    maxlength="5000"
+                    class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition resize-y"
+                    placeholder="Describe your returns and refund policy…"
+                >{{ old('returns_policy', $returnsPolicy) }}</textarea>
+                @error('returns_policy')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- FAQ --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">FAQ</h2>
+                <p class="mb-5 text-sm text-muted-foreground">This content is shown on the public FAQ page. Use plain text or simple formatting.</p>
+
+                <label for="faq_content" class="block mb-2 text-sm font-semibold text-foreground">
+                    FAQ Content
+                </label>
+                <textarea
+                    id="faq_content"
+                    name="faq_content"
+                    rows="12"
+                    maxlength="10000"
+                    class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition resize-y"
+                    placeholder="List your frequently asked questions and answers…"
+                >{{ old('faq_content', $faqContent) }}</textarea>
+                @error('faq_content')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="flex justify-end">

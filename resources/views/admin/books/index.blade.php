@@ -35,6 +35,7 @@
                 <thead class="bg-muted">
                     <tr>
                         <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Book Info</th>
+                        <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Category</th>
                         <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Price</th>
                         <th class="px-6 py-4 text-xs font-bold tracking-wider text-muted-foreground uppercase">Stock Status</th>
                         <th class="px-6 py-4 text-xs font-bold tracking-wider text-right text-muted-foreground uppercase">Actions</th>
@@ -57,6 +58,15 @@
                                     <div class="text-xs text-muted-foreground">{{ $book->author }}</div>
                                 </div>
                             </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($book->category)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-muted border border-border text-muted-foreground">
+                                    {{ $book->category->name }}
+                                </span>
+                            @else
+                                <span class="text-xs text-muted-foreground">—</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-sm font-bold text-foreground">
                             ৳ {{ number_format($book->display_price, 0) }}
@@ -94,7 +104,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="px-6 py-16 text-center">
+                        <td colspan="5" class="px-6 py-16 text-center">
                             <div class="flex flex-col items-center">
                                 <svg class="w-12 h-12 mb-3 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                                 <p class="font-medium text-muted-foreground">No books found in inventory.</p>

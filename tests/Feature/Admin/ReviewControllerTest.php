@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Category;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,6 +17,9 @@ class ReviewControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // ProductFactory resolves category_id via Category::inRandomOrder()->first()
+        Category::factory()->create();
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');

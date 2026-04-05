@@ -2,32 +2,70 @@
 
 @section('content')
 
+{{-- Rotating Quote — sits above the hero --}}
+@if($quote)
+<div class="relative border-b border-border bg-card overflow-hidden"
+     x-data="{
+         quoteText: {{ Js::from($quote->quote) }},
+         quoteAuthor: {{ Js::from($quote->author) }},
+         visible: true,
+         progress: false,
+         startQuoteRefresh() {
+             this.progress = true;
+             setInterval(() => {
+                 this.visible = false;
+                 setTimeout(() => {
+                     fetch('/random-quote')
+                         .then(r => r.json())
+                         .then(data => {
+                             this.quoteText   = data.quote;
+                             this.quoteAuthor = data.author;
+                             this.visible     = true;
+                             this.progress    = false;
+                             setTimeout(() => this.progress = true, 50);
+                         });
+                 }, 400);
+             }, 10000);
+         }
+     }"
+     x-init="startQuoteRefresh()">
+
+    {{-- Auto-progress bar --}}
+    <div class="absolute bottom-0 left-0 h-[2px] bg-gray-200 w-full">
+        <div class="h-full bg-gray-400 origin-left"
+             :class="progress ? 'transition-none' : ''"
+             :style="progress ? 'animation: quote-progress 10s linear forwards;' : 'width:0'">
+        </div>
+    </div>
+
+    <div class="container mx-auto max-w-3xl px-6 py-3 flex items-center justify-center gap-4"
+         :class="visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'"
+         style="transition: opacity 0.4s ease, transform 0.4s ease;">
+
+        <div class="text-center">
+            <p class="text-sm md:text-base italic text-gray-600 leading-relaxed">
+                <span class="text-xl font-serif not-italic text-gray-300 leading-none align-bottom">&ldquo;</span><span x-text="quoteText"></span><span class="text-xl font-serif not-italic text-gray-300 leading-none align-bottom">&rdquo;</span>
+            </p>
+            <p class="mt-1.5 text-[11px] font-semibold text-gray-400 uppercase tracking-widest not-italic">
+                — <span x-text="quoteAuthor"></span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes quote-progress {
+    from { width: 0%; }
+    to   { width: 100%; }
+}
+</style>
+@endif
+
+{{-- Hero Section — full-bleed, outside the centered container --}}
+<x-hero />
+
 {{-- Main content container --}}
 <div class="container px-4 mx-auto max-w-7xl" x-data="{ mounted: false }" x-init="setTimeout(() => mounted = true, 100)">
-
-    {{-- Quote — below carousel --}}
-    @if($quote)
-        <div class="mt-4 mb-2 italic text-center text-muted-foreground"
-             x-data="{
-                 quoteText: {{ Js::from($quote->quote) }},
-                 quoteAuthor: {{ Js::from($quote->author) }},
-                 startQuoteRefresh() {
-                     setInterval(() => {
-                         fetch('/random-quote')
-                             .then(response => response.json())
-                             .then(data => {
-                                 this.quoteText = data.quote;
-                                 this.quoteAuthor = data.author;
-                             });
-                     }, 15000);
-                 }
-             }"
-             x-init="startQuoteRefresh()">
-            "<span x-text="quoteText"></span>"
-            <br>
-            <span class="text-sm">— <span x-text="quoteAuthor"></span></span>
-        </div>
-    @endif
 
     <div class="grid grid-cols-1 gap-4 mt-8 transition-all duration-700 ease-out delay-300 transform md:grid-cols-4" :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
         <div class="flex items-center p-4 transition-shadow border shadow-sm bg-card text-card-foreground border-border rounded-2xl hover:shadow-md">
@@ -100,8 +138,14 @@
             @foreach($popularAuthors as $item)
             <a href="{{ route('categories.index', ['authors[]' => $item->author]) }}" class="flex items-center p-5 transition-all duration-300 border shadow-sm cursor-pointer bg-card text-card-foreground border-border rounded-2xl hover:shadow-md hover:-translate-y-1 group">
                 
-                <div class="flex items-center justify-center w-16 h-16 overflow-hidden text-2xl font-black text-white transition-all duration-500 bg-gray-900 rounded-full shrink-0 group-hover:bg-gray-800 group-hover:scale-110 group-hover:shadow-inner">
-                    {{ substr($item->author, 0, 1) }}
+                <div class="w-16 h-16 overflow-hidden rounded-full shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:shadow-inner">
+                    @if($item->photo_path)
+                        <img src="{{ asset('storage/' . $item->photo_path) }}" alt="{{ $item->author }}" class="object-cover w-full h-full">
+                    @else
+                        <div class="flex items-center justify-center w-full h-full text-2xl font-black text-white bg-gray-900 group-hover:bg-gray-800">
+                            {{ substr($item->author, 0, 1) }}
+                        </div>
+                    @endif
                 </div>
                 
                 <div class="ml-5 overflow-hidden">
@@ -201,6 +245,93 @@
         
         <div class="mt-8 text-center md:hidden">
             <a href="/categories" class="inline-block px-8 py-3 text-sm font-bold text-gray-700 transition-colors border-2 border-gray-200 rounded-full hover:bg-gray-100">See All Books</a>
+        </div>
+    </div>
+
+    <div class="mt-20 mb-10 transition-all duration-700 ease-out delay-700 transform"
+         :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Bestsellers</h2>
+                <p class="mt-1 text-sm text-muted-foreground">The most purchased books by our readers.</p>
+            </div>
+            <a href="{{ route('bestsellers.index') }}" class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">See All Bestsellers &rarr;</a>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
+            @foreach($bestSellers as $book)
+            <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 border bg-card text-card-foreground border-border rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-gray-200">
+
+                <div class="absolute z-10 top-2 right-2">
+                    @auth
+                        @php
+                            $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
+                                                                ->where('product_id', $book->id)
+                                                                ->exists();
+                        @endphp
+                        <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="p-2 transition bg-white rounded-full shadow-sm hover:scale-110 active:scale-95">
+                                <svg class="w-5 h-5 {{ $isWishlisted ? 'text-red-500 fill-current' : 'text-gray-400 fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="block p-2 transition bg-white rounded-full shadow-sm hover:scale-110">
+                            <svg class="w-5 h-5 text-gray-400 fill-none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </a>
+                    @endauth
+                </div>
+
+                <a href="/product/{{ $book->slug }}" class="z-10 block grow">
+                    <div
+                        x-data="{ zoomed: false }"
+                        @mouseenter="zoomed = true"
+                        @mouseleave="zoomed = false"
+                        class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg"
+                    >
+                        <div class="absolute inset-0 z-10 transition-opacity duration-300 pointer-events-none bg-black/0 group-hover:bg-black/5"></div>
+                        @if($book->image_path)
+                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
+                                 class="object-cover w-full h-full transition-transform duration-300"
+                                 :class="{ 'scale-125 z-10': zoomed }">
+                        @else
+                            <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
+                        @endif
+                    </div>
+
+                    <div class="flex items-center mb-1.5 space-x-1">
+                        <svg class="w-4 h-4 text-yellow-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        <span class="text-xs font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
+                    </div>
+
+                    <h3 class="font-bold truncate transition-colors duration-300 text-foreground group-hover:text-gray-900" title="{{ $book->title }}">{{ $book->title }}</h3>
+                    <p class="mb-3 text-xs font-medium truncate text-muted-foreground">{{ $book->author }}</p>
+                </a>
+
+                <div class="z-10 flex flex-col justify-center pt-3 mt-auto border-t border-border h-[88px]">
+
+                    <p class="text-lg font-extrabold transition-all duration-300 ease-out transform text-foreground group-hover:-translate-y-8 group-hover:opacity-0">
+                        ৳ {{ number_format($book->display_price, 0) }}
+                    </p>
+
+                    <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
+                        @csrf
+                        <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-gray-900 shadow-md rounded-lg hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                            Add to Cart
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        <div class="mt-8 text-center md:hidden">
+            <a href="{{ route('bestsellers.index') }}" class="inline-block px-8 py-3 text-sm font-bold text-gray-700 transition-colors border-2 border-gray-200 rounded-full hover:bg-gray-100">See All Bestsellers</a>
         </div>
     </div>
 

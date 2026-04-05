@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Quote;
-use Illuminate\Support\Facades\Cache; // NEW: Added for caching
+use Illuminate\Support\Facades\Cache;
 
 class CatalogController extends Controller
 {
@@ -52,17 +52,29 @@ class CatalogController extends Controller
 
     public function home()
     {
-        $data = Cache::remember('homepage_data_v2', 300, function () {
+        $data = Cache::remember('homepage_data_v4', 300, function () {
             return [
                 'topBooks' => Product::withAvg('approvedReviews', 'rating')
                                 ->withCount('approvedReviews')
                                 ->orderBy('rating', 'desc')
                                 ->take(5)
                                 ->get(),
-                'popularAuthors' => Product::selectRaw('author, count(*) as book_count')
-                                ->whereNotNull('author')
-                                ->where('author', '!=', '')
-                                ->groupBy('author')
+                'bestSellers' => Product::withAvg('approvedReviews', 'rating')
+                                ->withCount('approvedReviews')
+                                ->leftJoin('order_items', 'products.id', '=', 'order_items.product_id')
+                                ->select('products.*')
+                                ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
+                                ->groupBy('products.id')
+                                ->orderByDesc('total_sold')
+                                ->take(5)
+                                ->get(),
+                'popularAuthors' => Product::select('products.author')
+                                ->selectRaw('count(*) as book_count')
+                                ->selectRaw('MAX(authors.photo_path) as photo_path')
+                                ->leftJoin('authors', 'products.author', '=', 'authors.name')
+                                ->whereNotNull('products.author')
+                                ->where('products.author', '!=', '')
+                                ->groupBy('products.author')
                                 ->orderBy('book_count', 'desc')
                                 ->take(4)
                                 ->get(),
@@ -173,8 +185,25 @@ class CatalogController extends Controller
             });
         }
 
-        // FIX 2.6: Changed ->get() to ->paginate(24) to prevent memory crashes on large catalogs
-        // Added withQueryString() so pagination works WITH the applied filters
+        // G. ON SALE FILTER
+        if ($request->boolean('on_sale')) {
+            $query->whereNotNull('sale_price')
+                  ->where(function ($q) {
+                      $q->whereNull('sale_ends_at')->orWhere('sale_ends_at', '>', now());
+                  });
+            if ($pageTitle === 'All Books') {
+                $pageTitle = 'Sale Items';
+            }
+        }
+
+        // H. SORT
+        if ($request->input('sort') === 'newest') {
+            $query->orderByDesc('created_at');
+            if ($pageTitle === 'All Books') {
+                $pageTitle = 'New Arrivals';
+            }
+        }
+
         $products = $query->paginate(24)->withQueryString();
 
         $genres = Category::all();

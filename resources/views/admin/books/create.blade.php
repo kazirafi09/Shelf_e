@@ -144,6 +144,27 @@
             </div>
             <p class="mt-2 text-xs text-orange-600">* At least one price format is required</p>
 
+            {{-- Sale & Promotion --}}
+            <div class="md:col-span-2 p-4 border border-border rounded-xl bg-muted/30">
+                <p class="mb-3 text-sm font-bold text-foreground">Sale & Promotion <span class="text-xs font-normal text-muted-foreground">(optional)</span></p>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="sale_price" class="block mb-1 text-sm font-medium text-foreground">Sale Price (৳)</label>
+                        <input type="number" id="sale_price" name="sale_price" step="0.01" placeholder="0.00"
+                            value="{{ old('sale_price') }}"
+                            class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
+                        <p class="mt-1 text-xs text-muted-foreground">Discounted price — overrides format prices when sale is active</p>
+                    </div>
+                    <div>
+                        <label for="sale_ends_at" class="block mb-1 text-sm font-medium text-foreground">Sale Ends At</label>
+                        <input type="datetime-local" id="sale_ends_at" name="sale_ends_at"
+                            value="{{ old('sale_ends_at') }}"
+                            class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
+                        <p class="mt-1 text-xs text-muted-foreground">Leave blank to run the sale indefinitely</p>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label for="stock" class="block mb-1 text-sm font-bold text-foreground">Stock Quantity</label>
                 <input type="number" id="stock" name="stock_quantity" placeholder="How many in stock?" required

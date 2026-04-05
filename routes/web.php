@@ -21,7 +21,6 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminBookController;
 use App\Http\Controllers\Admin\AdminOrderController;
-use App\Http\Controllers\Admin\HeroSlideController;
 use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\CoinController as AdminCoinController;
@@ -66,6 +65,14 @@ Route::get('/bestsellers', [CatalogController::class, 'bestsellers'])->name('bes
 
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
+Route::get('/returns-policy', function () {
+    return view('pages.returns-policy', ['content' => \App\Models\Setting::get('returns_policy', '')]);
+})->name('returns-policy');
+
+Route::get('/faq', function () {
+    return view('pages.faq', ['content' => \App\Models\Setting::get('faq_content', '')]);
+})->name('faq');
 
 Route::view('/newsletter', 'pages.newsletter')->name('newsletter');
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
@@ -143,10 +150,7 @@ Route::prefix('admin')
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/hero-slides/search', [HeroSlideController::class, 'search'])->name('hero-slides.search');
-        Route::resource('hero-slides', HeroSlideController::class)->only(['index', 'store', 'destroy']);
-
-        // Orders
+// Orders
         Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::get('/orders/{id}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');

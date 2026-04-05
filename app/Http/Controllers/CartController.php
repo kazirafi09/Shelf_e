@@ -22,11 +22,14 @@ class CartController extends Controller
         }
 
         $format = $request->input('format');
-        $itemPrice = $format === 'paperback' ? $product->paperback_price : $product->hardcover_price;
+        $basePrice = $format === 'paperback' ? $product->paperback_price : $product->hardcover_price;
 
-        if (is_null($itemPrice)) {
+        if (is_null($basePrice)) {
             return redirect()->back()->with('error', 'The selected format is currently unavailable for this book.');
         }
+
+        // Use sale_price when the sale is still active; otherwise fall back to the format price.
+        $itemPrice = $product->active_sale_price ?? $basePrice;
 
         $requested = max(1, (int) $request->input('quantity', 1));
 

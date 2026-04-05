@@ -215,8 +215,16 @@
                         </a>
                         
                         <div class="pt-2 mt-auto">
-                            <p class="mb-3 text-lg font-bold text-foreground">৳ {{ number_format($product->display_price, 0) }}</p>
-                            
+                            @php $activeSalePrice = $product->active_sale_price; @endphp
+                            @if($activeSalePrice)
+                                <div class="mb-3">
+                                    <span class="text-xs line-through text-gray-400">৳ {{ number_format($product->display_price, 0) }}</span>
+                                    <span class="ml-1 text-lg font-bold text-foreground">৳ {{ number_format($activeSalePrice, 0) }}</span>
+                                </div>
+                            @else
+                                <p class="mb-3 text-lg font-bold text-foreground">৳ {{ number_format($product->display_price, 0) }}</p>
+                            @endif
+
                             {{-- THE FIX: Wrap the button in a secure POST form --}}
                             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
                                 @csrf

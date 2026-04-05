@@ -53,7 +53,7 @@ $col3 = array_slice($testimonials, 6, 3);
 @endphp
 
 <section
-    class="my-20 relative bg-background overflow-hidden"
+    class="my-20 relative overflow-hidden"
     x-data="{
         visible: false,
         init() {

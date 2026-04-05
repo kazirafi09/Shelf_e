@@ -19,7 +19,14 @@
 </head>
 
 
-<body class="relative bg-background text-foreground font-sans antialiased">
+<body class="relative bg-[#faf8f5] text-foreground font-sans antialiased">
+
+    {{-- Global ambient background blobs — fixed so they persist across all pages --}}
+    <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
+        <div class="absolute -top-40 -right-40 w-[700px] h-[700px] rounded-full bg-amber-100/60 blur-[130px]"></div>
+        <div class="absolute top-1/3 -left-40 w-[500px] h-[500px] rounded-full bg-sky-100/50 blur-[110px]"></div>
+        <div class="absolute -bottom-32 right-1/4 w-[400px] h-[400px] rounded-full bg-orange-50/70 blur-[100px]"></div>
+    </div>
 
     @php
         $announcementText = \App\Models\Setting::get('announcement_text', 'Free Standard Shipping on orders over ৳1000!');
@@ -501,25 +508,25 @@
                 <div>
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Shop</h4>
                     <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> New Arrivals</a></li>
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Bestsellers</a></li>
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Sale Items</a></li>
+                        <li><a href="{{ route('categories.index', ['sort' => 'newest']) }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> New Arrivals</a></li>
+                        <li><a href="{{ route('bestsellers.index') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Bestsellers</a></li>
+                        <li><a href="{{ route('categories.index', ['on_sale' => '1']) }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Sale Items</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Support</h4>
                     <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Track Order</a></li>
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Returns Policy</a></li>
-                        <li><a href="#" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> FAQ</a></li>
+                        <li><a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Track Order</a></li>
+                        <li><a href="{{ route('returns-policy') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Returns Policy</a></li>
+                        <li><a href="{{ route('faq') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> FAQ</a></li>
                     </ul>
                 </div>
 
                 <div id="contact">
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Contact</h4>
                     <ul class="space-y-3 text-sm text-gray-500">
-                        <li class="flex items-center"><svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg> +880 1234 567890</li>
-                        <li class="flex items-center"><svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> support@shelf-e.com</li>
+
+                        <li class="flex items-center"><svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> <a href="mailto:support@shelf-e.com" class="hover:text-gray-900 transition-colors">support@shelf-e.com</a></li>
                         <li class="flex items-start"><svg class="w-4 h-4 mt-1 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Dhaka, Bangladesh</li>
                     </ul>
                 </div>
@@ -528,8 +535,7 @@
             <div class="container flex flex-col items-center justify-between px-4 pt-8 mx-auto mt-12 text-xs text-center text-gray-400 border-t border-gray-200 md:flex-row">
                 <p>&copy; {{ date('Y') }} Shelf-E. All rights reserved.</p>
                 <div class="flex mt-4 space-x-6 md:mt-0">
-                    <a href="#" class="transition-colors hover:text-gray-900">Privacy Policy</a>
-                    <a href="#" class="transition-colors hover:text-gray-900">Terms of Service</a>
+                    <a href="{{ route('contact') }}" class="transition-colors hover:text-gray-900">Contact Us</a>
                 </div>
             </div>
         </div>

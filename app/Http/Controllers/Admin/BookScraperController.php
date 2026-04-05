@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Author;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\BookScraperService;
@@ -15,7 +16,8 @@ class BookScraperController extends Controller
 
     public function index()
     {
-        return view('admin.scraper.index');
+        $categories = Category::orderBy('name')->get();
+        return view('admin.scraper.index', compact('categories'));
     }
 
     public function search(Request $request)
@@ -36,74 +38,70 @@ class BookScraperController extends Controller
     public function import(Request $request)
     {
         $validated = $request->validate([
-            'title'          => 'required|string|max:255|unique:products,title',
-            'author'         => 'nullable|string|max:255',
-            'isbn'           => 'nullable|string|max:20',
-            'description'    => 'nullable|string',
-            'published_year' => 'nullable|string|max:20',
-            'cover_url'      => 'nullable|url|max:2048',
-            'work_key'       => 'nullable|string|max:100',
-            'subjects_json'  => 'nullable|string',
+            'handle'      => 'required|string|max:255',
+            'title'       => 'required|string|max:255|unique:products,title',
+            'author'      => 'nullable|string|max:255',
+            'price'       => 'nullable|numeric|min:0',
+            'cover_url'   => 'nullable|url|max:2048',
+            'category_id' => 'nullable|integer|exists:categories,id',
         ]);
 
         $slug = Str::slug($validated['title']) . '-' . substr(uniqid(), -5);
 
-        // 1. Decode subjects passed from the search results
-        $searchSubjects = json_decode($validated['subjects_json'] ?? '[]', true) ?? [];
+        // Fetch description + tags from the full product JSON
+        $details = $this->scraper->fetchProductDetails($validated['handle']);
 
-        // 2. Fetch full work details from Open Library for richer description + subjects
-        $workDetails = ['description' => null, 'subjects' => []];
-        if (!empty($validated['work_key'])) {
-            $workDetails = $this->scraper->fetchWorkDetails($validated['work_key']);
+        // Use admin-chosen category if provided; otherwise auto-resolve.
+        // Priority: 1) admin pick, 2) genre extracted from body text, 3) Shopify tags/product_type.
+        if (!empty($validated['category_id'])) {
+            $category = Category::findOrFail($validated['category_id']);
+        } elseif (!empty($details['genre'])) {
+            $category = $this->resolveCategory([$details['genre']]);
+        } else {
+            $subjects = array_values(array_filter(array_merge(
+                $details['tags'],
+                $details['product_type'] ? [$details['product_type']] : []
+            )));
+            $category = $this->resolveCategory($subjects);
         }
 
-        // 3. Build description and synopsis.
-        //    Prefer the full work description; fall back to the search snippet.
-        $fullText    = $workDetails['description'] ?? $validated['description'] ?? null;
-        $description = $fullText;
-        $synopsis    = null;
-
-        if ($fullText && strlen($fullText) > 600) {
-            // Split on a sentence boundary around the 400-char mark
-            $split = strpos($fullText, '. ', 400);
-            if ($split !== false) {
-                $description = trim(substr($fullText, 0, $split + 1));
-                $synopsis    = trim(substr($fullText, $split + 2));
-            }
-        }
-
-        // 4. Resolve category — merge work subjects with the search result subjects
-        $allSubjects = array_merge($workDetails['subjects'], $searchSubjects);
-        $category    = $this->resolveCategory($allSubjects);
-
-        // 5. Download cover image to local storage
+        // Download cover image to local storage
         $imagePath = null;
         if (!empty($validated['cover_url'])) {
             $imagePath = $this->scraper->downloadCover($validated['cover_url'], $slug);
         }
 
-        // 6. Create the product
+        $authorName = $validated['author'] ?? null;
+
         $product = Product::create([
             'title'           => $validated['title'],
-            'author'          => $validated['author'] ?? 'Unknown',
+            'author'          => $authorName ?? 'Unknown',
             'slug'            => $slug,
-            'description'     => $description,
-            'synopsis'        => $synopsis,
+            'description'     => $details['description'],
+            'synopsis'        => $details['synopsis'],
             'category_id'     => $category->id,
-            'paperback_price' => 0,
-            'hardcover_price' => 0,
+            'paperback_price' => $validated['price'] ?? 0,
+            'hardcover_price' => null,
             'stock_quantity'  => 0,
             'rating'          => 0,
             'image_path'      => $imagePath,
         ]);
 
+        // Create or look up the Author record and attach it via the pivot.
+        if ($authorName) {
+            $author = Author::firstOrCreate(
+                ['slug' => Str::slug($authorName)],
+                ['name' => $authorName]
+            );
+            $product->authors()->sync([$author->id]);
+        }
+
         return redirect()->route('admin.books.edit', $product->id)
-            ->with('success', "'{$product->title}' imported successfully. Please set the price and review the details.");
+            ->with('success', "'{$product->title}' imported. Please review the details and set the stock.");
     }
 
-    /**
-     * Find or create a Category from an array of Open Library subject strings.
-     */
+    // ── Private helpers ──────────────────────────────────────────────────────
+
     private function resolveCategory(array $subjects): Category
     {
         foreach ($subjects as $subject) {
@@ -118,91 +116,66 @@ class BookScraperController extends Controller
             );
         }
 
-        // Fallback: get or create a generic "Uncategorized" category
         return Category::firstOrCreate(
             ['slug' => 'uncategorized'],
             ['name' => 'Uncategorized']
         );
     }
 
-    /**
-     * Map a raw Open Library subject string to a clean category name.
-     * Returns null for overly specific or noisy subjects we can't use.
-     */
     private function normalizeSubject(string $subject): ?string
     {
         $map = [
-            // Fiction genres
-            'fiction'                           => 'Fiction',
-            'general fiction'                   => 'Fiction',
-            'literary fiction'                  => 'Fiction',
-            'mystery'                           => 'Mystery',
-            'mystery fiction'                   => 'Mystery',
-            'detective and mystery stories'     => 'Mystery',
-            'science fiction'                   => 'Science Fiction',
-            'fantasy'                           => 'Fantasy',
-            'fantasy fiction'                   => 'Fantasy',
-            'epic fantasy'                      => 'Fantasy',
-            'romance'                           => 'Romance',
-            'romance fiction'                   => 'Romance',
-            'love stories'                      => 'Romance',
-            'horror'                            => 'Horror',
-            'horror fiction'                    => 'Horror',
-            'thriller'                          => 'Thriller',
-            'suspense fiction'                  => 'Thriller',
-            'historical fiction'                => 'Historical Fiction',
-            'adventure fiction'                 => 'Adventure',
-            'adventure stories'                 => 'Adventure',
-            // Non-fiction
-            'biography'                         => 'Biography',
-            'autobiography'                     => 'Biography',
-            'biography & autobiography'         => 'Biography',
-            'history'                           => 'History',
-            'world history'                     => 'History',
-            'self-help'                         => 'Self-Help',
-            'personal development'              => 'Self-Help',
-            'philosophy'                        => 'Philosophy',
-            'religion'                          => 'Religion',
-            'spirituality'                      => 'Religion',
-            'poetry'                            => 'Poetry',
-            'drama'                             => 'Drama',
-            'plays'                             => 'Drama',
-            'travel'                            => 'Travel',
-            'travel writing'                    => 'Travel',
-            'cooking'                           => 'Cooking',
-            'cookbooks'                         => 'Cooking',
-            'art'                               => 'Art',
-            'music'                             => 'Music',
-            'sports'                            => 'Sports',
-            'science'                           => 'Science',
-            'technology'                        => 'Technology',
-            'computers'                         => 'Technology',
-            'business'                          => 'Business',
-            'economics'                         => 'Economics',
-            'politics'                          => 'Politics',
-            'political science'                 => 'Politics',
-            'psychology'                        => 'Psychology',
-            'education'                         => 'Education',
-            'health'                            => 'Health',
-            'medicine'                          => 'Health',
-            'comics'                            => 'Comics & Graphic Novels',
-            'graphic novels'                    => 'Comics & Graphic Novels',
-            // Children & YA
-            'juvenile fiction'                  => 'Children',
-            "children's stories"                => 'Children',
-            "children's literature"             => 'Children',
-            'picture books'                     => 'Children',
-            'young adult fiction'               => 'Young Adult',
-            'young adult literature'            => 'Young Adult',
-            // Bangla / Bengali
-            'bangla'                            => 'Bangla Literature',
-            'bengali'                           => 'Bangla Literature',
-            'bengali fiction'                   => 'Bangla Literature',
-            'bengali literature'                => 'Bangla Literature',
-            'bangla literature'                 => 'Bangla Literature',
-            'bangladeshi literature'            => 'Bangla Literature',
-            'বাংলা সাহিত্য'                    => 'Bangla Literature',
-            'বাংলা'                             => 'Bangla Literature',
+            'fiction'                       => 'Fiction',
+            'general fiction'               => 'Fiction',
+            'literary fiction'              => 'Fiction',
+            'mystery'                       => 'Mystery',
+            'mystery fiction'               => 'Mystery',
+            'science fiction'               => 'Science Fiction',
+            'fantasy'                       => 'Fantasy',
+            'fantasy fiction'               => 'Fantasy',
+            'romance'                       => 'Romance',
+            'horror'                        => 'Horror',
+            'thriller'                      => 'Thriller',
+            'historical fiction'            => 'Historical Fiction',
+            'adventure fiction'             => 'Adventure',
+            'adventure stories'             => 'Adventure',
+            'biography'                     => 'Biography',
+            'autobiography'                 => 'Biography',
+            'biography & autobiography'     => 'Biography',
+            'history'                       => 'History',
+            'self-help'                     => 'Self-Help',
+            'personal development'          => 'Self-Help',
+            'philosophy'                    => 'Philosophy',
+            'religion'                      => 'Religion',
+            'spirituality'                  => 'Religion',
+            'poetry'                        => 'Poetry',
+            'drama'                         => 'Drama',
+            'travel'                        => 'Travel',
+            'cooking'                       => 'Cooking',
+            'art'                           => 'Art',
+            'music'                         => 'Music',
+            'sports'                        => 'Sports',
+            'science'                       => 'Science',
+            'technology'                    => 'Technology',
+            'business'                      => 'Business',
+            'economics'                     => 'Economics',
+            'politics'                      => 'Politics',
+            'psychology'                    => 'Psychology',
+            'education'                     => 'Education',
+            'health'                        => 'Health',
+            'comics'                        => 'Comics & Graphic Novels',
+            'graphic novels'                => 'Comics & Graphic Novels',
+            'juvenile fiction'              => 'Children',
+            "children's stories"            => 'Children',
+            'young adult fiction'           => 'Young Adult',
+            'bangla'                        => 'Bangla Literature',
+            'bengali'                       => 'Bangla Literature',
+            'bengali fiction'               => 'Bangla Literature',
+            'bengali literature'            => 'Bangla Literature',
+            'bangla literature'             => 'Bangla Literature',
+            'bangladeshi literature'        => 'Bangla Literature',
+            'বাংলা সাহিত্য'                => 'Bangla Literature',
+            'বাংলা'                         => 'Bangla Literature',
         ];
 
         $lower = mb_strtolower(trim($subject));
@@ -211,8 +184,13 @@ class BookScraperController extends Controller
             return $map[$lower];
         }
 
-        // Accept short, clean subjects that don't look like identifiers
-        if (mb_strlen($subject) <= 35 && !preg_match('/[\[\]()0-9@]/', $subject)) {
+        // Only accept multi-word subjects that look like genre/topic phrases,
+        // not single proper nouns (which are likely author names from Shopify tags).
+        if (
+            mb_strlen($subject) <= 35
+            && !preg_match('/[\[\]()0-9@]/', $subject)
+            && str_word_count($subject) >= 2
+        ) {
             return ucwords(mb_strtolower($subject));
         }
 

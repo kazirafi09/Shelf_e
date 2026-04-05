@@ -15,7 +15,7 @@
                     </div>
                     <div class="ml-5">
                         <h4 class="text-lg font-bold text-foreground">Phone Support</h4>
-                        <p class="mt-1 text-muted-foreground">+880 1234 567890</p>
+                        <p class="mt-1 text-muted-foreground">Coming soon</p>
                         <p class="text-sm text-muted-foreground">Sun-Thu, 9am - 6pm</p>
                     </div>
                 </div>

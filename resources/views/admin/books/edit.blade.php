@@ -38,7 +38,7 @@
                 x-data="{
                     query: '',
                     results: [],
-                    selectedAuthors: @json($book->authors->map->only('id', 'name')),
+                    selectedAuthors: {{ Illuminate\Support\Js::from($book->authors->map->only('id', 'name')) }},
                     open: false,
                     async search() {
                         if (this.query.length < 2) { this.results = []; this.open = false; return; }
@@ -147,6 +147,27 @@
                 </div>
             </div>
 
+            {{-- Sale & Promotion --}}
+            <div class="sm:col-span-2 p-4 border border-border rounded-xl bg-muted/30">
+                <p class="mb-3 text-sm font-bold text-foreground">Sale & Promotion <span class="text-xs font-normal text-muted-foreground">(optional)</span></p>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label class="block mb-1 text-sm font-medium text-foreground">Sale Price (৳)</label>
+                        <input type="number" name="sale_price" step="0.01" placeholder="0.00"
+                            value="{{ old('sale_price', $book->sale_price) }}"
+                            class="block w-full mt-1 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm sm:text-sm">
+                        <p class="mt-1 text-xs text-muted-foreground">Discounted price — overrides format prices when sale is active</p>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-sm font-medium text-foreground">Sale Ends At</label>
+                        <input type="datetime-local" name="sale_ends_at"
+                            value="{{ old('sale_ends_at', $book->sale_ends_at ? $book->sale_ends_at->format('Y-m-d\TH:i') : '') }}"
+                            class="block w-full mt-1 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm sm:text-sm">
+                        <p class="mt-1 text-xs text-muted-foreground">Leave blank to run the sale indefinitely</p>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label class="block text-sm font-bold text-foreground">Stock Quantity</label>
                 <input type="number" name="stock_quantity" value="{{ old('stock_quantity', $book->stock_quantity) }}" required
@@ -167,22 +188,49 @@
 
             <div class="sm:col-span-2">
                 <label class="block mb-2 text-sm font-bold text-foreground">Cover Image</label>
+                <p class="mb-3 text-xs text-muted-foreground">Drag & drop a new image or click to browse. Leave unchanged to keep the current cover.</p>
 
-                <div class="flex items-start p-4 space-x-6 border border-border rounded-xl bg-muted/30">
-                    @if($book->image_path)
-                        <div class="text-center shrink-0">
-                            <p class="mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Current Cover</p>
-                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="Current Cover" 
-                                 class="object-cover w-24 h-32 border-2 border-white rounded-lg shadow-md">
+                <div x-data="{
+                        imageUrl: @json($book->image_path ? asset('storage/' . $book->image_path) : null),
+                        isDragging: false,
+                        fileChosen(event) {
+                            this.processFile(event.target.files[0]);
+                        },
+                        handleDrop(event) {
+                            this.isDragging = false;
+                            const file = event.dataTransfer.files[0];
+                            this.processFile(file);
+                            this.$refs.fileInput.files = event.dataTransfer.files;
+                        },
+                        processFile(file) {
+                            if (!file || !file.type.match('image.*')) return;
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = e => this.imageUrl = e.target.result;
+                        }
+                    }"
+                    @dragover.prevent="isDragging = true"
+                    @dragleave.prevent="isDragging = false"
+                    @drop.prevent="handleDrop($event)"
+                    :class="isDragging ? 'border-cyan-500 bg-cyan-50' : 'border-border bg-background'"
+                    class="relative flex flex-col items-center justify-center w-full p-6 overflow-hidden transition-colors border-2 border-dashed rounded-xl h-52 group hover:bg-muted">
+
+                    <input x-ref="fileInput" type="file" name="image" @change="fileChosen" accept="image/png, image/jpeg, image/webp" class="absolute inset-0 z-50 w-full h-full opacity-0 cursor-pointer">
+
+                    <div x-show="!imageUrl" class="text-center text-muted-foreground transition-transform pointer-events-none group-hover:scale-105">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="text-sm font-medium text-foreground"><span class="text-cyan-600">Click to upload</span> or drag and drop</p>
+                        <p class="mt-1 text-xs text-muted-foreground">PNG, JPG, WEBP up to 2MB</p>
+                    </div>
+
+                    <div x-show="imageUrl" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted">
+                        <img :src="imageUrl" class="object-contain w-full h-full rounded-lg shadow-sm">
+                        <div class="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100 rounded-xl">
+                            <span class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-black/60">Click or Drop to change</span>
                         </div>
-                    @endif
-                    
-                    <div class="flex-1">
-                        <p class="mb-2 text-xs font-medium text-muted-foreground">Upload New Image <span class="text-muted-foreground/70">(Leave blank to keep current)</span></p>
-                        <input type="file" name="image" accept="image/*"
-                               class="block w-full text-sm text-muted-foreground transition-all cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
                     </div>
                 </div>
+                @error('image') <span class="block mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
         </div>

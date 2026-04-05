@@ -2,11 +2,16 @@
 
 @section('content')
 <div class="container px-4 py-8 mx-auto" x-data="{
-    shipping: {{ old('delivery', 'express') === 'standard' ? 60 : 150 }},
+    division: '{{ $prefillDivision ?? 'Dhaka' }}',
+    shippingInsideDhaka: {{ $insideDhakaRate }},
+    shippingOutsideDhaka: {{ $outsideDhakaRate }},
     subtotal: {{ $subtotal }},
     availableCoins: {{ auth()->check() ? auth()->user()->coin_balance : 0 }},
     redeemCoins: false,
     couponCode: '{{ old('coupon_code', '') }}',
+    get shipping() {
+        return this.division === 'Dhaka' ? this.shippingInsideDhaka : this.shippingOutsideDhaka;
+    },
     get couponDiscount() {
         return this.couponCode.trim().toUpperCase() === 'FIRST15'
             ? Math.round(this.subtotal * 0.15)
@@ -22,7 +27,7 @@
         this.$refs.fieldName.value      = addr.name;
         this.$refs.fieldEmail.value     = addr.email;
         this.$refs.fieldAddress.value   = addr.address;
-        this.$refs.fieldDivision.value  = addr.division;
+        this.division                   = addr.division;
         this.$refs.fieldDistrict.value  = addr.district;
         this.$refs.fieldPostal.value    = addr.postal_code ?? '';
         this.$refs.fieldPhone.value     = addr.phone;
@@ -130,9 +135,9 @@
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
                             <label class="block mb-1 text-sm font-medium text-foreground">Division</label>
-                            <select name="division" x-ref="fieldDivision" class="w-full px-4 py-3 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)]" required>
-                                @foreach(['Dhaka','Chittagong','Sylhet','Rajshahi','Khulna','Barisal','Rangpur','Mymensingh'] as $div)
-                                    <option value="{{ $div }}" {{ $prefillDivision === $div ? 'selected' : '' }}>{{ $div }}</option>
+                            <select name="division" x-model="division" class="w-full px-4 py-3 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)]" required>
+                                @foreach(['Dhaka','Chattogram','Sylhet','Rajshahi','Khulna','Barishal','Rangpur','Mymensingh'] as $div)
+                                    <option value="{{ $div }}">{{ $div }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -170,23 +175,23 @@
                     </div>
                 </div>
 
-                <h2 class="mb-6 text-2xl font-bold text-foreground">Delivery Method</h2>
-                <div class="grid grid-cols-1 gap-4 mb-10 md:grid-cols-2">
-                    <label class="relative flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer hover:bg-muted">
-                        <input type="radio" name="delivery" value="standard" @click="shipping = 60" {{ old('delivery') == 'standard' ? 'checked' : '' }} class="absolute w-0 h-0 opacity-0 peer">
-                        <span class="font-bold text-foreground">Standard Delivery</span>
-                        <span class="text-sm text-muted-foreground">(3-5 days)</span>
-                        <span class="mt-2 font-bold text-foreground">৳ 60</span>
-                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-gray-500"></div>
-                    </label>
-                    
-                    <label class="relative flex flex-col items-center p-4 border border-border rounded-lg cursor-pointer hover:bg-muted">
-                        <input type="radio" name="delivery" value="express" @click="shipping = 150" {{ old('delivery', 'express') == 'express' ? 'checked' : '' }} class="absolute w-0 h-0 opacity-0 peer">
-                        <span class="font-bold text-foreground">Express Delivery</span>
-                        <span class="text-sm text-muted-foreground">(1-2 days)</span>
-                        <span class="mt-2 font-bold text-foreground">৳ 150</span>
-                        <div class="absolute inset-0 transition-all border-2 border-transparent rounded-lg peer-checked:border-gray-500"></div>
-                    </label>
+                <h2 class="mb-6 text-2xl font-bold text-foreground">Delivery</h2>
+                <div class="mb-10 flex items-center justify-between gap-4 p-4 border border-border rounded-xl bg-muted/40">
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border shrink-0">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-foreground"
+                               x-text="division === 'Dhaka' ? 'Inside Dhaka' : 'Outside Dhaka'"></p>
+                            <p class="text-sm text-muted-foreground"
+                               x-text="division === 'Dhaka' ? '3–5 business days' : '5–7 business days'"></p>
+                        </div>
+                    </div>
+                    <p class="text-lg font-bold text-foreground shrink-0">৳ <span x-text="shipping"></span></p>
                 </div>
 
                 <h2 class="mb-6 text-2xl font-bold text-foreground">Payment Method</h2>

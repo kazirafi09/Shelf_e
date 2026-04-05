@@ -118,7 +118,7 @@
             <div style="margin-top:4px;font-size:11px;color:#64748b;line-height:1.7;">
                 123 Bookworm Lane<br>
                 Dhaka, Bangladesh<br>
-                <span style="font-weight:700;color:#0f172a;">+880 1234 567890</span><br>
+
                 support@shelf-e.com
             </div>
         </div>

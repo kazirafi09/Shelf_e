@@ -18,9 +18,15 @@ class Product extends Model
         'synopsis',
         'paperback_price',
         'hardcover_price',
+        'sale_price',
+        'sale_ends_at',
         'stock_quantity',
         'rating',
-        'image_path'
+        'image_path',
+    ];
+
+    protected $casts = [
+        'sale_ends_at' => 'datetime',
     ];
 
     // 2. Define the relationship back to the Category
@@ -53,6 +59,17 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    /**
+     * Returns the sale_price if a sale is currently active, null otherwise.
+     */
+    public function getActiveSalePriceAttribute(): ?float
+    {
+        if ($this->sale_price && $this->sale_ends_at && $this->sale_ends_at->isFuture()) {
+            return (float) $this->sale_price;
+        }
+        return null;
+    }
+
     public function getDisplayPriceAttribute()
     {
         // If both exist, show the lowest price

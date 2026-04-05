@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Book Scraper')
-@section('subtitle', 'Search Open Library and import book data directly into your catalog.')
+@section('subtitle', 'Search Book Tank BD and import book data directly into your catalog.')
 
 @section('admin-content')
 
@@ -67,7 +67,7 @@
                     type="text"
                     x-model="query"
                     @keydown.enter.prevent="search()"
-                    placeholder="Search by book title, e.g. 'The Great Gatsby'…"
+                    placeholder="Search by book title or author, e.g. 'Humayun Ahmed'…"
                     class="block w-full py-3 pl-10 pr-4 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm"
                 >
             </div>
@@ -76,11 +76,9 @@
                 :disabled="isLoading || query.trim().length < 2"
                 class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {{-- Spinner inside button --}}
                 <svg x-show="isLoading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                 </svg>
                 <span x-text="isLoading ? 'Searching…' : 'Search'"></span>
             </button>
@@ -92,14 +90,13 @@
         <span x-text="error"></span>
     </div>
 
-    {{-- Loading Spinner (full results area) --}}
+    {{-- Loading Spinner --}}
     <div x-show="isLoading && results.length === 0" x-transition.opacity class="flex flex-col items-center justify-center py-20" style="display: none;">
-        <svg class="w-10 h-10 text-cyan-500 animate-spin" fill="none" viewBox="0 0 24 24">
+        <svg class="w-10 h-10 text-primary animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-            <path class="opacity-75" fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
         </svg>
-        <p class="mt-3 text-sm font-medium text-muted-foreground">Searching Open Library…</p>
+        <p class="mt-3 text-sm font-medium text-muted-foreground">Searching Book Tank BD…</p>
     </div>
 
     {{-- Empty State --}}
@@ -108,16 +105,19 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
         </svg>
-        <p class="text-sm font-medium text-muted-foreground">No results found. Try a different title.</p>
+        <p class="text-sm font-medium text-muted-foreground">No results found on Book Tank BD. Try a different title.</p>
     </div>
 
     {{-- Results Table --}}
     <div x-show="results.length > 0" x-transition.opacity class="overflow-hidden bg-card text-card-foreground border border-border shadow-sm rounded-2xl" style="display: none;">
 
-        <div class="px-6 py-4 border-b border-border">
+        <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <p class="text-sm font-semibold text-foreground">
-                <span x-text="results.length"></span> results from Open Library
+                <span x-text="results.length"></span> results from Book Tank BD
             </p>
+            <a href="https://booktankbd.com" target="_blank" rel="noopener" class="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                booktankbd.com ↗
+            </a>
         </div>
 
         <div class="overflow-x-auto">
@@ -127,7 +127,8 @@
                         <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Cover</th>
                         <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Title</th>
                         <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Author</th>
-                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Year</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Price</th>
+                        <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Category</th>
                         <th class="px-6 py-3 text-xs font-bold tracking-wider text-muted-foreground uppercase">Action</th>
                     </tr>
                 </thead>
@@ -155,7 +156,6 @@
                             {{-- Title --}}
                             <td class="px-6 py-4 max-w-xs">
                                 <p class="text-sm font-semibold text-foreground line-clamp-2" x-text="book.title || '—'"></p>
-                                <p class="mt-0.5 text-xs text-muted-foreground" x-text="book.isbn ? 'ISBN: ' + book.isbn : ''"></p>
                             </td>
 
                             {{-- Author --}}
@@ -163,32 +163,37 @@
                                 <p class="text-sm text-muted-foreground" x-text="book.author || '—'"></p>
                             </td>
 
-                            {{-- Year --}}
+                            {{-- Price --}}
                             <td class="px-6 py-4">
-                                <p class="text-sm text-muted-foreground" x-text="book.published_year || '—'"></p>
+                                <p class="text-sm font-semibold text-foreground" x-text="book.price ? '৳ ' + parseFloat(book.price).toFixed(0) : '—'"></p>
                             </td>
 
-                            {{-- Import Form --}}
+                            {{-- Category + Import (single form) --}}
                             <td class="px-6 py-4">
-                                {{-- We use a standard HTML form with hidden inputs so the import
-                                     goes through Laravel's backend validation cleanly. --}}
-                                <form action="{{ route('admin.scraper.import') }}" method="POST" class="inline">
+                                <span class="text-xs text-muted-foreground italic">Auto-detected on import</span>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <form action="{{ route('admin.scraper.import') }}" method="POST" class="flex items-center gap-2">
                                     @csrf
-                                    <input type="hidden" name="title"          :value="book.title">
-                                    <input type="hidden" name="author"         :value="book.author">
-                                    <input type="hidden" name="isbn"           :value="book.isbn">
-                                    <input type="hidden" name="description"    :value="book.description">
-                                    <input type="hidden" name="published_year" :value="book.published_year">
-                                    <input type="hidden" name="cover_url"      :value="book.cover_url">
-                                    <input type="hidden" name="work_key"       :value="book.work_key">
-                                    <input type="hidden" name="subjects_json"  :value="JSON.stringify(book.subjects || [])">
+                                    <input type="hidden" name="handle"    :value="book.handle">
+                                    <input type="hidden" name="title"     :value="book.title">
+                                    <input type="hidden" name="author"    :value="book.author">
+                                    <input type="hidden" name="price"     :value="book.price">
+                                    <input type="hidden" name="cover_url" :value="book.cover_url">
+                                    <select name="category_id"
+                                            class="px-2 py-1.5 text-xs bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
+                                        <option value="">Auto-detect</option>
+                                        @foreach($categories as $cat)
+                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
                                     <button
                                         type="submit"
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95 shrink-0"
                                     >
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M12 4v16m8-8H4"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                         </svg>
                                         Import
                                     </button>

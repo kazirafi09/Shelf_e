@@ -36,7 +36,7 @@ class AdminBookController extends Controller
         }
 
         // Add withQueryString() so pagination links remember the search term
-        $books = $query->latest()->paginate(10)->withQueryString();
+        $books = $query->latest()->with('category')->paginate(10)->withQueryString();
 
         $globalCategories = Category::all();
 
@@ -63,6 +63,8 @@ class AdminBookController extends Controller
             'paperback_price' => 'nullable|numeric|min:0',
             'hardcover_price' => 'nullable|numeric|min:0',
             // At least one price format must be provided
+            'sale_price'      => 'nullable|numeric|min:0',
+            'sale_ends_at'    => 'nullable|date|after:now',
             'category_id'     => 'required|integer|exists:categories,id',
             'stock_quantity'  => 'required|integer|min:0',
             'description'     => 'required|string',
@@ -100,6 +102,8 @@ class AdminBookController extends Controller
             'author'          => $validated['author'],
             'paperback_price' => $validated['paperback_price'] ?? null,
             'hardcover_price' => $validated['hardcover_price'] ?? null,
+            'sale_price'      => $validated['sale_price'] ?? null,
+            'sale_ends_at'    => $validated['sale_ends_at'] ?? null,
             'category_id'     => $validated['category_id'],
             'stock_quantity'  => $validated['stock_quantity'],
             'description'     => $validated['description'],
@@ -131,6 +135,8 @@ class AdminBookController extends Controller
             'category_id'     => 'required|integer|exists:categories,id',
             'paperback_price' => 'nullable|numeric|min:0',
             'hardcover_price' => 'nullable|numeric|min:0',
+            'sale_price'      => 'nullable|numeric|min:0',
+            'sale_ends_at'    => 'nullable|date',
             'stock_quantity'  => 'required|integer|min:0',
             'description'     => 'nullable|string',
             'synopsis'        => 'nullable|string',
@@ -150,6 +156,8 @@ class AdminBookController extends Controller
             'category_id'     => $request->category_id,
             'paperback_price' => $request->paperback_price ?? null,
             'hardcover_price' => $request->hardcover_price ?? null,
+            'sale_price'      => $request->sale_price ?: null,
+            'sale_ends_at'    => $request->sale_ends_at ?: null,
             'stock_quantity'  => $request->stock_quantity,
             'description'     => $request->description,
             'synopsis'        => $request->synopsis,

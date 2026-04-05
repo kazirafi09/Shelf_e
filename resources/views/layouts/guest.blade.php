@@ -51,7 +51,6 @@
                 <div>
                     <h4 class="mb-4 font-bold text-gray-900">Contact</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
-                        <li>+880 1234 567890</li>
                         <li>support@shelf-e.com</li>
                         <li>Dhaka, Bangladesh</li>
                     </ul>

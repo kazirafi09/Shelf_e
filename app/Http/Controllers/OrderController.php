@@ -6,6 +6,7 @@ use App\Exceptions\InsufficientCoinsException;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Subscriber;
 use App\Models\UserAddress;
 use App\Services\CoinService;
@@ -26,7 +27,10 @@ class OrderController extends Controller
             $subtotal += $item['price'] * $item['quantity'];
         }
 
-        $shipping = count($cartItems) > 0 ? 150 : 0;
+        $insideDhakaRate  = (int) Setting::get('shipping_inside_dhaka', 60);
+        $outsideDhakaRate = (int) Setting::get('shipping_outside_dhaka', 150);
+        // Default preview uses inside-Dhaka rate (Dhaka is the pre-selected division)
+        $shipping = count($cartItems) > 0 ? $insideDhakaRate : 0;
         $total = $subtotal + $shipping;
 
         // Pre-fill from the user's most recent order (returning customers)
@@ -41,7 +45,7 @@ class OrderController extends Controller
             ? UserAddress::where('user_id', auth()->id())->orderByDesc('is_default')->orderBy('created_at')->get()
             : collect();
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses'));
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses', 'insideDhakaRate', 'outsideDhakaRate'));
     }
 
     public function show($id)
@@ -61,10 +65,14 @@ class OrderController extends Controller
         // Eager load the items and associated products to prevent N+1 queries
         $order = \App\Models\Order::with('items.product')->findOrFail($id);
 
-        // Security check: Ensure the user can only view their own order
-        if (auth()->check() && $order->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized access to this order.');
-        }
+        // IDOR fix: both conditions must be true — the visitor must be logged in
+        // AND must own the order. The previous guard used && which short-circuits
+        // when the visitor is a guest, letting anyone enumerate order IDs.
+        abort_unless(
+            auth()->check() && $order->user_id === auth()->id(),
+            403,
+            'You are not authorized to view this order.'
+        );
 
         return view('checkout.confirmation', compact('order'));
     }
@@ -84,15 +92,17 @@ class OrderController extends Controller
             'division' => 'required|string|max:100',
             'district' => 'required|string|max:100',
             'postal_code' => 'nullable|string|max:10',
-            'delivery'     => 'required|string',
             'payment'      => 'required|string',
             'redeem_coins' => 'nullable|boolean',
             'coupon_code'  => 'nullable|string|max:50',
         ]);
 
         $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['quantity']);
-        $shipping = ($request->delivery === 'express') ? 150 : 60;
-        $total    = $subtotal + $shipping;
+        $insideDhakaRate  = (int) Setting::get('shipping_inside_dhaka', 60);
+        $outsideDhakaRate = (int) Setting::get('shipping_outside_dhaka', 150);
+        $deliveryMethod   = $validatedData['division'] === 'Dhaka' ? 'inside_dhaka' : 'outside_dhaka';
+        $shipping         = $deliveryMethod === 'inside_dhaka' ? $insideDhakaRate : $outsideDhakaRate;
+        $total            = $subtotal + $shipping;
 
         // ── Coupon validation ──────────────────────────────────────────────────
         // FIRST15: 15% off subtotal, one-time use, tied to the subscriber's email.
@@ -147,7 +157,7 @@ class OrderController extends Controller
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
         try {
-            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon) {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $deliveryMethod) {
 
                 // Re-verify stock for every cart item before committing
                 $productIds = array_keys($cart);
@@ -169,8 +179,8 @@ class OrderController extends Controller
                     'address'         => $validatedData['address'],
                     'division'        => $validatedData['division'],
                     'district'        => $validatedData['district'],
-                    'postal_code'     => $validatedData['postal_code'],
-                    'delivery_method' => $validatedData['delivery'],
+                    'postal_code'     => $validatedData['postal_code'] ?? null,
+                    'delivery_method' => $deliveryMethod,
                     'payment_method'  => $validatedData['payment'],
                     'subtotal'        => $subtotal,
                     'shipping_cost'   => $shipping,
