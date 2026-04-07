@@ -9,19 +9,49 @@
     availableCoins: {{ auth()->check() ? auth()->user()->coin_balance : 0 }},
     redeemCoins: false,
     couponCode: '{{ old('coupon_code', '') }}',
+    couponDiscount: 0,
+    couponValid: null,
+    couponMessage: '',
+    couponChecking: false,
     get shipping() {
         return this.division === 'Dhaka' ? this.shippingInsideDhaka : this.shippingOutsideDhaka;
-    },
-    get couponDiscount() {
-        return this.couponCode.trim().toUpperCase() === 'FIRST15'
-            ? Math.round(this.subtotal * 0.15)
-            : 0;
     },
     get coinsToApply() {
         return Math.min(this.availableCoins, this.subtotal + this.shipping - this.couponDiscount);
     },
     get grandTotal() {
         return this.subtotal + this.shipping - this.couponDiscount - (this.redeemCoins ? this.coinsToApply : 0);
+    },
+    async applyVoucher() {
+        const code = this.couponCode.trim().toUpperCase();
+        if (!code) { this.couponDiscount = 0; this.couponValid = null; this.couponMessage = ''; return; }
+        this.couponChecking = true;
+        this.couponValid = null;
+        this.couponMessage = '';
+        try {
+            const res = await fetch(`/api/voucher/validate?code=${encodeURIComponent(code)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+            if (data.valid) {
+                if (data.discount_type === 'percentage') {
+                    this.couponDiscount = Math.round(this.subtotal * (data.discount_value / 100));
+                } else {
+                    this.couponDiscount = Math.min(data.discount_value, this.subtotal);
+                }
+                this.couponValid = true;
+                this.couponMessage = data.description || 'Discount applied!';
+            } else {
+                this.couponDiscount = 0;
+                this.couponValid = false;
+                this.couponMessage = data.message || 'Invalid code.';
+            }
+        } catch(e) {
+            this.couponDiscount = 0;
+            this.couponValid = false;
+            this.couponMessage = 'Could not verify code. Try again.';
+        }
+        this.couponChecking = false;
     },
     fillAddress(addr) {
         this.$refs.fieldName.value      = addr.name;
@@ -285,7 +315,7 @@
                             <span class="font-medium text-gray-700">+৳ <span x-text="shipping"></span></span>
                         </div>
 
-                        {{-- Coupon discount row (visible only when a valid-looking code is entered) --}}
+                        {{-- Coupon discount row --}}
                         <div
                             x-show="couponDiscount > 0"
                             x-transition:enter="transition ease-out duration-150"
@@ -293,7 +323,7 @@
                             x-transition:enter-end="opacity-100 translate-y-0"
                             class="flex justify-between text-sm font-semibold text-green-700"
                         >
-                            <span>Discount (FIRST15)</span>
+                            <span>Discount (<span x-text="couponCode.toUpperCase()"></span>)</span>
                             <span>−৳ <span x-text="couponDiscount.toLocaleString()"></span></span>
                         </div>
 
@@ -303,20 +333,28 @@
                             <label class="block mb-1.5 text-xs font-semibold text-foreground">
                                 Discount Code
                             </label>
-                            <input
-                                type="text"
-                                x-model="couponCode"
-                                placeholder="e.g. FIRST15"
-                                maxlength="50"
-                                class="w-full px-3 py-2.5 text-sm font-mono uppercase tracking-widest bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg transition-colors"
-                            >
-                            {{-- Live hint: shown only when the typed code matches FIRST15 --}}
-                            <p
-                                x-show="couponDiscount > 0"
-                                x-cloak
-                                class="mt-1.5 text-xs font-medium text-green-600"
-                            >
-                                ✓ 15% discount will be applied to your order
+                            <div class="flex gap-2">
+                                <input
+                                    type="text"
+                                    x-model="couponCode"
+                                    @keydown.enter.prevent="applyVoucher()"
+                                    placeholder="Enter code..."
+                                    maxlength="50"
+                                    style="text-transform:uppercase"
+                                    class="flex-1 px-3 py-2.5 text-sm font-mono uppercase tracking-widest bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg transition-colors"
+                                >
+                                <button type="button" @click="applyVoucher()"
+                                        :disabled="couponChecking"
+                                        class="px-3 py-2.5 text-xs font-bold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors shrink-0 disabled:opacity-50">
+                                    <span x-show="!couponChecking">Apply</span>
+                                    <span x-show="couponChecking" x-cloak>...</span>
+                                </button>
+                            </div>
+                            <p x-show="couponValid === true" x-cloak class="mt-1.5 text-xs font-medium text-green-600">
+                                ✓ <span x-text="couponMessage"></span>
+                            </p>
+                            <p x-show="couponValid === false" x-cloak class="mt-1.5 text-xs font-medium text-red-500">
+                                <span x-text="couponMessage"></span>
                             </p>
                             @error('coupon_code')
                                 <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>

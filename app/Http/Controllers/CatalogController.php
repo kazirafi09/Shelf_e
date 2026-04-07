@@ -269,7 +269,7 @@ class CatalogController extends Controller
     // 3. Load Single Product Page
     public function show($slug)
     {
-        $product = Product::with(['category', 'previews', 'approvedReviews.user'])
+        $product = Product::with(['category', 'previews', 'approvedReviews.user', 'authors'])
             ->withCount('approvedReviews')
             ->withAvg('approvedReviews', 'rating')
             ->where('slug', $slug)

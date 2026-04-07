@@ -76,6 +76,55 @@
         </div>
     </div>
 
+    {{-- Voucher Announcement Banner --}}
+    @php
+        $announcedVoucher = \App\Models\Voucher::announced()->first();
+    @endphp
+    @if($announcedVoucher)
+    <div x-data="{ visible: true, copied: false }" x-show="visible"
+         class="relative z-40 px-4 py-2.5 text-sm font-medium text-center text-amber-900 bg-amber-100 border-b border-amber-200">
+        <div class="container flex flex-wrap items-center justify-center gap-x-3 gap-y-1 mx-auto">
+            <svg class="w-4 h-4 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span>
+                @if($announcedVoucher->description)
+                    {{ $announcedVoucher->description }}
+                @else
+                    Special offer! Use code
+                @endif
+            </span>
+            <button type="button"
+                    @click="navigator.clipboard.writeText('{{ $announcedVoucher->code }}').then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
+                    class="inline-flex items-center gap-1.5 font-mono font-black tracking-widest text-amber-800 bg-amber-200 hover:bg-amber-300 border border-amber-400 px-2.5 py-0.5 rounded transition-colors cursor-pointer">
+                <span>{{ $announcedVoucher->code }}</span>
+                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <svg x-show="copied" x-cloak class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </button>
+            <span>for
+                @if($announcedVoucher->discount_type === 'percentage')
+                    {{ number_format($announcedVoucher->discount_value, 0) }}% off
+                @else
+                    ৳{{ number_format($announcedVoucher->discount_value, 0) }} off
+                @endif
+                @if($announcedVoucher->expires_at)
+                    &mdash; expires {{ $announcedVoucher->expires_at->format('d M') }}
+                @endif
+            </span>
+        </div>
+        <button type="button" @click="visible = false"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-amber-600 hover:text-amber-900 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+    @endif
+
     <header x-data="{ scrolled: false, mobileMenuOpen: false }"
             @scroll.window="scrolled = (window.pageYOffset > 20)"
             :class="scrolled ? 'shadow-md bg-white/95 backdrop-blur-md sticky top-0 z-50' : 'bg-white border-b border-gray-200'"
@@ -209,36 +258,43 @@
 
         {{-- DESKTOP NAVIGATION --}}
         <nav class="container hidden px-4 mx-auto space-x-8 text-sm font-medium text-gray-600 border-t border-gray-100 md:flex md:justify-center">
-            <div class="relative flex items-center group">
-                <a href="{{ route('categories.index') }}" class="flex items-center py-4 font-medium text-gray-700 transition-colors hover:text-gray-900">
+            <div class="relative flex items-center" x-data="{ catOpen: false }" @click.away="catOpen = false">
+                <button type="button" @click="catOpen = !catOpen"
+                        class="flex items-center py-4 font-medium text-gray-700 transition-colors hover:text-gray-900 focus:outline-none">
                     Categories
-                    <svg class="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </a>
+                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" :class="catOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
 
-                <div class="absolute left-0 z-50 invisible transition-all duration-300 transform translate-y-2 opacity-0 top-full w-[600px] group-hover:translate-y-0 group-hover:opacity-100 group-hover:visible">
-                    <div class="pt-2">
-                        <div class="overflow-hidden bg-white border border-gray-100 shadow-2xl rounded-xl">
-                            <div class="p-8">
-                                <h3 class="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Browse Collections</h3>
-
-                                <div class="grid grid-cols-3 gap-x-8 gap-y-4">
-                                    @if(isset($globalCategories))
-                                        @foreach($globalCategories as $category)
-                                            <a href="{{ route('categories.index', ['category' => $category->slug]) }}"
-                                            class="flex items-center text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 group/link">
+                <div x-show="catOpen"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-2"
+                     style="display:none"
+                     class="absolute left-0 z-50 top-full w-[600px] pt-2">
+                    <div class="overflow-hidden bg-white border border-gray-100 shadow-2xl rounded-xl">
+                        <div class="p-8">
+                            <h3 class="mb-4 text-xs font-bold tracking-wider text-gray-400 uppercase">Browse Collections</h3>
+                            <div class="grid grid-cols-3 gap-x-8 gap-y-4">
+                                @if(isset($globalCategories))
+                                    @foreach($globalCategories as $category)
+                                        <a href="{{ route('categories.index', ['category' => $category->slug]) }}"
+                                           @click="catOpen = false"
+                                           class="flex items-center text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 group/link">
                                             <span class="w-1.5 h-1.5 mr-2 rounded-full bg-gray-200 transition-colors group-hover/link:bg-gray-900"></span>
                                             {{ $category->name }}
-                                            </a>
-                                        @endforeach
-                                    @endif
-                                </div>
+                                        </a>
+                                    @endforeach
+                                @endif
                             </div>
-
-                            <div class="px-8 py-4 border-t border-gray-100 bg-gray-50">
-                                <a href="{{ route('categories.index') }}" class="flex items-center justify-center text-sm font-bold text-gray-900 transition-colors hover:text-gray-700">
-                                    See All Books <span class="ml-1" aria-hidden="true">&rarr;</span>
-                                </a>
-                            </div>
+                        </div>
+                        <div class="px-8 py-4 border-t border-gray-100 bg-gray-50">
+                            <a href="{{ route('categories.index') }}" @click="catOpen = false"
+                               class="flex items-center justify-center text-sm font-bold text-gray-900 transition-colors hover:text-gray-700">
+                                See All Books <span class="ml-1" aria-hidden="true">&rarr;</span>
+                            </a>
                         </div>
                     </div>
                 </div>

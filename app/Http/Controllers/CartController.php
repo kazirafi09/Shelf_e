@@ -22,6 +22,13 @@ class CartController extends Controller
         }
 
         $format = $request->input('format');
+
+        // If no format was submitted (e.g. quick-add buttons on homepage/catalog),
+        // fall back to the first available format: paperback → hardcover.
+        if (! in_array($format, ['paperback', 'hardcover'], true)) {
+            $format = $product->paperback_price ? 'paperback' : ($product->hardcover_price ? 'hardcover' : null);
+        }
+
         $basePrice = $format === 'paperback' ? $product->paperback_price : $product->hardcover_price;
 
         if (is_null($basePrice)) {

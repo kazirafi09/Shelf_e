@@ -12,7 +12,11 @@
       "Bash(curl:*)",
       "Bash(composer show:*)",
       "Bash(php -r ':*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(grep -E \"\\\\.php$\")",
+      "Bash(powershell -Command \"Get-Item 'D:\\\\Shelf-e\\\\shelf-e\\\\public\\\\storage' | Select-Object LinkType, Target\")",
+      "Bash(mv:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

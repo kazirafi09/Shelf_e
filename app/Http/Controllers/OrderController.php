@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Subscriber;
 use App\Models\UserAddress;
+use App\Models\Voucher;
+use App\Models\VoucherUsage;
 use App\Services\CoinService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -104,46 +106,63 @@ class OrderController extends Controller
         $shipping         = $deliveryMethod === 'inside_dhaka' ? $insideDhakaRate : $outsideDhakaRate;
         $total            = $subtotal + $shipping;
 
-        // ── Coupon validation ──────────────────────────────────────────────────
-        // FIRST15: 15% off subtotal, one-time use, tied to the subscriber's email.
-        // We resolve the subscriber here (outside the transaction) so we can return
-        // an early validation error before any DB writes occur.
-        $couponCode          = strtoupper(trim($request->input('coupon_code', '')));
-        $discountAmount      = 0;
+        // ── Voucher validation ────────────────────────────────────────────────
+        // Resolved outside the transaction so validation errors return early
+        // before any DB writes occur.
+        $couponCode      = strtoupper(trim($request->input('coupon_code', '')));
+        $discountAmount  = 0;
+        $appliedVoucher  = null;
         $subscriberForCoupon = null;
 
         if ($couponCode !== '') {
-            if ($couponCode !== 'FIRST15') {
-                return back()
-                    ->withErrors(['coupon_code' => 'Invalid discount code.'])
-                    ->withInput();
-            }
-
-            // Discount codes require a logged-in account so we can verify
-            // the subscriber email and prevent guest abuse.
             if (! auth()->check()) {
                 return back()
                     ->withErrors(['coupon_code' => 'You must be logged in to apply a discount code.'])
                     ->withInput();
             }
 
-            // Match against the authenticated user's account email, not the
-            // billing address field (which an unauthenticated user could spoof).
-            $subscriberForCoupon = Subscriber::where('email', auth()->user()->email)
-                ->where('discount_used', false)
-                ->first();
+            $voucher = Voucher::where('code', $couponCode)->first();
 
-            if (! $subscriberForCoupon) {
+            if (! $voucher || ! $voucher->isUsable()) {
                 return back()
-                    ->withErrors(['coupon_code' => 'This code is not valid for your account, or has already been used.'])
+                    ->withErrors(['coupon_code' => 'This discount code is invalid or has expired.'])
                     ->withInput();
             }
 
-            // 15% off the subtotal (shipping is excluded from the discount)
-            $discountAmount = (int) round($subtotal * 0.15);
+            if ($subtotal < $voucher->min_order_amount) {
+                return back()
+                    ->withErrors(['coupon_code' => "This code requires a minimum order of ৳" . number_format($voucher->min_order_amount, 0) . "."])
+                    ->withInput();
+            }
+
+            // Check per-user usage limit via voucher_usages table
+            if ($voucher->hasBeenUsedByUser(auth()->id())) {
+                return back()
+                    ->withErrors(['coupon_code' => 'You have already used this discount code.'])
+                    ->withInput();
+            }
+
+            // Legacy FIRST15 backward-compat: also check subscribers.discount_used
+            // for users who applied FIRST15 before the new voucher system existed.
+            if ($voucher->code === 'FIRST15') {
+                $subscriberForCoupon = Subscriber::where('email', auth()->user()->email)->first();
+                if (! $subscriberForCoupon) {
+                    return back()
+                        ->withErrors(['coupon_code' => 'FIRST15 is only available to newsletter subscribers.'])
+                        ->withInput();
+                }
+                if ($subscriberForCoupon->discount_used) {
+                    return back()
+                        ->withErrors(['coupon_code' => 'You have already used this discount code.'])
+                        ->withInput();
+                }
+            }
+
+            $discountAmount = $voucher->calculateDiscount($subtotal);
             $total         -= $discountAmount;
+            $appliedVoucher = $voucher;
         }
-        // ──────────────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
 
         $user = auth()->user();
         $coinsToRedeem = 0;
@@ -157,7 +176,7 @@ class OrderController extends Controller
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
         try {
-            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $deliveryMethod) {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $appliedVoucher, $deliveryMethod) {
 
                 // Re-verify stock for every cart item before committing
                 $productIds = array_keys($cart);
@@ -203,11 +222,21 @@ class OrderController extends Controller
 
                 OrderItem::insert($orderItems);
 
-                // ── Mark newsletter discount as used ──────────────────────────
-                // Runs inside the transaction: if anything fails and the
-                // transaction rolls back, the subscriber stays eligible.
-                if ($subscriberForCoupon) {
-                    $subscriberForCoupon->update(['discount_used' => true]);
+                // ── Record voucher usage ──────────────────────────────────────
+                // Inside the transaction so it rolls back on failure.
+                if ($appliedVoucher) {
+                    VoucherUsage::create([
+                        'voucher_id' => $appliedVoucher->id,
+                        'user_id'    => $user->id,
+                        'order_id'   => $newOrder->id,
+                        'used_at'    => now(),
+                    ]);
+                    $appliedVoucher->increment('used_count');
+
+                    // Legacy FIRST15: also mark the subscriber record as used
+                    if ($subscriberForCoupon) {
+                        $subscriberForCoupon->update(['discount_used' => true]);
+                    }
                 }
                 // ─────────────────────────────────────────────────────────────
 

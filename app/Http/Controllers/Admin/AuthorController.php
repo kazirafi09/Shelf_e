@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -56,6 +57,8 @@ class AuthorController extends Controller
             'photo_path' => $photoPath,
         ]);
 
+        Cache::forget('homepage_data_v4');
+
         return redirect()->route('admin.authors.index')->with('success', 'Author created successfully.');
     }
 
@@ -99,6 +102,8 @@ class AuthorController extends Controller
 
         $author->update($updateData);
 
+        Cache::forget('homepage_data_v4');
+
         return redirect()->route('admin.authors.index')->with('success', "Author '{$author->name}' updated successfully.");
     }
 
@@ -109,6 +114,8 @@ class AuthorController extends Controller
         }
 
         $author->delete();
+
+        Cache::forget('homepage_data_v4');
 
         return back()->with('success', "Author '{$author->name}' deleted.");
     }

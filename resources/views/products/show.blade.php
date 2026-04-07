@@ -11,7 +11,7 @@
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
 
-        <div class="lg:col-span-3" x-data="{ openPeekInside: false, currentIndex: 0, total: {{ $product->previews->count() }} }">
+        <div class="lg:col-span-3 w-72 sm:w-80 mx-auto lg:w-auto lg:mx-0" x-data="{ openPeekInside: false, currentIndex: 0, total: {{ $product->previews->count() }} }">
             @auth
                 @php
                     $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
@@ -174,12 +174,17 @@
 
             </div>
 
-        <div class="lg:col-span-6">
+        <div class="lg:col-span-5">
             <h1 class="mb-2 text-4xl font-bold text-foreground">{{ $product->title }}</h1>
 
             <div class="flex items-center mb-6 space-x-4">
                 <div class="flex items-center text-muted-foreground">
-                    <div class="w-8 h-8 mr-3 overflow-hidden bg-muted rounded-full"></div>
+                    @php $authorModel = $product->authors->first(); @endphp
+                    <div class="w-11 h-11 mr-3 overflow-hidden bg-muted rounded-full shrink-0">
+                        @if($authorModel && $authorModel->photo_path)
+                            <img src="{{ asset('storage/' . $authorModel->photo_path) }}" alt="{{ $product->author }}" class="object-cover w-full h-full">
+                        @endif
+                    </div>
                     <span>By <span class="font-bold text-foreground">{{ $product->author }}</span></span>
                 </div>
             </div>
@@ -192,16 +197,7 @@
                 <span class="text-sm text-muted-foreground">({{ number_format($product->approved_reviews_count ?? 0) }} ratings)</span>
             </div>
 
-            <div class="grid grid-cols-2 pb-10 mb-10 text-sm border-b border-border gap-y-4 gap-x-8">
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Publisher</span><span class="text-muted-foreground">{{ $product->publisher ?? 'Shelf-E Press' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Language</span><span class="text-muted-foreground">{{ $product->language ?? 'English' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">First Publish</span><span class="text-muted-foreground">{{ $product->publish_year ?? 'N/A' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Pages</span><span class="text-muted-foreground">{{ $product->pages ?? 'N/A' }}p</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">ISBN</span><span class="text-muted-foreground">{{ $product->isbn ?? 'N/A' }}</span></div>
-                <div class="grid grid-cols-2"><span class="font-medium text-foreground">Dimensions</span><span class="text-muted-foreground">{{ $product->dimensions ?? 'N/A' }}</span></div>
-            </div>
-
-            <div x-data="{ activeTab: 'description' }">
+<div x-data="{ activeTab: 'description' }">
                 <div class="flex mb-6 space-x-8 border-b border-border">
                     <button @click="activeTab = 'description'" :class="activeTab === 'description' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'" class="pb-3 font-medium transition border-b-2">Description</button>
                     <button @click="activeTab = 'author'" :class="activeTab === 'author' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'" class="pb-3 font-medium transition border-b-2">About Author</button>
@@ -224,8 +220,8 @@
             </div>
         </div>
 
-        <div class="lg:col-span-3">
-            <div class="sticky top-6" x-data="{
+        <div class="lg:col-span-4">
+            <div class="sticky top-28" x-data="{
                 paperbackPrice: {{ $product->paperback_price ? $product->paperback_price : 'null' }},
                 hardcoverPrice: {{ $product->hardcover_price ? $product->hardcover_price : 'null' }},
                 salePrice: {{ $product->sale_price ?? 'null' }},
@@ -273,9 +269,9 @@
                     return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(price);
                 }
             }">
-                <div class="p-8 mb-10 bg-card text-card-foreground border border-border shadow-2xl rounded-3xl">
+                <div class="p-5 xl:p-8 mb-10 bg-card text-card-foreground border border-border shadow-2xl rounded-3xl">
 
-                    <div class="flex mb-8 space-x-3 text-center">
+                    <div class="flex mb-6 gap-2 text-center">
                         <button type="button"
                             @click="if(hasPaperback) format = 'paperback'"
                             :disabled="!hasPaperback"
@@ -284,13 +280,13 @@
                                 'border-border bg-background hover:border-primary/50 cursor-pointer': format !== 'paperback' && hasPaperback,
                                 'border-border bg-muted opacity-50 cursor-not-allowed': !hasPaperback
                             }"
-                            class="flex-1 p-3 text-left transition border rounded-xl">
-                            <span class="block text-sm text-muted-foreground">Paperback</span>
+                            class="flex-1 min-w-0 p-2.5 text-left transition border rounded-xl">
+                            <span class="block text-xs text-muted-foreground truncate">Paperback</span>
                             <template x-if="hasPaperback">
-                                <span class="font-bold text-foreground" x-text="'৳ ' + formatPrice(paperbackPrice)"></span>
+                                <span class="text-sm font-bold text-foreground truncate block" x-text="'৳ ' + formatPrice(paperbackPrice)"></span>
                             </template>
                             <template x-if="!hasPaperback">
-                                <span class="text-sm font-medium text-muted-foreground">Unavailable</span>
+                                <span class="text-xs font-medium text-muted-foreground">Unavailable</span>
                             </template>
                         </button>
 
@@ -302,13 +298,13 @@
                                 'border-border bg-background hover:border-primary/50 cursor-pointer': format !== 'hardcover' && hasHardcover,
                                 'border-border bg-muted opacity-50 cursor-not-allowed': !hasHardcover
                             }"
-                            class="flex-1 p-3 text-left transition border rounded-xl">
-                            <span class="block text-sm text-muted-foreground">Hardcover</span>
+                            class="flex-1 min-w-0 p-2.5 text-left transition border rounded-xl">
+                            <span class="block text-xs text-muted-foreground truncate">Hardcover</span>
                             <template x-if="hasHardcover">
-                                <span class="font-bold text-foreground" x-text="'৳ ' + formatPrice(hardcoverPrice)"></span>
+                                <span class="text-sm font-bold text-foreground truncate block" x-text="'৳ ' + formatPrice(hardcoverPrice)"></span>
                             </template>
                             <template x-if="!hasHardcover">
-                                <span class="text-sm font-medium text-muted-foreground">Unavailable</span>
+                                <span class="text-xs font-medium text-muted-foreground">Unavailable</span>
                             </template>
                         </button>
                     </div>
@@ -337,12 +333,12 @@
                             <div>
                                 <span class="block text-sm line-through text-gray-400"
                                       x-text="'৳ ' + formatPrice(currentPrice * quantity)"></span>
-                                <span class="text-4xl font-extrabold text-foreground"
+                                <span class="text-3xl xl:text-4xl font-extrabold text-foreground"
                                       x-text="'৳ ' + formatPrice(totalPrice)"></span>
                             </div>
                         </template>
                         <template x-if="!saleActive">
-                            <div class="text-4xl font-extrabold text-foreground"
+                            <div class="text-3xl xl:text-4xl font-extrabold text-foreground"
                                  x-text="'৳ ' + formatPrice(totalPrice)">
                                 ৳ {{ number_format($product->paperback_price ?? $product->hardcover_price ?? 0, 0) }}
                             </div>

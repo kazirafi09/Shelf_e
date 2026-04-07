@@ -138,7 +138,7 @@
             @foreach($popularAuthors as $item)
             <a href="{{ route('categories.index', ['authors[]' => $item->author]) }}" class="flex items-center p-5 transition-all duration-300 border shadow-sm cursor-pointer bg-card text-card-foreground border-border rounded-2xl hover:shadow-md hover:-translate-y-1 group">
                 
-                <div class="w-16 h-16 overflow-hidden rounded-full shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:shadow-inner">
+                <div class="w-24 h-24 overflow-hidden rounded-full shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:shadow-inner">
                     @if($item->photo_path)
                         <img src="{{ asset('storage/' . $item->photo_path) }}" alt="{{ $item->author }}" class="object-cover w-full h-full">
                     @else
@@ -170,43 +170,29 @@
             <a href="/categories" class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">See All Collection &rarr;</a>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             @foreach($topBooks as $book)
-            <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 border bg-card text-card-foreground border-border rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-gray-200">
-                
-                <div class="absolute z-10 top-2 right-2">
-                    @auth
-                        @php
-                            // Assuming your loop variable is $book. Change to $product if your loop uses $product as $product!
-                            $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
-                                                                ->where('product_id', $book->id)
-                                                                ->exists();
-                        @endphp
-                        <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="p-2 transition bg-white rounded-full shadow-sm hover:scale-110 active:scale-95">
-                                <svg class="w-5 h-5 {{ $isWishlisted ? 'text-red-500 fill-current' : 'text-gray-400 fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                </svg>
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="block p-2 transition bg-white rounded-full shadow-sm hover:scale-110">
-                            <svg class="w-5 h-5 text-gray-400 fill-none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            <div class="relative flex flex-col p-3 transition duration-300 border border-border bg-card text-card-foreground rounded-xl group hover:shadow-lg">
+
+                @auth
+                    @php $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $book->id)->exists(); @endphp
+                    <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST" class="absolute z-10 top-2 right-2">
+                        @csrf
+                        <button type="submit" class="transition hover:scale-110 {{ $isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}">
+                            <svg class="w-5 h-5 {{ $isWishlisted ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                             </svg>
-                        </a>
-                    @endauth
-                </div>
-                
-                <a href="/product/{{ $book->slug }}" class="z-10 block grow">
-                    <div
-                        x-data="{ zoomed: false }"
-                        @mouseenter="zoomed = true"
-                        @mouseleave="zoomed = false"
-                        class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg"
-                    >
-                        <div class="absolute inset-0 z-10 transition-opacity duration-300 pointer-events-none bg-black/0 group-hover:bg-black/5"></div>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="absolute z-10 text-gray-400 top-2 right-2 hover:text-red-500">
+                        <svg class="w-5 h-5 fill-none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </a>
+                @endauth
+
+                <a href="/product/{{ $book->slug }}" class="block grow">
+                    <div x-data="{ zoomed: false }" @mouseenter="zoomed = true" @mouseleave="zoomed = false"
+                         class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
                         @if($book->image_path)
                             <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
                                  class="object-cover w-full h-full transition-transform duration-300"
@@ -215,29 +201,32 @@
                             <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
                         @endif
                     </div>
-                    
-                    <div class="flex items-center mb-1.5 space-x-1">
-                        <svg class="w-4 h-4 text-yellow-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                        <span class="text-xs font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
-                    </div>
-                    
-                    <h3 class="font-bold truncate transition-colors duration-300 text-foreground group-hover:text-gray-900" title="{{ $book->title }}">{{ $book->title }}</h3>
-                    <p class="mb-3 text-xs font-medium truncate text-muted-foreground">{{ $book->author }}</p>
-                </a>
-                
-                <div class="z-10 flex flex-col justify-center pt-3 mt-auto border-t border-border h-[88px]">
 
-                    <p class="text-lg font-extrabold transition-all duration-300 ease-out transform text-foreground group-hover:-translate-y-8 group-hover:opacity-0">
-                        ৳ {{ number_format($book->display_price, 0) }}
-                    </p>
-                                    
-                    <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
+                    <div class="flex items-center justify-center mb-1 space-x-1">
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <span class="text-sm font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
+                    </div>
+
+                    <h3 class="font-bold text-foreground truncate transition group-hover:text-gray-500" title="{{ $book->title }}">{{ $book->title }}</h3>
+                    <p class="mb-2 text-xs text-muted-foreground truncate">{{ $book->author }}</p>
+                </a>
+
+                <div class="pt-2 mt-auto">
+                    @php $activeSalePrice = $book->active_sale_price; @endphp
+                    @if($activeSalePrice)
+                        <div class="mb-3">
+                            <span class="text-xs line-through text-gray-400">৳ {{ number_format($book->display_price, 0) }}</span>
+                            <span class="ml-1 text-lg font-bold text-foreground">৳ {{ number_format($activeSalePrice, 0) }}</span>
+                        </div>
+                    @else
+                        <p class="mb-3 text-lg font-bold text-foreground">৳ {{ number_format($book->display_price, 0) }}</p>
+                    @endif
+                    <form action="{{ route('cart.add', $book->id) }}" method="POST" class="w-full">
                         @csrf
-                        <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-gray-900 shadow-md rounded-lg hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                        <button type="submit" class="w-full py-2 font-bold text-white transition-colors bg-gray-700 rounded-md hover:bg-gray-800 active:scale-[0.98]">
                             Add to Cart
                         </button>
                     </form>
-
                 </div>
             </div>
             @endforeach
@@ -258,42 +247,36 @@
             <a href="{{ route('bestsellers.index') }}" class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">See All Bestsellers &rarr;</a>
         </div>
 
-        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             @foreach($bestSellers as $book)
-            <div class="relative flex flex-col p-4 overflow-hidden transition-all duration-500 border bg-card text-card-foreground border-border rounded-2xl group hover:shadow-xl hover:-translate-y-2 hover:border-gray-200">
+            @php $rank = $loop->iteration; @endphp
+            <div class="relative flex flex-col p-3 transition duration-300 border border-border bg-card text-card-foreground rounded-xl group hover:shadow-lg">
 
-                <div class="absolute z-10 top-2 right-2">
-                    @auth
-                        @php
-                            $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())
-                                                                ->where('product_id', $book->id)
-                                                                ->exists();
-                        @endphp
-                        <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="p-2 transition bg-white rounded-full shadow-sm hover:scale-110 active:scale-95">
-                                <svg class="w-5 h-5 {{ $isWishlisted ? 'text-red-500 fill-current' : 'text-gray-400 fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                                </svg>
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('login') }}" class="block p-2 transition bg-white rounded-full shadow-sm hover:scale-110">
-                            <svg class="w-5 h-5 text-gray-400 fill-none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                        </a>
-                    @endauth
+                {{-- Rank badge --}}
+                <div class="absolute top-2 left-2 z-10 flex items-center justify-center w-7 h-7 rounded-full text-xs font-black
+                    {{ $rank === 1 ? 'bg-yellow-400 text-yellow-900' : ($rank === 2 ? 'bg-gray-300 text-gray-700' : ($rank === 3 ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-500')) }}">
+                    {{ $rank }}
                 </div>
 
-                <a href="/product/{{ $book->slug }}" class="z-10 block grow">
-                    <div
-                        x-data="{ zoomed: false }"
-                        @mouseenter="zoomed = true"
-                        @mouseleave="zoomed = false"
-                        class="relative flex items-center justify-center w-full mb-4 overflow-hidden text-gray-400 bg-gray-100 shadow-sm aspect-[2/3] rounded-lg"
-                    >
-                        <div class="absolute inset-0 z-10 transition-opacity duration-300 pointer-events-none bg-black/0 group-hover:bg-black/5"></div>
+                @auth
+                    @php $isWishlisted = \App\Models\Wishlist::where('user_id', auth()->id())->where('product_id', $book->id)->exists(); @endphp
+                    <form action="{{ route('wishlist.toggle', $book->id) }}" method="POST" class="absolute z-10 top-2 right-2">
+                        @csrf
+                        <button type="submit" class="transition hover:scale-110 {{ $isWishlisted ? 'text-red-500' : 'text-gray-400 hover:text-red-500' }}">
+                            <svg class="w-5 h-5 {{ $isWishlisted ? 'fill-current' : 'fill-none' }}" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="absolute z-10 text-gray-400 top-2 right-2 hover:text-red-500">
+                        <svg class="w-5 h-5 fill-none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    </a>
+                @endauth
+
+                <a href="/product/{{ $book->slug }}" class="block grow">
+                    <div x-data="{ zoomed: false }" @mouseenter="zoomed = true" @mouseleave="zoomed = false"
+                         class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
                         @if($book->image_path)
                             <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
                                  class="object-cover w-full h-full transition-transform duration-300"
@@ -303,28 +286,31 @@
                         @endif
                     </div>
 
-                    <div class="flex items-center mb-1.5 space-x-1">
-                        <svg class="w-4 h-4 text-yellow-400 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                        <span class="text-xs font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
+                    <div class="flex items-center justify-center mb-1 space-x-1">
+                        <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        <span class="text-sm font-bold text-foreground">{{ number_format($book->approved_reviews_avg_rating ?? 0, 1) }}</span>
                     </div>
 
-                    <h3 class="font-bold truncate transition-colors duration-300 text-foreground group-hover:text-gray-900" title="{{ $book->title }}">{{ $book->title }}</h3>
-                    <p class="mb-3 text-xs font-medium truncate text-muted-foreground">{{ $book->author }}</p>
+                    <h3 class="font-bold text-foreground truncate transition group-hover:text-gray-500" title="{{ $book->title }}">{{ $book->title }}</h3>
+                    <p class="mb-2 text-xs text-muted-foreground truncate">{{ $book->author }}</p>
                 </a>
 
-                <div class="z-10 flex flex-col justify-center pt-3 mt-auto border-t border-border h-[88px]">
-
-                    <p class="text-lg font-extrabold transition-all duration-300 ease-out transform text-foreground group-hover:-translate-y-8 group-hover:opacity-0">
-                        ৳ {{ number_format($book->display_price, 0) }}
-                    </p>
-
-                    <form action="{{ route('cart.add', $book->id) }}" method="POST" class="absolute transition-all duration-300 ease-out translate-y-8 opacity-0 left-4 right-4 bottom-4 group-hover:translate-y-0 group-hover:opacity-100">
+                <div class="pt-2 mt-auto">
+                    @php $activeSalePrice = $book->active_sale_price; @endphp
+                    @if($activeSalePrice)
+                        <div class="mb-3">
+                            <span class="text-xs line-through text-gray-400">৳ {{ number_format($book->display_price, 0) }}</span>
+                            <span class="ml-1 text-lg font-bold text-foreground">৳ {{ number_format($activeSalePrice, 0) }}</span>
+                        </div>
+                    @else
+                        <p class="mb-3 text-lg font-bold text-foreground">৳ {{ number_format($book->display_price, 0) }}</p>
+                    @endif
+                    <form action="{{ route('cart.add', $book->id) }}" method="POST" class="w-full">
                         @csrf
-                        <button type="submit" class="w-full py-2.5 text-sm font-bold text-white transition-all bg-gray-900 shadow-md rounded-lg hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0">
+                        <button type="submit" class="w-full py-2 font-bold text-white transition-colors bg-gray-700 rounded-md hover:bg-gray-800 active:scale-[0.98]">
                             Add to Cart
                         </button>
                     </form>
-
                 </div>
             </div>
             @endforeach

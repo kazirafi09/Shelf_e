@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\CoinController as AdminCoinController;
 use App\Http\Controllers\Admin\ProductPreviewController;
 use App\Http\Controllers\Admin\BookScraperController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
+use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -42,6 +43,35 @@ Route::get('/random-quote', function () {
 
 // ADD THIS NEW ROUTE FOR LIVE SEARCH:
 Route::get('/api/search-books', [CatalogController::class, 'liveSearch'])->name('api.search.books')->middleware('throttle:60,1');
+
+// Voucher preview — authenticated, throttled to prevent brute-force
+Route::get('/api/voucher/validate', function (Request $request) {
+    if (! auth()->check()) {
+        return response()->json(['valid' => false, 'message' => 'Login required.']);
+    }
+
+    $code = strtoupper(trim($request->input('code', '')));
+    if ($code === '') {
+        return response()->json(['valid' => false]);
+    }
+
+    $voucher = \App\Models\Voucher::where('code', $code)->first();
+
+    if (! $voucher || ! $voucher->isUsable()) {
+        return response()->json(['valid' => false, 'message' => 'Invalid or expired code.']);
+    }
+
+    if ($voucher->hasBeenUsedByUser(auth()->id())) {
+        return response()->json(['valid' => false, 'message' => 'You have already used this code.']);
+    }
+
+    return response()->json([
+        'valid'          => true,
+        'discount_type'  => $voucher->discount_type,
+        'discount_value' => $voucher->discount_value,
+        'description'    => $voucher->description,
+    ]);
+})->middleware(['auth', 'throttle:30,1'])->name('api.voucher.validate');
 
 /*
 |--------------------------------------------------------------------------
@@ -189,6 +219,9 @@ Route::prefix('admin')
         // Store Settings
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
+
+        // Vouchers
+        Route::resource('vouchers', AdminVoucherController::class)->except(['show']);
     });
 
 require __DIR__.'/auth.php';
