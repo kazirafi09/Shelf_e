@@ -22,7 +22,7 @@
 
     {{-- The Form --}}
     <form action="{{ route('admin.books.update', $book->id) }}" method="POST" enctype="multipart/form-data"
-          class="p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5 sm:p-8">
+          class="p-6 border shadow-sm bg-card text-card-foreground border-border rounded-2xl ring-1 ring-gray-900/5 sm:p-8">
         @csrf
         @method('PUT')
 
@@ -103,7 +103,7 @@
                     x-transition:enter="transition ease-out duration-100"
                     x-transition:enter-start="opacity-0 -translate-y-1"
                     x-transition:enter-end="opacity-100 translate-y-0"
-                    class="absolute z-20 w-full mt-1 overflow-hidden bg-background border border-border rounded-xl shadow-lg"
+                    class="absolute z-20 w-full mt-1 overflow-hidden border shadow-lg bg-background border-border rounded-xl"
                     style="display: none;"
                 >
                     <template x-for="author in results" :key="author.id">
@@ -148,7 +148,7 @@
             </div>
 
             {{-- Sale & Promotion --}}
-            <div class="sm:col-span-2 p-4 border border-border rounded-xl bg-muted/30">
+            <div class="p-4 border sm:col-span-2 border-border rounded-xl bg-muted/30">
                 <p class="mb-3 text-sm font-bold text-foreground">Sale & Promotion <span class="text-xs font-normal text-muted-foreground">(optional)</span></p>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
@@ -217,7 +217,7 @@
 
                     <input x-ref="fileInput" type="file" name="image" @change="fileChosen" accept="image/png, image/jpeg, image/webp" class="absolute inset-0 z-50 w-full h-full opacity-0 cursor-pointer">
 
-                    <div x-show="!imageUrl" class="text-center text-muted-foreground transition-transform pointer-events-none group-hover:scale-105">
+                    <div x-show="!imageUrl" class="text-center transition-transform pointer-events-none text-muted-foreground group-hover:scale-105">
                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <p class="text-sm font-medium text-foreground"><span class="text-cyan-600">Click to upload</span> or drag and drop</p>
                         <p class="mt-1 text-xs text-muted-foreground">PNG, JPG, WEBP up to 2MB</p>
@@ -237,7 +237,7 @@
 
         {{-- Footer Actions --}}
         <div class="flex items-center justify-end gap-4 pt-6 mt-6 border-t border-border">
-            <a href="{{ route('admin.books.index') }}" class="text-sm font-bold text-muted-foreground transition-colors hover:text-foreground">
+            <a href="{{ route('admin.books.index') }}" class="text-sm font-bold transition-colors text-muted-foreground hover:text-foreground">
                 Cancel Changes
             </a>
             <button type="submit" 
@@ -250,8 +250,8 @@
     {{-- ============================================================ --}}
     {{-- Peek Inside Media                                            --}}
     {{-- ============================================================ --}}
-    <div class="mt-8 p-6 bg-card text-card-foreground border border-border shadow-sm rounded-2xl ring-1 ring-gray-900/5 sm:p-8">
-        <div class="mb-5 pb-4 border-b border-border">
+    <div class="p-6 mt-8 border shadow-sm bg-card text-card-foreground border-border rounded-2xl ring-1 ring-gray-900/5 sm:p-8">
+        <div class="pb-4 mb-5 border-b border-border">
             <h3 class="text-base font-bold text-foreground">Peek Inside Media</h3>
             <p class="mt-0.5 text-sm text-muted-foreground">Upload images or short video clips shown on the product page as a preview.</p>
         </div>

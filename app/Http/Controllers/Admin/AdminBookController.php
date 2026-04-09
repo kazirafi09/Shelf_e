@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Category;
 use Illuminate\Validation\ValidationException; // Add this import
@@ -112,6 +113,8 @@ class AdminBookController extends Controller
             'rating'          => 0,
         ]);
 
+        Cache::forget('homepage_data_v4');
+
         return redirect()->route('admin.books.index')->with('success', 'New book added successfully!');
     }
 
@@ -187,6 +190,8 @@ class AdminBookController extends Controller
 
         $book->update($updateData);
 
+        Cache::forget('homepage_data_v4');
+
         return redirect()->route('admin.books.index')->with('success', "Book '{$book->title}' updated successfully!");
     }
 
@@ -200,6 +205,8 @@ class AdminBookController extends Controller
         }
 
         $book->delete();
+
+        Cache::forget('homepage_data_v4');
 
         return back()->with('success', "Book '{$book->title}' has been deleted.");
     }

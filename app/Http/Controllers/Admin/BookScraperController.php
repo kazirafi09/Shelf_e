@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Services\BookScraperService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class BookScraperController extends Controller
@@ -95,6 +96,8 @@ class BookScraperController extends Controller
             );
             $product->authors()->sync([$author->id]);
         }
+
+        Cache::forget('homepage_data_v4');
 
         return redirect()->route('admin.books.edit', $product->id)
             ->with('success', "'{$product->title}' imported. Please review the details and set the stock.");
