@@ -335,7 +335,6 @@
             <div class="relative overflow-hidden bg-gray-900 rounded-2xl p-7 flex items-center gap-6 min-h-[130px] group">
                 {{-- background decoration --}}
                 <div class="absolute -right-6 -top-6 w-40 h-40 rounded-full bg-white opacity-[0.03] group-hover:scale-110 transition-transform duration-500"></div>
-                <div class="absolute -right-2 bottom-0 w-24 h-24 rounded-full bg-amber-400 opacity-[0.06] group-hover:scale-125 transition-transform duration-700"></div>
 
                 <div class="relative z-10 flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 shrink-0">
                     <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
