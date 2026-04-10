@@ -57,8 +57,10 @@
 
                 {{-- ======================================================
                      Peek Inside Lightbox
-                     Fixed overlay — position takes it out of normal flow
+                     Teleported to <body> so the fixed overlay is never
+                     trapped inside <main>'s transform stacking context.
                      ====================================================== --}}
+                <template x-teleport="body">
                 <div
                     x-show="openPeekInside"
                     x-transition:enter="transition ease-out duration-200"
@@ -170,6 +172,7 @@
 
                     </div>
                 </div>
+                </template>
             @endif
 
             </div>
