@@ -83,6 +83,17 @@ class CatalogController extends Controller
             ];
         });
 
+        // Deals are time-sensitive: short 60-second cache so the displayed
+        // countdown stays accurate and expired deals fall off quickly.
+        $data['dealsOfWeek'] = Cache::remember('homepage_deals_v1', 60, function () {
+            return Product::withAvg('approvedReviews', 'rating')
+                ->whereNotNull('sale_price')
+                ->where('sale_ends_at', '>', now())
+                ->orderBy('sale_ends_at', 'asc')   // soonest-expiring first
+                ->take(6)
+                ->get();
+        });
+
         return view('home', $data);
     }
 

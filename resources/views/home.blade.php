@@ -321,6 +321,102 @@
         </div>
     </div>
 
+    {{-- ═══════════════════════════════════════════════════════════
+         Deals of the Week
+    ═══════════════════════════════════════════════════════════ --}}
+    @if(isset($dealsOfWeek) && $dealsOfWeek->isNotEmpty())
+    <div class="mt-20 mb-10 transition-all duration-700 ease-out delay-700 transform"
+         :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
+
+        {{-- ── Promotional Banners ──────────────────────────────────── --}}
+        <div class="grid grid-cols-1 gap-4 mb-10 md:grid-cols-2">
+
+            {{-- Banner 1 — dark, "New Arrivals" --}}
+            <div class="relative overflow-hidden bg-gray-900 rounded-2xl p-7 flex items-center gap-6 min-h-[130px] group">
+                {{-- background decoration --}}
+                <div class="absolute -right-6 -top-6 w-40 h-40 rounded-full bg-white opacity-[0.03] group-hover:scale-110 transition-transform duration-500"></div>
+                <div class="absolute -right-2 bottom-0 w-24 h-24 rounded-full bg-amber-400 opacity-[0.06] group-hover:scale-125 transition-transform duration-700"></div>
+
+                <div class="relative z-10 flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 shrink-0">
+                    <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-black tracking-[0.2em] uppercase text-amber-400 mb-1">Just landed</p>
+                    <h3 class="text-lg font-extrabold text-white leading-tight">New Arrivals</h3>
+                    <p class="mt-0.5 text-xs text-gray-400">Fresh titles added every week.</p>
+                    <a href="{{ route('categories.index') }}"
+                       class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
+                        Browse now
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Banner 2 — light amber, "Bestsellers Promo" --}}
+            <div class="relative overflow-hidden bg-amber-50 border border-amber-100 rounded-2xl p-7 flex items-center gap-6 min-h-[130px] group">
+                <div class="absolute -right-6 -top-6 w-40 h-40 rounded-full bg-amber-400 opacity-10 group-hover:scale-110 transition-transform duration-500"></div>
+                <div class="absolute right-8 bottom-0 w-20 h-20 rounded-full bg-amber-300 opacity-10 group-hover:scale-125 transition-transform duration-700"></div>
+
+                <div class="relative z-10 flex items-center justify-center w-14 h-14 rounded-xl bg-amber-400/20 shrink-0">
+                    <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                    </svg>
+                </div>
+                <div class="relative z-10">
+                    <p class="text-[10px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Limited time</p>
+                    <h3 class="text-lg font-extrabold text-gray-900 leading-tight">Up to 40% Off</h3>
+                    <p class="mt-0.5 text-xs text-gray-500">On selected bestselling titles.</p>
+                    <a href="{{ route('categories.index') }}"
+                       class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-700 hover:text-amber-800 transition-colors">
+                        Shop deals
+                        <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- ── Section heading ─────────────────────────────────────── --}}
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <div class="inline-flex items-center gap-2.5 mb-2">
+                    <span class="w-8 h-px bg-red-400"></span>
+                    <span class="text-[10px] font-black tracking-[0.2em] uppercase text-red-500">Hot offers</span>
+                </div>
+                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Deals of the Week</h2>
+                <p class="mt-1 text-sm text-muted-foreground">Limited-time prices — grab them before the clock runs out.</p>
+            </div>
+            <a href="{{ route('categories.index') }}"
+               class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">
+                View All Deals &rarr;
+            </a>
+        </div>
+
+        {{-- ── Deal cards grid ──────────────────────────────────────── --}}
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            @foreach($dealsOfWeek as $book)
+                <x-home.deal-card :book="$book" />
+            @endforeach
+        </div>
+
+        <div class="mt-8 text-center md:hidden">
+            <a href="{{ route('categories.index') }}"
+               class="inline-block px-8 py-3 text-sm font-bold text-gray-700 transition-colors border-2 border-gray-200 rounded-full hover:bg-gray-100">
+                View All Deals
+            </a>
+        </div>
+
+    </div>
+    @endif
+
     <x-testimonials />
 
 </div>
