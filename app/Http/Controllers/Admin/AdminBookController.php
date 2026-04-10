@@ -97,7 +97,7 @@ class AdminBookController extends Controller
             $imagePath = $file->store('books', 'public');
         }
 
-        Product::create([
+        $product = Product::create([
             'title'           => $validated['title'],
             'slug'            => Str::slug($validated['title']) . '-' . substr(uniqid(), -5),
             'author'          => $validated['author'],
@@ -112,6 +112,8 @@ class AdminBookController extends Controller
             'image_path'      => $imagePath,
             'rating'          => 0,
         ]);
+
+        $product->categories()->sync([$validated['category_id']]);
 
         Cache::forget('homepage_data_v4');
 
@@ -189,6 +191,8 @@ class AdminBookController extends Controller
         }
 
         $book->update($updateData);
+
+        $book->categories()->sync([$request->category_id]);
 
         Cache::forget('homepage_data_v4');
 
