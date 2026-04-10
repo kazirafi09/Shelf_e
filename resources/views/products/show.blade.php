@@ -72,7 +72,7 @@
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
                     style="display: none;"
                 >
-                    {{-- Modal panel --}}
+                    {{-- Modal panel — self-contained, never taller than 90vh --}}
                     <div
                         x-show="openPeekInside"
                         x-transition:enter="transition ease-out duration-200"
@@ -81,12 +81,12 @@
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 scale-100"
                         x-transition:leave-end="opacity-0 scale-95"
-                        class="relative flex flex-col items-center w-full max-w-3xl max-h-[90vh]"
+                        class="relative flex flex-col w-full max-w-3xl max-h-[90vh] rounded-2xl bg-black shadow-2xl overflow-hidden"
                     >
-                        {{-- Close button --}}
+                        {{-- Close button — overlaid inside top-right corner --}}
                         <button
                             @click="openPeekInside = false"
-                            class="absolute -top-10 right-0 flex items-center justify-center w-9 h-9 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                            class="absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 text-white rounded-full bg-black/50 hover:bg-black/70 transition-colors"
                             aria-label="Close"
                         >
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,8 +94,8 @@
                             </svg>
                         </button>
 
-                        {{-- Media slides --}}
-                        <div class="relative w-full overflow-hidden rounded-2xl bg-black shadow-2xl">
+                        {{-- Media slides — flex-1 + min-h-0 lets this shrink to fit --}}
+                        <div class="relative flex-1 min-h-0 w-full overflow-hidden">
                             @foreach($product->previews as $preview)
                             <div
                                 x-show="currentIndex === {{ $loop->index }}"
@@ -105,66 +105,66 @@
                                 x-transition:leave="transition ease-in duration-150"
                                 x-transition:leave-start="opacity-100"
                                 x-transition:leave-end="opacity-0"
-                                class="flex items-center justify-center w-full"
+                                class="flex items-center justify-center w-full h-full"
                                 style="display: none;"
                             >
                                 @if($preview->type === 'image')
                                     <img
                                         src="{{ asset('storage/' . $preview->path) }}"
                                         alt="Preview {{ $loop->iteration }}"
-                                        class="object-contain w-full max-h-[75vh] rounded-2xl"
+                                        class="object-contain max-w-full max-h-full"
                                     >
                                 @else
                                     <video
                                         src="{{ asset('storage/' . $preview->path) }}"
                                         controls
-                                        class="w-full max-h-[75vh] rounded-2xl"
+                                        class="max-w-full max-h-full"
                                     ></video>
                                 @endif
                             </div>
                             @endforeach
-                        </div>
 
-                        {{-- Navigation + counter --}}
-                        @if($product->previews->count() > 1)
-                        <div class="flex items-center justify-between w-full mt-4 px-1">
+                            {{-- Prev / Next arrows overlaid on image edges --}}
+                            @if($product->previews->count() > 1)
                             <button
                                 @click="currentIndex = (currentIndex - 1 + total) % total"
-                                class="flex items-center justify-center w-10 h-10 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                                class="absolute left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 text-white rounded-full bg-black/50 hover:bg-black/70 transition-colors"
                                 aria-label="Previous"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                                 </svg>
                             </button>
-
-                            <span class="text-sm font-semibold text-white/70">
-                                <span x-text="currentIndex + 1"></span>
-                                <span class="text-white/40">/</span>
-                                {{ $product->previews->count() }}
-                            </span>
-
                             <button
                                 @click="currentIndex = (currentIndex + 1) % total"
-                                class="flex items-center justify-center w-10 h-10 text-white rounded-full bg-white/10 hover:bg-white/25 transition-colors"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-10 h-10 text-white rounded-full bg-black/50 hover:bg-black/70 transition-colors"
                                 aria-label="Next"
                             >
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </button>
+                            @endif
                         </div>
 
-                        {{-- Dot indicators --}}
-                        <div class="flex items-center gap-1.5 mt-3">
-                            @foreach($product->previews as $preview)
-                            <button
-                                @click="currentIndex = {{ $loop->index }}"
-                                :class="currentIndex === {{ $loop->index }} ? 'bg-white w-4' : 'bg-white/30 w-2'"
-                                class="h-2 rounded-full transition-all duration-200"
-                                aria-label="Go to slide {{ $loop->iteration }}"
-                            ></button>
-                            @endforeach
+                        {{-- Counter + dot indicators — fixed-height footer, never pushed off-screen --}}
+                        @if($product->previews->count() > 1)
+                        <div class="flex flex-col items-center gap-2 py-3 shrink-0">
+                            <span class="text-sm font-semibold text-white/70">
+                                <span x-text="currentIndex + 1"></span>
+                                <span class="text-white/40">/</span>
+                                {{ $product->previews->count() }}
+                            </span>
+                            <div class="flex items-center gap-1.5">
+                                @foreach($product->previews as $preview)
+                                <button
+                                    @click="currentIndex = {{ $loop->index }}"
+                                    :class="currentIndex === {{ $loop->index }} ? 'bg-white w-4' : 'bg-white/30 w-2'"
+                                    class="h-2 rounded-full transition-all duration-200"
+                                    aria-label="Go to slide {{ $loop->iteration }}"
+                                ></button>
+                                @endforeach
+                            </div>
                         </div>
                         @endif
 
