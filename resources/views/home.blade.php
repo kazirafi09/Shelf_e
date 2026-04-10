@@ -371,7 +371,7 @@
                     <p class="text-[10px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Limited time</p>
                     <h3 class="text-lg font-extrabold text-gray-900 leading-tight">Up to 40% Off</h3>
                     <p class="mt-0.5 text-xs text-gray-500">On selected bestselling titles.</p>
-                    <a href="{{ route('categories.index', ['in_demand' => 1]) }}"
+                    <a href="{{ route('categories.index', ['on_sale' => 1]) }}"
                        class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-700 hover:text-amber-800 transition-colors">
                         Shop deals
                         <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,7 +393,7 @@
                 <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Deals of the Week</h2>
                 <p class="mt-1 text-sm text-muted-foreground">Limited-time prices — grab them before the clock runs out.</p>
             </div>
-            <a href="{{ route('categories.index') }}"
+            <a href="{{ route('categories.index', ['on_sale' => 1]) }}"
                class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">
                 View All Deals &rarr;
             </a>
@@ -407,7 +407,7 @@
         </div>
 
         <div class="mt-8 text-center md:hidden">
-            <a href="{{ route('categories.index') }}"
+            <a href="{{ route('categories.index', ['on_sale' => 1]) }}"
                class="inline-block px-8 py-3 text-sm font-bold text-gray-700 transition-colors border-2 border-gray-200 rounded-full hover:bg-gray-100">
                 View All Deals
             </a>
