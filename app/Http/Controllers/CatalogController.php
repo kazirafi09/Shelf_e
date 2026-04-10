@@ -215,6 +215,19 @@ class CatalogController extends Controller
             }
         }
 
+        // I. NEW ARRIVALS — books added in the last 7 days
+        if ($request->boolean('new_arrivals')) {
+            $query->where('created_at', '>=', now()->subWeek())
+                  ->orderByDesc('created_at');
+            $pageTitle = 'New Arrivals';
+        }
+
+        // J. IN DEMAND — books that have at least one order
+        if ($request->boolean('in_demand')) {
+            $query->whereHas('orderItems');
+            $pageTitle = 'In Demand';
+        }
+
         $products = $query->paginate(24)->withQueryString();
 
         $genres = Category::all();

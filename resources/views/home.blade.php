@@ -346,7 +346,7 @@
                     <p class="text-[10px] font-black tracking-[0.2em] uppercase text-amber-400 mb-1">Just landed</p>
                     <h3 class="text-lg font-extrabold text-white leading-tight">New Arrivals</h3>
                     <p class="mt-0.5 text-xs text-gray-400">Fresh titles added every week.</p>
-                    <a href="{{ route('categories.index') }}"
+                    <a href="{{ route('categories.index', ['new_arrivals' => 1]) }}"
                        class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
                         Browse now
                         <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,7 +371,7 @@
                     <p class="text-[10px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Limited time</p>
                     <h3 class="text-lg font-extrabold text-gray-900 leading-tight">Up to 40% Off</h3>
                     <p class="mt-0.5 text-xs text-gray-500">On selected bestselling titles.</p>
-                    <a href="{{ route('categories.index') }}"
+                    <a href="{{ route('categories.index', ['in_demand' => 1]) }}"
                        class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-700 hover:text-amber-800 transition-colors">
                         Shop deals
                         <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
