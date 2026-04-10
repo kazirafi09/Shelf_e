@@ -15,9 +15,10 @@ class BookScraperService
     public function searchByTitle(string $query): array
     {
         $response = Http::timeout(20)->get(self::BASE_URL . '/search/suggest.json', [
-            'q'                => $query,
-            'resources[type]'  => 'product',
-            'resources[limit]' => 10,
+            'q'                                          => $query,
+            'resources[type]'                            => 'product',
+            'resources[limit]'                           => 10,
+            'resources[options][unavailable_products]'   => 'show',
         ]);
 
         if ($response->failed()) {
@@ -166,8 +167,10 @@ class BookScraperService
         $rawTitle = $p['title'] ?? '';
         [$title, $author] = $this->splitTitleAuthor($rawTitle);
 
-        // Shopify suggest uses 'image.url'; product JSON uses 'image.src'
-        $coverUrl = $p['image']['url'] ?? $p['image']['src'] ?? null;
+        // Shopify suggest returns 'image' as a plain URL string;
+        // product JSON uses 'image.src'. Handle both.
+        $img      = $p['image'] ?? null;
+        $coverUrl = is_string($img) ? $img : ($img['url'] ?? $img['src'] ?? null);
 
         // Extract handle from URL path: /products/{handle}
         $handle = '';
