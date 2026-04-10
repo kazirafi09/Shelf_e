@@ -217,13 +217,13 @@
 
                     <input x-ref="fileInput" type="file" name="image" @change="fileChosen" accept="image/png, image/jpeg, image/webp" class="absolute inset-0 z-50 w-full h-full opacity-0 cursor-pointer">
 
-                    <div x-show="!imageUrl" class="text-center transition-transform pointer-events-none text-muted-foreground group-hover:scale-105">
+                    <div x-show="!imageUrl" style="{{ $book->image_path ? 'display:none;' : '' }}" class="text-center transition-transform pointer-events-none text-muted-foreground group-hover:scale-105">
                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <p class="text-sm font-medium text-foreground"><span class="text-cyan-600">Click to upload</span> or drag and drop</p>
                         <p class="mt-1 text-xs text-muted-foreground">PNG, JPG, WEBP up to 2MB</p>
                     </div>
 
-                    <div x-show="imageUrl" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted">
+                    <div x-show="imageUrl" style="{{ $book->image_path ? '' : 'display:none;' }}" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted">
                         <img :src="imageUrl" class="object-contain w-full h-full rounded-lg shadow-sm">
                         <div class="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100 rounded-xl">
                             <span class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-black/60">Click or Drop to change</span>
