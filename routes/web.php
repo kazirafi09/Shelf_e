@@ -28,6 +28,7 @@ use App\Http\Controllers\Admin\ProductPreviewController;
 use App\Http\Controllers\Admin\BookScraperController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Admin\AdminContactController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -223,6 +224,11 @@ Route::prefix('admin')
 
         // Vouchers
         Route::resource('vouchers', AdminVoucherController::class)->except(['show']);
+
+        // Contact Messages
+        Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
+        Route::patch('/contacts/{message}/read', [AdminContactController::class, 'markRead'])->name('contacts.markRead');
+        Route::delete('/contacts/{message}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
     });
 
 require __DIR__.'/auth.php';
