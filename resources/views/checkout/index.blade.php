@@ -73,7 +73,7 @@
 
     {{-- FOMO countdown banner --}}
     <div
-        class="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 mb-8 bg-gray-900 text-white rounded-xl overflow-hidden relative"
+        class="flex flex-wrap items-center justify-between gap-3 px-5 py-6 mb-8 bg-gray-900 text-white rounded-xl overflow-hidden relative"
         x-data="{
             end: null,
             hours: '00', mins: '00', secs: '00',
@@ -94,17 +94,14 @@
         }"
         x-init="init()"
     >
-        {{-- subtle glow decoration --}}
-        <div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-amber-400 opacity-[0.07] pointer-events-none"></div>
-
-        <div class="flex items-center gap-3 relative z-10">
+<div class="flex items-center gap-3 relative z-10">
             <svg class="w-5 h-5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <div>
                 <p class="text-sm font-bold leading-tight">Your cart prices are reserved!</p>
-                <p class="text-xs text-gray-400 mt-0.5">Complete your order before the timer runs out.</p>
+                <p class="text-sm text-gray-400 mt-0.5">Complete your order before the timer runs out.</p>
             </div>
         </div>
 
@@ -116,9 +113,9 @@
                     <span x-show="i < 2" class="text-gray-400 font-bold text-sm">:</span>
                 </div>
             </template>
-            <span class="ml-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400">remaining</span>
+            <span class="ml-1 text-xs font-semibold uppercase tracking-widest text-gray-400">remaining</span>
         </div>
-        <p x-show="expired" class="text-xs font-bold text-amber-400 relative z-10 shrink-0">Prices may have changed — please review.</p>
+        <p x-show="expired" class="text-sm font-bold text-amber-400 relative z-10 shrink-0">Prices may have changed — please review.</p>
     </div>
 
     @if($errors->any())
