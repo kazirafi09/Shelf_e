@@ -181,6 +181,7 @@ class BookScraperController extends Controller
             'science'                       => 'Science',
             'technology'                    => 'Technology',
             'business'                      => 'Business',
+            'finance'                       => 'Finance',
             'economics'                     => 'Economics',
             'politics'                      => 'Politics',
             'psychology'                    => 'Psychology',
@@ -200,6 +201,10 @@ class BookScraperController extends Controller
             'বাংলা সাহিত্য'                => 'Bangla Literature',
             'বাংলা'                         => 'Bangla Literature',
         ];
+
+        // Strip trailing genre-qualifier suffixes so "Self-help Book" → "Self-help",
+        // "Business Book" → "Business", etc., before hitting the map.
+        $subject = preg_replace('/\s+books?\s*$/i', '', trim($subject));
 
         $lower = mb_strtolower(trim($subject));
 
