@@ -16,7 +16,8 @@
       "Bash(grep -E \"\\\\.php$\")",
       "Bash(powershell -Command \"Get-Item 'D:\\\\Shelf-e\\\\shelf-e\\\\public\\\\storage' | Select-Object LinkType, Target\")",
       "Bash(mv:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
