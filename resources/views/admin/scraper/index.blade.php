@@ -23,7 +23,10 @@
         categorySaving: false,
 
         async search() {
-            if (this.query.trim().length < 2) return;
+            if (this.query.trim().length < 2) {
+                this.error = 'Please enter at least 2 characters to search.';
+                return;
+            }
 
             this.isLoading = true;
             this.results  = [];
@@ -105,6 +108,7 @@
                 <input
                     type="text"
                     x-model="query"
+                    @input="error = null"
                     @keydown.enter.prevent="search()"
                     placeholder="Search by book title or author, e.g. 'Humayun Ahmed'…"
                     class="block w-full py-3 pl-10 pr-4 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm"
@@ -112,7 +116,7 @@
             </div>
             <button
                 type="submit"
-                :disabled="isLoading || query.trim().length < 2"
+                :disabled="isLoading"
                 class="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold transition rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <svg x-show="isLoading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

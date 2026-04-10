@@ -22,7 +22,9 @@
       "Bash(grep:*)",
       "Bash(ls -la database/migrations/*categories*)",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(p['title']\\) for p in d.get\\('products',[]\\)]\")",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(php D:/Shelf-e/shelf-e/artisan db:show)",
+      "Bash(php:*)"
     ]
   }
 }
