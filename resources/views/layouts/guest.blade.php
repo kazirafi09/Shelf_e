@@ -52,7 +52,7 @@
                     <h4 class="mb-4 font-bold text-gray-900">Contact</h4>
                     <ul class="space-y-2 text-sm text-gray-600">
                         <li>info@shelfebd.com</li>
-                        <li>Dhaka, Bangladesh</li>
+
                     </ul>
                 </div>
             </div>

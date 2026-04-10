@@ -93,7 +93,7 @@
             <div style="font-size:28px;font-weight:900;letter-spacing:-.03em;color:#0f172a;line-height:1;">
                 <span class="accent">Shelf</span>-E
             </div>
-            <div style="margin-top:4px;font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;">Premium Bookstore · Dhaka, Bangladesh</div>
+            <div style="margin-top:4px;font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;">Premium Bookstore</div>
         </div>
         <div style="text-align:right;">
             <div style="font-size:22px;font-weight:900;letter-spacing:-.02em;color:#0f172a;">INVOICE</div>
@@ -128,8 +128,7 @@
             <div class="label" style="margin-bottom:5px;">From</div>
             <div style="font-size:13px;font-weight:800;color:#0f172a;">Shelf-E</div>
             <div style="margin-top:4px;font-size:11px;color:#64748b;line-height:1.7;">
-                123 Bookworm Lane<br>
-                Dhaka, Bangladesh<br>
+
 
                 info@shelfebd.com
             </div>
