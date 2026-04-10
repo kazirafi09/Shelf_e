@@ -21,9 +21,19 @@ class CategoryController extends Controller
             'name' => 'required|string|max:100|unique:categories,name',
         ]);
 
+        $slug = Str::slug($validated['name']);
+
+        if (Category::where('slug', $slug)->exists()) {
+            $error = 'A category with a similar name already exists (duplicate slug).';
+            if ($request->expectsJson()) {
+                return response()->json(['errors' => ['name' => [$error]]], 422);
+            }
+            return back()->withErrors(['name' => $error])->withInput();
+        }
+
         $category = Category::create([
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
+            'slug' => $slug,
         ]);
 
         if ($request->expectsJson()) {
@@ -39,9 +49,15 @@ class CategoryController extends Controller
             'name' => 'required|string|max:100|unique:categories,name,' . $category->id,
         ]);
 
+        $slug = Str::slug($validated['name']);
+
+        if (Category::where('slug', $slug)->where('id', '!=', $category->id)->exists()) {
+            return back()->withErrors(['name' => 'A category with a similar name already exists (duplicate slug).'])->withInput();
+        }
+
         $category->update([
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
+            'slug' => $slug,
         ]);
 
         return back()->with('success', "Category '{$category->name}' updated.");
