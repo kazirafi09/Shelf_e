@@ -191,7 +191,7 @@
                 <p class="mb-3 text-xs text-muted-foreground">Drag & drop a new image or click to browse. Leave unchanged to keep the current cover.</p>
 
                 <div x-data="{
-                        imageUrl: @json($book->image_path ? asset('storage/' . $book->image_path) : null),
+                        imageUrl: {{ Illuminate\Support\Js::from($book->image_path ? asset('storage/' . $book->image_path) : null) }},
                         isDragging: false,
                         fileChosen(event) {
                             this.processFile(event.target.files[0]);
