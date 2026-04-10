@@ -225,14 +225,49 @@
                 </div>
 
                 <h2 class="mb-6 text-2xl font-bold text-foreground">Payment Method</h2>
-                <div class="p-6 mb-8 border border-border rounded-xl bg-muted">
-                    <div class="flex flex-wrap gap-6 mb-6">
+                <div class="p-6 mb-8 border border-border rounded-xl bg-muted" x-data="{ payment: 'cod' }">
+                    <div class="flex flex-wrap gap-6 mb-4">
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payment" value="cod" checked class="w-4 h-4 text-gray-700 focus:ring-gray-500">
+                            <input type="radio" name="payment" value="cod" x-model="payment" class="w-4 h-4 text-gray-700 focus:ring-gray-500">
                             <span class="font-medium text-foreground">Cash on Delivery</span>
                         </label>
+                        @if(!empty($bkashNumber))
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="payment" value="bkash" x-model="payment" class="w-4 h-4 text-gray-700 focus:ring-gray-500">
+                            <span class="font-medium text-foreground">Bkash</span>
+                        </label>
+                        @endif
                     </div>
-                    <p class="text-xs text-muted-foreground">Pay with cash when your books arrive at your doorstep.</p>
+
+                    <p x-show="payment === 'cod'" class="text-xs text-muted-foreground">Pay with cash when your books arrive at your doorstep.</p>
+
+                    @if(!empty($bkashNumber))
+                    <div x-show="payment === 'bkash'"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         style="display:none;"
+                         class="mt-2 space-y-4">
+                        <div class="p-4 border border-pink-200 rounded-lg bg-pink-50">
+                            <p class="mb-1 text-xs font-bold tracking-wide text-pink-700 uppercase">Send payment via Bkash</p>
+                            <p class="text-sm text-pink-800">
+                                Send the exact amount to:
+                                <span class="font-black text-lg tracking-wider">{{ $bkashNumber }}</span>
+                            </p>
+                            <p class="mt-1 text-xs text-pink-600">Please send the payment before placing the order, then enter the Transaction ID below.</p>
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-sm font-medium text-foreground">Bkash Transaction ID</label>
+                            <input type="text" name="bkash_transaction_id"
+                                   value="{{ old('bkash_transaction_id') }}"
+                                   placeholder="e.g. 8A7X6B5C4D"
+                                   class="w-full px-4 py-3 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)]">
+                            @error('bkash_transaction_id')
+                                <p class="mt-1 text-xs font-medium text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="flex items-center mb-8 space-x-2">

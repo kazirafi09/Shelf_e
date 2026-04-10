@@ -122,6 +122,29 @@
                 </div>
             </div>
 
+            {{-- Bkash Payment --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Bkash Payment</h2>
+                <p class="mb-5 text-sm text-muted-foreground">The Bkash merchant number customers will send payment to at checkout. Leave blank to hide the Bkash payment option.</p>
+
+                <label for="bkash_number" class="block mb-2 text-sm font-semibold text-foreground">
+                    Bkash Number
+                </label>
+                <input
+                    type="text"
+                    id="bkash_number"
+                    name="bkash_number"
+                    value="{{ old('bkash_number', $bkashNumber) }}"
+                    maxlength="20"
+                    class="w-full max-w-xs px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
+                    placeholder="e.g. 01XXXXXXXXX"
+                >
+                @error('bkash_number')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1.5 text-xs text-muted-foreground">This number will be displayed to the customer when they select Bkash at checkout.</p>
+            </div>
+
             {{-- Returns Policy --}}
             <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
                 <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Returns Policy</h2>

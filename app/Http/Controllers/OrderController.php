@@ -47,7 +47,9 @@ class OrderController extends Controller
             ? UserAddress::where('user_id', auth()->id())->orderByDesc('is_default')->orderBy('created_at')->get()
             : collect();
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses', 'insideDhakaRate', 'outsideDhakaRate'));
+        $bkashNumber = Setting::get('bkash_number', '');
+
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses', 'insideDhakaRate', 'outsideDhakaRate', 'bkashNumber'));
     }
 
     public function show($id)
@@ -96,7 +98,8 @@ class OrderController extends Controller
             'division' => 'required|string|max:100',
             'district' => 'required|string|max:100',
             'postal_code' => 'nullable|string|max:10',
-            'payment'      => 'required|string',
+            'payment'      => 'required|in:cod,bkash',
+            'bkash_transaction_id' => 'required_if:payment,bkash|nullable|string|max:100',
             'redeem_coins' => 'nullable|boolean',
             'coupon_code'  => 'nullable|string|max:50',
         ]);
@@ -203,6 +206,7 @@ class OrderController extends Controller
                     'postal_code'     => $validatedData['postal_code'] ?? null,
                     'delivery_method' => $deliveryMethod,
                     'payment_method'  => $validatedData['payment'],
+                    'bkash_transaction_id' => $validatedData['payment'] === 'bkash' ? ($validatedData['bkash_transaction_id'] ?? null) : null,
                     'subtotal'        => $subtotal,
                     'shipping_cost'   => $shipping,
                     'discount_amount' => $discountAmount,

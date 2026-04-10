@@ -122,9 +122,19 @@
                     </div>
                     <div class="pt-4 border-t border-border">
                         <p class="mb-1 text-[10px] font-black tracking-widest text-muted-foreground uppercase">Payment Method</p>
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-widest bg-orange-50 text-orange-700 border border-orange-100">
-                            {{ $order->payment_method }}
-                        </span>
+                        @if($order->payment_method === 'bkash')
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-widest bg-pink-50 text-pink-700 border border-pink-200">
+                                Bkash
+                            </span>
+                            @if($order->bkash_transaction_id)
+                                <p class="mt-2 text-[10px] font-black tracking-widest text-muted-foreground uppercase">Transaction ID</p>
+                                <p class="mt-0.5 text-sm font-bold text-foreground font-mono">{{ $order->bkash_transaction_id }}</p>
+                            @endif
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-widest bg-orange-50 text-orange-700 border border-orange-100">
+                                {{ $order->payment_method }}
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>

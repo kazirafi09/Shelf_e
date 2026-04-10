@@ -100,7 +100,19 @@
             <div style="margin-top:6px;font-size:11px;color:#64748b;line-height:1.7;">
                 <div><strong style="color:#0f172a;">Order&nbsp;ID</strong>&nbsp;&nbsp;#{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
                 <div><strong style="color:#0f172a;">Date</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ $order->created_at->format('d M Y') }}</div>
-                <div><strong style="color:#0f172a;">Payment</strong>&nbsp;&nbsp;{{ strtoupper($order->payment_method) }}</div>
+                <div>
+                    <strong style="color:#0f172a;">Payment</strong>&nbsp;&nbsp;
+                    @if($order->payment_method === 'bkash')
+                        Bkash
+                    @else
+                        {{ strtoupper($order->payment_method) }}
+                    @endif
+                </div>
+                @if($order->payment_method === 'bkash' && $order->bkash_transaction_id)
+                <div style="font-size:10px;color:#64748b;margin-top:2px;">
+                    <strong style="color:#0f172a;">TxID</strong>&nbsp;&nbsp;{{ $order->bkash_transaction_id }}
+                </div>
+                @endif
                 <div style="margin-top:4px;">
                     <span style="display:inline-block;padding:2px 10px;background:#dcfce7;color:#15803d;font-size:9px;font-weight:800;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;">
                         {{ strtoupper($order->status) }}

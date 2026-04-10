@@ -24,6 +24,22 @@
                 <span class="text-muted-foreground">Date:</span>
                 <span class="font-medium text-foreground">{{ $order->created_at->format('M j, Y') }}</span>
             </div>
+            <div class="flex justify-between mb-2">
+                <span class="text-muted-foreground">Payment:</span>
+                <span class="font-medium text-foreground">
+                    @if($order->payment_method === 'bkash')
+                        Bkash
+                    @else
+                        Cash on Delivery
+                    @endif
+                </span>
+            </div>
+            @if($order->payment_method === 'bkash' && $order->bkash_transaction_id)
+            <div class="flex justify-between mb-2">
+                <span class="text-muted-foreground">Bkash Transaction ID:</span>
+                <span class="font-bold text-foreground font-mono">{{ $order->bkash_transaction_id }}</span>
+            </div>
+            @endif
             <div class="flex justify-between pt-2 mt-2 border-t border-border">
                 <span class="font-bold text-foreground">Total Paid:</span>
                 <span class="font-bold text-gray-700">৳{{ number_format($order->total_amount, 2) }}</span>

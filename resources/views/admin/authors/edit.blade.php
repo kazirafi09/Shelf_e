@@ -44,21 +44,51 @@
             </div>
 
             <div>
-                <label for="photo" class="block mb-1 text-sm font-bold text-foreground">Author Photo</label>
-                @if($author->photo_path)
-                    <div class="flex items-center gap-3 mb-3">
-                        <img src="{{ asset('storage/' . $author->photo_path) }}"
-                             alt="{{ $author->name }}"
-                             class="object-cover w-16 h-16 rounded-full border border-border">
-                        <p class="text-xs text-muted-foreground">Current photo — upload a new file to replace it.</p>
+                <label class="block mb-1 text-sm font-bold text-foreground">Author Photo</label>
+
+                <div x-data="{
+                        imageUrl: {{ $author->photo_path ? '\''.asset('storage/'.$author->photo_path).'\'' : 'null' }},
+                        isDragging: false,
+                        fileChosen(event) {
+                            this.processFile(event.target.files[0]);
+                        },
+                        handleDrop(event) {
+                            this.isDragging = false;
+                            const file = event.dataTransfer.files[0];
+                            this.processFile(file);
+                            this.$refs.fileInput.files = event.dataTransfer.files;
+                        },
+                        processFile(file) {
+                            if (!file || !file.type.match('image.*')) return;
+                            const reader = new FileReader();
+                            reader.readAsDataURL(file);
+                            reader.onload = function(e) { this.imageUrl = e.target.result; }.bind(this);
+                        }
+                    }"
+                    @dragover.prevent="isDragging = true"
+                    @dragleave.prevent="if (!$el.contains($event.relatedTarget)) isDragging = false"
+                    @drop.prevent="handleDrop($event)"
+                    @click="$refs.fileInput.click()"
+                    :class="isDragging ? 'border-cyan-500 bg-cyan-50' : 'border-border bg-background'"
+                    class="relative flex flex-col items-center justify-center w-full p-6 overflow-hidden transition-colors border-2 border-dashed rounded-xl h-52 group hover:bg-muted cursor-pointer">
+
+                    <input x-ref="fileInput" type="file" name="photo" @change="fileChosen" accept="image/jpeg,image/png,image/webp" class="hidden">
+
+                    <div x-show="!imageUrl" class="text-center text-muted-foreground transition-transform pointer-events-none group-hover:scale-105">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="text-sm font-medium text-foreground"><span class="text-cyan-600">Click to upload</span> or drag and drop</p>
+                        <p class="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP. Max 2 MB. Leave blank to keep the current photo.</p>
                     </div>
-                @endif
-                <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp"
-                       class="block w-full text-sm text-muted-foreground border border-input rounded-[var(--radius)] bg-background cursor-pointer
-                              file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-lg
-                              file:text-sm file:font-bold file:bg-muted file:text-foreground
-                              hover:file:bg-muted/80">
-                <p class="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP. Max 2 MB. Leave blank to keep the current photo.</p>
+
+                    <div x-show="imageUrl" style="display: none;" @click.stop="$refs.fileInput.click()" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted cursor-pointer">
+                        <img :src="imageUrl" class="object-contain w-full h-full rounded-lg shadow-sm">
+                        <div class="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100 rounded-xl">
+                            <span class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-black/60">Click or Drop to change</span>
+                        </div>
+                    </div>
+
+                </div>
+                @error('photo') <span class="block mt-1 text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
 
         </div>

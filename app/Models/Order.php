@@ -30,6 +30,7 @@ class Order extends Model
         'coupon_code',
         'total_amount',
         'status',
+        'bkash_transaction_id',
     ];
 
     public function items()
