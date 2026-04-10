@@ -24,7 +24,7 @@
 
                 {{-- Headline --}}
                 <h1 class="text-[2.6rem] sm:text-5xl lg:text-[3.4rem] font-black tracking-tight text-gray-900 leading-[1.08] mb-5">
-                    aDiscover Your<br>
+                    Discover Your<br>
                     <span class="relative whitespace-nowrap">
                         <span class="relative z-10">Next Great</span>
                         {{-- Hand-drawn underline accent --}}
