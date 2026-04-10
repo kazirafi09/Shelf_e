@@ -12,6 +12,16 @@
         isLoading: false,
         error: null,
 
+        // Reactive category list — quick-add will push new entries here
+        // and all per-row selects will update automatically.
+        categories: @json($categories->map(fn($c) => ['id' => $c->id, 'name' => $c->name])),
+
+        // Quick-add modal state
+        showCategoryModal: false,
+        newCategoryName: '',
+        categoryError: null,
+        categorySaving: false,
+
         async search() {
             if (this.query.trim().length < 2) return;
 
@@ -47,6 +57,35 @@
                 this.error = 'Network error. Please check your connection.';
             } finally {
                 this.isLoading = false;
+            }
+        },
+
+        async createCategory() {
+            if (this.newCategoryName.trim().length < 2) return;
+            this.categorySaving = true;
+            this.categoryError = null;
+            try {
+                const res = await fetch('{{ route('admin.categories.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({ name: this.newCategoryName }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    this.categoryError = data.errors?.name?.[0] ?? 'Something went wrong.';
+                } else {
+                    this.categories.push({ id: data.id, name: data.name });
+                    this.newCategoryName = '';
+                    this.showCategoryModal = false;
+                }
+            } catch (e) {
+                this.categoryError = 'Network error.';
+            } finally {
+                this.categorySaving = false;
             }
         }
     }"
@@ -115,9 +154,19 @@
             <p class="text-sm font-semibold text-foreground">
                 <span x-text="results.length"></span> results from Book Tank BD
             </p>
-            <a href="https://booktankbd.com" target="_blank" rel="noopener" class="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                booktankbd.com ↗
-            </a>
+            <div class="flex items-center gap-4">
+                {{-- Quick-Add Category button --}}
+                <button type="button" @click="showCategoryModal = true"
+                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-700 hover:text-cyan-900 transition">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    New Category
+                </button>
+                <a href="https://booktankbd.com" target="_blank" rel="noopener" class="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    booktankbd.com ↗
+                </a>
+            </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -168,13 +217,9 @@
                                 <p class="text-sm font-semibold text-foreground" x-text="book.price ? '৳ ' + parseFloat(book.price).toFixed(0) : '—'"></p>
                             </td>
 
-                            {{-- Category + Import (single form) --}}
+                            {{-- Category select (reactive — updates when a new category is created) --}}
                             <td class="px-6 py-4">
-                                <span class="text-xs text-muted-foreground italic">Auto-detected on import</span>
-                            </td>
-
-                            <td class="px-6 py-4">
-                                <form action="{{ route('admin.scraper.import') }}" method="POST" class="flex items-center gap-2">
+                                <form :id="'import-form-' + index" action="{{ route('admin.scraper.import') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="handle"    :value="book.handle">
                                     <input type="hidden" name="title"     :value="book.title">
@@ -182,28 +227,64 @@
                                     <input type="hidden" name="price"     :value="book.price">
                                     <input type="hidden" name="cover_url" :value="book.cover_url">
                                     <select name="category_id"
-                                            class="px-2 py-1.5 text-xs bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
-                                        <option value="">Auto-detect</option>
-                                        @foreach($categories as $cat)
-                                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                        @endforeach
+                                            class="w-full px-2 py-1.5 text-xs bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-lg">
+                                        <option value="">— Uncategorized —</option>
+                                        <template x-for="cat in categories" :key="cat.id">
+                                            <option :value="cat.id" x-text="cat.name"></option>
+                                        </template>
                                     </select>
-                                    <button
-                                        type="submit"
-                                        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95 shrink-0"
-                                    >
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        Import
-                                    </button>
                                 </form>
+                            </td>
+
+                            {{-- Import button (submits the form for this row) --}}
+                            <td class="px-6 py-4">
+                                <button
+                                    type="submit"
+                                    :form="'import-form-' + index"
+                                    class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold transition bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg active:scale-95 shrink-0"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    </svg>
+                                    Import
+                                </button>
                             </td>
 
                         </tr>
                     </template>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    {{-- Quick-Add Category Modal --}}
+    <div
+        x-show="showCategoryModal"
+        x-transition.opacity
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+        style="display: none;"
+        @keydown.escape.window="showCategoryModal = false"
+    >
+        <div @click.outside="showCategoryModal = false" class="w-full max-w-sm p-6 bg-card border border-border rounded-2xl shadow-xl">
+            <h3 class="mb-1 text-sm font-bold text-foreground">Create New Category</h3>
+            <p class="mb-4 text-xs text-muted-foreground">The new category will appear in all import dropdowns instantly.</p>
+            <input
+                type="text"
+                x-model="newCategoryName"
+                @keydown.enter.prevent="createCategory()"
+                placeholder="Category name…"
+                class="block w-full px-4 py-2.5 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm mb-2"
+            >
+            <p x-show="categoryError" x-text="categoryError" class="mb-3 text-xs text-red-600" style="display: none;"></p>
+            <div class="flex justify-end gap-3">
+                <button type="button" @click="showCategoryModal = false"
+                        class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Cancel</button>
+                <button type="button" @click="createCategory()"
+                        :disabled="categorySaving || newCategoryName.trim().length < 2"
+                        class="px-5 py-2 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition active:scale-95 disabled:opacity-50">
+                    <span x-text="categorySaving ? 'Saving…' : 'Create'"></span>
+                </button>
+            </div>
         </div>
     </div>
 

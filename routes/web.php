@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\BookScraperController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\AdminContactController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -224,6 +225,9 @@ Route::prefix('admin')
 
         // Vouchers
         Route::resource('vouchers', AdminVoucherController::class)->except(['show']);
+
+        // Categories
+        Route::resource('categories', AdminCategoryController::class)->only(['index', 'store', 'update', 'destroy']);
 
         // Contact Messages
         Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');

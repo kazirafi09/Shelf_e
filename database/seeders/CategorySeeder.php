@@ -8,30 +8,51 @@ use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $fakeCategories = [
+        $categories = [
+            'Fiction',
+            'Mystery',
             'Science Fiction',
-            'Mystery & Thriller',
-            'Biography & Memoir',
-            'Self-Help & Wellness',
-            'Cookbooks & Food',
-            'Graphic Novels',
+            'Fantasy',
+            'Romance',
+            'Horror',
+            'Thriller',
+            'Historical Fiction',
+            'Adventure',
+            'Biography',
+            'History',
+            'Self-Help',
+            'Philosophy',
+            'Religion',
             'Poetry',
-            'History & Politics',
-            'Business & Economics',
-            'Travel Guides'
+            'Drama',
+            'Travel',
+            'Cooking',
+            'Art',
+            'Music',
+            'Sports',
+            'Science',
+            'Technology',
+            'Business',
+            'Finance',
+            'Economics',
+            'Politics',
+            'Psychology',
+            'Education',
+            'Health',
+            'Comics & Graphic Novels',
+            'Children',
+            'Young Adult',
+            'Bangla Literature',
+            'Uncategorized',
         ];
 
-        foreach ($fakeCategories as $categoryName) {
-            // This prevents adding duplicates if you run the seeder twice
-            Category::firstOrCreate([
-                'name' => $categoryName,
-                'slug' => Str::slug($categoryName)
-            ]);
+        foreach ($categories as $name) {
+            Category::firstOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name]
+            );
         }
     }
 }

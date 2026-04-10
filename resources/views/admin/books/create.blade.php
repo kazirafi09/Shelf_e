@@ -125,14 +125,86 @@
                 </div>
             </div>
 
-            <div>
+            {{-- Category with inline Quick-Add --}}
+            <div
+                x-data="{
+                    showModal: false,
+                    newName: '',
+                    saving: false,
+                    errorMsg: null,
+                    async save() {
+                        this.saving = true;
+                        this.errorMsg = null;
+                        try {
+                            const res = await fetch('{{ route('admin.categories.store') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify({ name: this.newName }),
+                            });
+                            const data = await res.json();
+                            if (!res.ok) {
+                                this.errorMsg = data.errors?.name?.[0] ?? 'Something went wrong.';
+                            } else {
+                                const opt = new Option(data.name, data.id, true, true);
+                                this.$refs.categorySelect.add(opt);
+                                this.newName = '';
+                                this.showModal = false;
+                            }
+                        } catch (e) {
+                            this.errorMsg = 'Network error.';
+                        } finally {
+                            this.saving = false;
+                        }
+                    }
+                }"
+            >
                 <label for="category" class="block mb-1 text-sm font-bold text-foreground">Category</label>
-                <select id="category" name="category_id" class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
-                    <option value="">Select a Category...</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                    @endforeach
-                </select>
+                <div class="flex gap-2">
+                    <select x-ref="categorySelect" id="category" name="category_id" required
+                            class="flex-1 px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
+                        <option value="">Select a Category...</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="button" @click="showModal = true"
+                            title="Create new category"
+                            class="flex items-center justify-center w-12 shrink-0 text-sm font-bold rounded-[var(--radius)] border border-input bg-muted text-foreground hover:bg-muted/80 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Quick-Add Modal --}}
+                <div
+                    x-show="showModal"
+                    x-transition.opacity
+                    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+                    style="display: none;"
+                    @keydown.escape.window="showModal = false"
+                >
+                    <div @click.outside="showModal = false" class="w-full max-w-sm p-6 bg-card border border-border rounded-2xl shadow-xl">
+                        <h3 class="mb-1 text-sm font-bold text-foreground">Create New Category</h3>
+                        <p class="mb-4 text-xs text-muted-foreground">It will be added to the dropdown immediately.</p>
+                        <input type="text" x-model="newName" @keydown.enter.prevent="save()"
+                               placeholder="Category name…" autofocus
+                               class="block w-full px-4 py-2.5 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm mb-2">
+                        <p x-show="errorMsg" x-text="errorMsg" class="mb-3 text-xs text-red-600" style="display: none;"></p>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="showModal = false"
+                                    class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Cancel</button>
+                            <button type="button" @click="save()" :disabled="saving || newName.trim().length < 2"
+                                    class="px-5 py-2 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition active:scale-95 disabled:opacity-50">
+                                <span x-text="saving ? 'Saving…' : 'Create'"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
