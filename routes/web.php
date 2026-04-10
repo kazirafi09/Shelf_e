@@ -25,7 +25,6 @@ use App\Http\Controllers\Admin\AuthorController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\CoinController as AdminCoinController;
 use App\Http\Controllers\Admin\ProductPreviewController;
-use App\Http\Controllers\Admin\BookScraperController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\AdminContactController;
@@ -213,11 +212,6 @@ Route::prefix('admin')
         // Product Previews
         Route::post('/products/{product}/previews', [ProductPreviewController::class, 'store'])->name('product-previews.store');
         Route::delete('/previews/{preview}', [ProductPreviewController::class, 'destroy'])->name('product-previews.destroy');
-
-        // Book Scraper
-        Route::get('/scraper', [BookScraperController::class, 'index'])->name('scraper.index');
-        Route::post('/scraper/search', [BookScraperController::class, 'search'])->name('scraper.search');
-        Route::post('/scraper/import', [BookScraperController::class, 'import'])->name('scraper.import');
 
         // Store Settings
         Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
