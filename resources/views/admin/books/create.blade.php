@@ -207,7 +207,7 @@
                         }
                     }"
                     @dragover.prevent="isDragging = true"
-                    @dragleave.prevent="isDragging = false"
+                    @dragleave.prevent="if (!$el.contains($event.relatedTarget)) isDragging = false"
                     @drop.prevent="handleDrop($event)"
                     @click="$refs.fileInput.click()"
                     :class="isDragging ? 'border-cyan-500 bg-cyan-50' : 'border-border bg-background'"
@@ -221,7 +221,7 @@
                         <p class="mt-1 text-xs text-muted-foreground">PNG, JPG, WEBP up to 2MB</p>
                     </div>
 
-                    <div x-show="imageUrl" style="display: none;" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted">
+                    <div x-show="imageUrl" style="display: none;" @click.stop="$refs.fileInput.click()" class="absolute inset-0 z-40 flex items-center justify-center w-full h-full p-2 bg-muted cursor-pointer">
                         <img :src="imageUrl" class="object-contain w-full h-full rounded-lg shadow-sm">
                         <div class="absolute inset-0 flex items-center justify-center transition-opacity opacity-0 bg-black/40 group-hover:opacity-100 rounded-xl">
                             <span class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-black/60">Click or Drop to change</span>
