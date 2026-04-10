@@ -28,14 +28,21 @@
             <div class="md:col-span-2">
                 <label for="title" class="block mb-1 text-sm font-bold text-foreground">Book Title</label>
                 <input type="text" id="title" name="title" placeholder="e.g. The Great Gatsby" required
+                    value="{{ old('title') }}"
                     class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
             </div>
 
+            @php
+                $oldAuthorIds = old('author_ids', []);
+                $oldAuthors = $oldAuthorIds
+                    ? \App\Models\Author::whereIn('id', $oldAuthorIds)->get()->map(fn($a) => ['id' => $a->id, 'name' => $a->name])->values()
+                    : collect();
+            @endphp
             <div
                 x-data="{
                     query: '',
                     results: [],
-                    selectedAuthors: [],
+                    selectedAuthors: @json($oldAuthors),
                     open: false,
                     async search() {
                         if (this.query.length < 2) { this.results = []; this.open = false; return; }
@@ -123,7 +130,7 @@
                 <select id="category" name="category_id" class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
                     <option value="">Select a Category...</option>
                     @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -132,12 +139,14 @@
                 <div>
                     <label for="paperback_price" class="block mb-1 text-sm font-bold text-foreground">Paperback Price (৳)</label>
                     <input type="number" id="paperback_price" name="paperback_price" step="0.01" placeholder="0.00"
+                        value="{{ old('paperback_price') }}"
                         class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
                     <p class="mt-1 text-xs text-muted-foreground">Leave empty if not available</p>
                 </div>
                 <div>
                     <label for="hardcover_price" class="block mb-1 text-sm font-bold text-foreground">Hardcover Price (৳)</label>
                     <input type="number" id="hardcover_price" name="hardcover_price" step="0.01" placeholder="0.00"
+                        value="{{ old('hardcover_price') }}"
                         class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
                     <p class="mt-1 text-xs text-muted-foreground">Leave empty if not available</p>
                 </div>
@@ -168,18 +177,19 @@
             <div>
                 <label for="stock" class="block mb-1 text-sm font-bold text-foreground">Stock Quantity</label>
                 <input type="number" id="stock" name="stock_quantity" placeholder="How many in stock?" required
+                    value="{{ old('stock_quantity') }}"
                     class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
             </div>
 
             <div class="md:col-span-2">
                 <label for="description" class="block mb-1 text-sm font-bold text-foreground">Description</label>
                 <textarea id="description" name="description" rows="4" placeholder="Write a short summary of the book..." required
-                    class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all"></textarea>
+                    class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">{{ old('description') }}</textarea>
             </div>
 
             <div class="md:col-span-2">
                 <label for="synopsis" class="block mb-1 text-sm font-bold text-foreground">Synopsis</label>
-                <textarea id="synopsis" name="synopsis" rows="4" placeholder="Write a brief synopsis of the book..." class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all"></textarea>
+                <textarea id="synopsis" name="synopsis" rows="4" placeholder="Write a brief synopsis of the book..." class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">{{ old('synopsis') }}</textarea>
             </div>
 
             <div class="mb-6">
