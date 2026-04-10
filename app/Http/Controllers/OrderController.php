@@ -67,14 +67,16 @@ class OrderController extends Controller
         // Eager load the items and associated products to prevent N+1 queries
         $order = \App\Models\Order::with('items.product')->findOrFail($id);
 
-        // IDOR fix: both conditions must be true — the visitor must be logged in
-        // AND must own the order. The previous guard used && which short-circuits
-        // when the visitor is a guest, letting anyone enumerate order IDs.
-        abort_unless(
-            auth()->check() && $order->user_id === auth()->id(),
-            403,
-            'You are not authorized to view this order.'
-        );
+        // Allow access if:
+        //   (a) a logged-in user owns this order, OR
+        //   (b) a guest just placed this order (ID stored in session after store())
+        $ownedByUser  = auth()->check() && $order->user_id === auth()->id();
+        $ownedByGuest = (int) session('confirmation_order_id') === (int) $id;
+
+        abort_unless($ownedByUser || $ownedByGuest, 403, 'You are not authorized to view this order.');
+
+        // Remove the one-time session key so the URL cannot be shared to bypass auth
+        session()->forget('confirmation_order_id');
 
         return view('checkout.confirmation', compact('order'));
     }
@@ -276,7 +278,7 @@ class OrderController extends Controller
 
         // Now $order exists outside the transaction!
         session()->forget('cart');
-
+        session()->put('confirmation_order_id', $order->id);
 
         return redirect()->route('order.confirmation', $order->id)
                          ->with('success', 'Your order has been placed successfully!');
