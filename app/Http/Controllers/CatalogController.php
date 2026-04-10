@@ -266,6 +266,30 @@ class CatalogController extends Controller
         return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle', 'isBestsellers'));
     }
 
+    public function series()
+    {
+        $products = Product::withAvg('approvedReviews', 'rating')
+            ->withCount('approvedReviews')
+            ->whereHas('category', function ($q) {
+                $q->where('name', 'LIKE', '%series%');
+            })
+            ->paginate(24)
+            ->withQueryString();
+
+        $genres = Category::all();
+
+        $authors = Product::selectRaw('author, MIN(id) as min_id')
+            ->whereNotNull('author')
+            ->where('author', '!=', '')
+            ->groupBy('author')
+            ->orderBy('author')
+            ->pluck('author');
+
+        $pageTitle = 'Series';
+
+        return view('categories.index', compact('products', 'genres', 'authors', 'pageTitle'));
+    }
+
     // 3. Load Single Product Page
     public function show($slug)
     {

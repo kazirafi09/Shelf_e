@@ -302,6 +302,8 @@
 
             <a href="/authors" class="flex items-center py-4 transition-colors hover:text-gray-900">Authors</a>
 
+            <a href="/series" class="flex items-center py-4 transition-colors hover:text-gray-900">Series</a>
+
             <a href="/bestsellers" class="flex items-center py-4 transition-colors hover:text-gray-900">Bestsellers</a>
 
             <a href="/contact" class="flex items-center py-4 transition-colors hover:text-gray-900">Contact</a>
@@ -347,6 +349,7 @@
                 </div>
 
                 <a href="/authors"                @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-gray-900 hover:bg-gray-50">Authors</a>
+                <a href="/series"                 @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-gray-900 hover:bg-gray-50">Series</a>
                 <a href="/bestsellers" @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-gray-900 hover:bg-gray-50">Bestsellers</a>
                 <a href="/contact"                @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-gray-900 hover:bg-gray-50">Contact</a>
                 <a href="#newsletter"             @click="mobileMenuOpen = false" class="block px-3 py-2 text-base font-medium text-gray-700 transition-colors rounded-md hover:text-gray-900 hover:bg-gray-50">Newsletter</a>

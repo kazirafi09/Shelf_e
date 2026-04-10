@@ -92,6 +92,7 @@ Route::get('/categories', [CatalogController::class, 'categories'])->name('categ
 Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('product.show');
 Route::get('/authors', [CatalogController::class, 'authors'])->name('authors.index');
 Route::get('/bestsellers', [CatalogController::class, 'bestsellers'])->name('bestsellers.index');
+Route::get('/series', [CatalogController::class, 'series'])->name('series.index');
 
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
