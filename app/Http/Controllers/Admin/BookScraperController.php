@@ -83,7 +83,7 @@ class BookScraperController extends Controller
             'category_id'     => $category->id,
             'paperback_price' => $validated['price'] ?? 0,
             'hardcover_price' => null,
-            'stock_quantity'  => 0,
+            'stock_quantity'  => 10000,
             'rating'          => 0,
             'image_path'      => $imagePath,
         ]);

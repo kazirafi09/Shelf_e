@@ -176,8 +176,8 @@
 
             <div>
                 <label for="stock" class="block mb-1 text-sm font-bold text-foreground">Stock Quantity</label>
-                <input type="number" id="stock" name="stock_quantity" placeholder="How many in stock?" required
-                    value="{{ old('stock_quantity') }}"
+                <input type="number" id="stock" name="stock_quantity" placeholder="How many in stock?"
+                    value="{{ old('stock_quantity', 10000) }}"
                     class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all">
             </div>
 
