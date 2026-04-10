@@ -203,7 +203,7 @@
                             if (!file || !file.type.match('image.*')) return;
                             const reader = new FileReader();
                             reader.readAsDataURL(file);
-                            reader.onload = e => this.imageUrl = e.target.result;
+                            reader.onload = function(e) { this.imageUrl = e.target.result; }.bind(this);
                         }
                     }"
                     @dragover.prevent="isDragging = true"
