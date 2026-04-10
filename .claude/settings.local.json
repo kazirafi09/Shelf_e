@@ -17,7 +17,10 @@
       "Bash(powershell -Command \"Get-Item 'D:\\\\Shelf-e\\\\shelf-e\\\\public\\\\storage' | Select-Object LinkType, Target\")",
       "Bash(mv:*)",
       "Bash(git checkout:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -r \"category.*product\\\\|product.*category\" database/migrations/*.php)",
+      "Bash(grep:*)",
+      "Bash(ls -la database/migrations/*categories*)"
     ]
   }
 }

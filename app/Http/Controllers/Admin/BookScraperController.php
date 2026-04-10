@@ -54,17 +54,23 @@ class BookScraperController extends Controller
 
         // Use admin-chosen category if provided; otherwise auto-resolve.
         // Priority: 1) admin pick, 2) genre extracted from body text, 3) Shopify tags/product_type.
+        // Genres may be comma/slash-separated (e.g. "Self help, Business") — split into multiple.
         if (!empty($validated['category_id'])) {
-            $category = Category::findOrFail($validated['category_id']);
+            $resolvedCategories = [Category::findOrFail($validated['category_id'])];
         } elseif (!empty($details['genre'])) {
-            $category = $this->resolveCategory([$details['genre']]);
+            $rawSubjects = preg_split('/\s*[,\/]\s*/', $details['genre']);
+            $resolvedCategories = $this->resolveCategories($rawSubjects);
         } else {
-            $subjects = array_values(array_filter(array_merge(
+            $rawSubjects = array_values(array_filter(array_merge(
                 $details['tags'],
                 $details['product_type'] ? [$details['product_type']] : []
             )));
-            $category = $this->resolveCategory($subjects);
+            // Also split any comma-joined tag strings
+            $rawSubjects = array_merge(...array_map(fn($s) => preg_split('/\s*[,\/]\s*/', $s), $rawSubjects));
+            $resolvedCategories = $this->resolveCategories($rawSubjects);
         }
+
+        $category = $resolvedCategories[0]; // first resolved = primary category_id
 
         // Download cover image to local storage
         $imagePath = null;
@@ -88,6 +94,9 @@ class BookScraperController extends Controller
             'image_path'      => $imagePath,
         ]);
 
+        // Attach all resolved categories to the pivot table.
+        $product->categories()->sync(collect($resolvedCategories)->pluck('id')->all());
+
         // Create or look up the Author record and attach it via the pivot.
         if ($authorName) {
             $author = Author::firstOrCreate(
@@ -105,24 +114,35 @@ class BookScraperController extends Controller
 
     // ── Private helpers ──────────────────────────────────────────────────────
 
-    private function resolveCategory(array $subjects): Category
+    /**
+     * Resolve an array of raw subject strings into Category models.
+     * Each subject is normalized; unrecognized subjects are skipped.
+     * Returns at least one Category (falls back to Uncategorized).
+     */
+    private function resolveCategories(array $subjects): array
     {
+        $categories = [];
+
         foreach ($subjects as $subject) {
             $name = $this->normalizeSubject((string) $subject);
             if (!$name) {
                 continue;
             }
 
-            return Category::firstOrCreate(
+            $categories[] = Category::firstOrCreate(
                 ['slug' => Str::slug($name)],
                 ['name' => $name]
             );
         }
 
-        return Category::firstOrCreate(
-            ['slug' => 'uncategorized'],
-            ['name' => 'Uncategorized']
-        );
+        if (empty($categories)) {
+            $categories[] = Category::firstOrCreate(
+                ['slug' => 'uncategorized'],
+                ['name' => 'Uncategorized']
+            );
+        }
+
+        return $categories;
     }
 
     private function normalizeSubject(string $subject): ?string

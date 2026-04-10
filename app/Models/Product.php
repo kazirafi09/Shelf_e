@@ -35,6 +35,11 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
     public function authors()
     {
         return $this->belongsToMany(Author::class);

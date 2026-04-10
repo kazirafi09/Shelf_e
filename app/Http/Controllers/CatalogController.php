@@ -141,7 +141,9 @@ class CatalogController extends Controller
 
         // C. GENRE CHECKBOXES (FROM SIDEBAR)
         if ($request->has('genres') && is_array($request->genres) && count($request->genres) > 0) {
-            $query->whereIn('category_id', $request->genres);
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->whereIn('categories.id', $request->genres);
+            });
 
             if (count($request->genres) === 1) {
                 $checkedGenre = Category::find($request->genres[0]);
