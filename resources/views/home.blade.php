@@ -351,7 +351,7 @@
                        class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors">
                         Browse now
                         <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                            {{-- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/> --}}
                         </svg>
                     </a>
                 </div>
