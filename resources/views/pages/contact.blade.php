@@ -26,7 +26,7 @@
                     </div>
                     <div class="ml-5">
                         <h4 class="text-lg font-bold text-foreground">Email Us</h4>
-                        <p class="mt-1 text-muted-foreground">support@shelf-e.com</p>
+                        <p class="mt-1 text-muted-foreground">info@shelfebd.com</p>
                         <p class="text-sm text-muted-foreground">We aim to reply within 24 hours.</p>
                     </div>
                 </div>

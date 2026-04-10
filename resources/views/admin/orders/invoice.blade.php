@@ -131,7 +131,7 @@
                 123 Bookworm Lane<br>
                 Dhaka, Bangladesh<br>
 
-                support@shelf-e.com
+                info@shelfebd.com
             </div>
         </div>
         <div>
@@ -198,7 +198,7 @@
     <div style="border-top:1px solid #f1f5f9;padding-top:6mm;display:flex;justify-content:space-between;align-items:flex-end;">
         <div style="font-size:10px;color:#94a3b8;line-height:1.7;">
             Returns accepted within 7 days in original condition.<br>
-            Queries? <span style="color:#06b6d4;font-weight:700;">support@shelf-e.com</span>
+            Queries? <span style="color:#06b6d4;font-weight:700;">info@shelfebd.com</span>
         </div>
         <div style="text-align:right;font-size:10px;color:#cbd5e1;">
             <span style="font-size:14px;font-weight:900;color:#e2e8f0;letter-spacing:-.02em;"><span style="color:#a5f3fc;">Shelf</span>-E</span><br>
