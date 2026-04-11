@@ -30,10 +30,9 @@
 
     @php
         $announcementText = \App\Models\Setting::get('announcement_text', 'Free Standard Shipping on orders over ৳1000!');
-        $fomoEndsAt       = \App\Models\Setting::get('fomo_ends_at', now()->addDay()->toIso8601String());
     @endphp
     <div class="relative z-50 px-4 py-2 text-xs font-medium tracking-wide text-white bg-gray-900 sm:text-sm">
-        <div class="container flex items-center justify-between mx-auto">
+        <div class="container flex items-center justify-center mx-auto">
 
             {{-- Announcement --}}
             <span class="flex items-center gap-2">
@@ -42,36 +41,6 @@
                 </svg>
                 {{ $announcementText }}
             </span>
-
-            {{-- FOMO Countdown --}}
-            <div class="hidden md:flex items-center gap-2"
-                 x-data="{
-                     endsAt: new Date({{ Js::from($fomoEndsAt) }}),
-                     hours: '00', minutes: '00', seconds: '00',
-                     expired: false,
-                     tick() {
-                         const diff = Math.floor((this.endsAt - Date.now()) / 1000);
-                         if (diff <= 0) {
-                             this.expired = true;
-                             this.hours = '00'; this.minutes = '00'; this.seconds = '00';
-                             return;
-                         }
-                         this.expired = false;
-                         this.hours   = String(Math.floor(diff / 3600)).padStart(2, '0');
-                         this.minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-                         this.seconds = String(diff % 60).padStart(2, '0');
-                     },
-                     init() { this.tick(); setInterval(() => this.tick(), 1000); }
-                 }">
-                <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span x-show="!expired" class="text-gray-300">Deal ends in:</span>
-                <span x-show="expired"  class="text-gray-300">Deals refreshing soon</span>
-                <span x-show="!expired"
-                      class="font-mono font-bold tracking-widest text-white"
-                      x-text="hours + ':' + minutes + ':' + seconds"></span>
-            </div>
 
         </div>
     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Store Settings')
-@section('subtitle', 'Manage the announcement banner, FOMO countdown, and delivery prices.')
+@section('subtitle', 'Manage the announcement banner and delivery prices.')
 
 @section('admin-content')
 
@@ -44,38 +44,6 @@
                 @error('announcement_text')
                     <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
                 @enderror
-            </div>
-
-            {{-- FOMO Countdown --}}
-            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
-                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">FOMO Deal Countdown</h2>
-                <p class="mb-5 text-sm text-muted-foreground">
-                    Set when the current deal expires. The top bar will count down to this moment in real time.
-                    Pick a future date &amp; time to restart the urgency.
-                </p>
-
-                <label for="fomo_ends_at" class="block mb-2 text-sm font-semibold text-foreground">
-                    Deal Ends At
-                </label>
-                <input
-                    type="datetime-local"
-                    id="fomo_ends_at"
-                    name="fomo_ends_at"
-                    value="{{ old('fomo_ends_at', \Carbon\Carbon::parse($fomoEndsAt)->format('Y-m-d\TH:i')) }}"
-                    class="px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
-                >
-                @error('fomo_ends_at')
-                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-
-                {{-- Live preview --}}
-                <div class="flex items-center gap-2 mt-5 text-xs text-muted-foreground">
-                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                    </svg>
-                    Visitors will see a countdown like:
-                    <span class="px-2 py-0.5 font-mono font-bold text-white bg-gray-900 rounded">Deal ends in: 04:32:18</span>
-                </div>
             </div>
 
             {{-- Delivery Prices --}}

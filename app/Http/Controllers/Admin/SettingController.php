@@ -12,7 +12,6 @@ class SettingController extends Controller
     {
         return view('admin.settings.index', [
             'announcementText' => Setting::get('announcement_text', ''),
-            'fomoEndsAt'       => Setting::get('fomo_ends_at', now()->addDay()->toIso8601String()),
             'shippingInsideDhaka'  => Setting::get('shipping_inside_dhaka', 60),
             'shippingOutsideDhaka' => Setting::get('shipping_outside_dhaka', 150),
             'bkashNumber'      => Setting::get('bkash_number', ''),
@@ -25,7 +24,6 @@ class SettingController extends Controller
     {
         $data = $request->validate([
             'announcement_text' => ['required', 'string', 'max:200'],
-            'fomo_ends_at'      => ['required', 'date'],
             'shipping_inside_dhaka'  => ['required', 'integer', 'min:0'],
             'shipping_outside_dhaka' => ['required', 'integer', 'min:0'],
             'bkash_number'      => ['nullable', 'string', 'max:20'],
@@ -34,7 +32,6 @@ class SettingController extends Controller
         ]);
 
         Setting::set('announcement_text', $data['announcement_text']);
-        Setting::set('fomo_ends_at', \Carbon\Carbon::parse($data['fomo_ends_at'])->toIso8601String());
         Setting::set('shipping_inside_dhaka', (int) $data['shipping_inside_dhaka']);
         Setting::set('shipping_outside_dhaka', (int) $data['shipping_outside_dhaka']);
         Setting::set('bkash_number', $data['bkash_number'] ?? '');
