@@ -37,7 +37,7 @@ class AdminBookController extends Controller
         }
 
         // Add withQueryString() so pagination links remember the search term
-        $books = $query->latest()->with('category')->paginate(10)->withQueryString();
+        $books = $query->latest()->with('category')->paginate(50)->withQueryString();
 
         $globalCategories = Category::all();
 
