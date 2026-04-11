@@ -37,7 +37,18 @@ class AppServiceProvider extends ServiceProvider
                 return Category::orderBy('name')->get();
             });
 
+            $topSellingCategories = Cache::remember('top_selling_categories', 3600, function () {
+                return Category::selectRaw('categories.*, COALESCE(SUM(order_items.quantity), 0) as total_sold')
+                    ->leftJoin('products', 'products.category_id', '=', 'categories.id')
+                    ->leftJoin('order_items', 'order_items.product_id', '=', 'products.id')
+                    ->groupBy('categories.id')
+                    ->orderByDesc('total_sold')
+                    ->limit(5)
+                    ->get();
+            });
+
             $view->with('globalCategories', $categories);
+            $view->with('topSellingCategories', $topSellingCategories);
         });
     }
 }

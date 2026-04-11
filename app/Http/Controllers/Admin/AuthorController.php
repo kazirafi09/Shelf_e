@@ -50,7 +50,7 @@ class AuthorController extends Controller
             $photoPath = $file->store('authors', 'public');
         }
 
-        Author::create([
+        $author = Author::create([
             'name'       => $validated['name'],
             'slug'       => Str::slug($validated['name']) . '-' . substr(uniqid(), -5),
             'bio'        => $validated['bio'] ?? null,
@@ -58,6 +58,10 @@ class AuthorController extends Controller
         ]);
 
         Cache::forget('homepage_data_v4');
+
+        if ($request->wantsJson()) {
+            return response()->json(['id' => $author->id, 'name' => $author->name], 201);
+        }
 
         return redirect()->route('admin.authors.index')->with('success', 'Author created successfully.');
     }

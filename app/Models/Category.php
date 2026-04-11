@@ -26,6 +26,7 @@ class Category extends Model
     {
         $clearCache = function () {
             Cache::forget('global_categories');
+            Cache::forget('top_selling_categories');
         };
 
         static::created($clearCache);

@@ -88,7 +88,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-right">
                             <div class="flex items-center justify-end space-x-4">
-                                <a href="{{ route('admin.books.edit', $book->id) }}" 
+                                <a href="{{ route('admin.books.edit', $book->id) . '?page=' . $books->currentPage() }}"
                                    class="font-bold transition-colors text-cyan-600 hover:text-cyan-800">Edit</a>
                                 
                                 <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" 

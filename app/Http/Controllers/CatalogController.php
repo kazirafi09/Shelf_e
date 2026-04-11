@@ -230,7 +230,7 @@ class CatalogController extends Controller
             $pageTitle = 'In Demand';
         }
 
-        $products = $query->paginate(24)->withQueryString();
+        $products = $query->paginate(30)->withQueryString();
 
         $genres = Category::all();
 
@@ -258,7 +258,7 @@ class CatalogController extends Controller
             })
             ->groupBy('products.author')
             ->orderBy('products.author')
-            ->paginate(24)
+            ->paginate(30)
             ->withQueryString();
 
         return view('authors.index', compact('authors'));
@@ -274,7 +274,7 @@ class CatalogController extends Controller
             ->selectRaw('COALESCE(SUM(order_items.quantity), 0) as total_sold')
             ->groupBy('products.id')
             ->orderByDesc('total_sold')
-            ->paginate(24)
+            ->paginate(30)
             ->withQueryString();
 
         $genres = Category::all();
@@ -299,7 +299,7 @@ class CatalogController extends Controller
             ->whereHas('category', function ($q) {
                 $q->where('name', 'LIKE', '%series%');
             })
-            ->paginate(24)
+            ->paginate(30)
             ->withQueryString();
 
         $genres = Category::all();

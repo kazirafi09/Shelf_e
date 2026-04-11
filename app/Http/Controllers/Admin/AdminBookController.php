@@ -196,7 +196,9 @@ class AdminBookController extends Controller
 
         Cache::forget('homepage_data_v4');
 
-        return redirect()->route('admin.books.index')->with('success', "Book '{$book->title}' updated successfully!");
+        $page = $request->input('page', 1);
+
+        return redirect()->route('admin.books.index', ['page' => $page])->with('success', "Book '{$book->title}' updated successfully!");
     }
 
     // 6. Delete a book

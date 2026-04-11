@@ -25,6 +25,7 @@
           class="p-6 border shadow-sm bg-card text-card-foreground border-border rounded-2xl ring-1 ring-gray-900/5 sm:p-8">
         @csrf
         @method('PUT')
+        <input type="hidden" name="page" value="{{ request('page', 1) }}">
 
         <div class="grid grid-cols-1 gap-y-6 gap-x-6 sm:grid-cols-2">
             
@@ -40,6 +41,10 @@
                     results: [],
                     selectedAuthors: {{ Illuminate\Support\Js::from($book->authors->map->only('id', 'name')) }},
                     open: false,
+                    showModal: false,
+                    newName: '',
+                    saving: false,
+                    errorMsg: null,
                     async search() {
                         if (this.query.length < 2) { this.results = []; this.open = false; return; }
                         const res = await fetch('/admin/authors/search?q=' + encodeURIComponent(this.query));
@@ -56,6 +61,33 @@
                     },
                     remove(id) {
                         this.selectedAuthors = this.selectedAuthors.filter(a => a.id !== id);
+                    },
+                    async saveAuthor() {
+                        this.saving = true;
+                        this.errorMsg = null;
+                        try {
+                            const res = await fetch('{{ route('admin.authors.store') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                    'Accept': 'application/json',
+                                },
+                                body: JSON.stringify({ name: this.newName }),
+                            });
+                            const data = await res.json();
+                            if (!res.ok) {
+                                this.errorMsg = data.errors?.name?.[0] ?? 'Something went wrong.';
+                            } else {
+                                this.select({ id: data.id, name: data.name });
+                                this.newName = '';
+                                this.showModal = false;
+                            }
+                        } catch (e) {
+                            this.errorMsg = 'Network error.';
+                        } finally {
+                            this.saving = false;
+                        }
                     }
                 }"
                 class="relative"
@@ -85,39 +117,77 @@
                     </template>
                 </div>
 
-                {{-- Search input --}}
-                <input
-                    type="text"
-                    x-model="query"
-                    @input.debounce.300ms="search()"
-                    @keydown.escape="open = false"
-                    @click.outside="open = false"
-                    placeholder="Search authors by name…"
-                    autocomplete="off"
-                    class="block w-full mt-1 bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm sm:text-sm"
-                >
-
-                {{-- Dropdown --}}
-                <div
-                    x-show="open"
-                    x-transition:enter="transition ease-out duration-100"
-                    x-transition:enter-start="opacity-0 -translate-y-1"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    class="absolute z-20 w-full mt-1 overflow-hidden border shadow-lg bg-background border-border rounded-xl"
-                    style="display: none;"
-                >
-                    <template x-for="author in results" :key="author.id">
-                        <button
-                            type="button"
-                            @click="select(author)"
-                            class="flex items-center w-full gap-3 px-4 py-2.5 text-sm text-left text-foreground hover:bg-cyan-50 hover:text-cyan-700 transition-colors"
+                {{-- Search input + Quick-Add button --}}
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <input
+                            type="text"
+                            x-model="query"
+                            @input.debounce.300ms="search()"
+                            @keydown.escape="open = false"
+                            @click.outside="open = false"
+                            placeholder="Search authors by name…"
+                            autocomplete="off"
+                            class="block w-full px-4 py-3 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm transition-all"
                         >
-                            <svg class="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
-                            <span x-text="author.name"></span>
-                        </button>
-                    </template>
+
+                        {{-- Dropdown --}}
+                        <div
+                            x-show="open"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="absolute z-20 w-full mt-1 overflow-hidden border shadow-lg bg-background border-border rounded-xl"
+                            style="display: none;"
+                        >
+                            <template x-for="author in results" :key="author.id">
+                                <button
+                                    type="button"
+                                    @click="select(author)"
+                                    class="flex items-center w-full gap-3 px-4 py-2.5 text-sm text-left text-foreground hover:bg-cyan-50 hover:text-cyan-700 transition-colors"
+                                >
+                                    <svg class="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    <span x-text="author.name"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <button type="button" @click="showModal = true"
+                            title="Create new author"
+                            class="flex items-center justify-center w-12 shrink-0 text-sm font-bold rounded-[var(--radius)] border border-input bg-muted text-foreground hover:bg-muted/80 transition active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Quick-Add Author Modal --}}
+                <div
+                    x-show="showModal"
+                    x-transition.opacity
+                    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+                    style="display: none;"
+                    @keydown.escape.window="showModal = false"
+                >
+                    <div @click.outside="showModal = false" class="w-full max-w-sm p-6 bg-card border border-border rounded-2xl shadow-xl">
+                        <h3 class="mb-1 text-sm font-bold text-foreground">Create New Author</h3>
+                        <p class="mb-4 text-xs text-muted-foreground">They will be added and selected immediately.</p>
+                        <input type="text" x-model="newName" @keydown.enter.prevent="saveAuthor()"
+                               placeholder="Author name…"
+                               class="block w-full px-4 py-2.5 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-xl shadow-sm mb-2">
+                        <p x-show="errorMsg" x-text="errorMsg" class="mb-3 text-xs text-red-600" style="display: none;"></p>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" @click="showModal = false"
+                                    class="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition">Cancel</button>
+                            <button type="button" @click="saveAuthor()" :disabled="saving || newName.trim().length < 2"
+                                    class="px-5 py-2 text-sm font-bold rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition active:scale-95 disabled:opacity-50">
+                                <span x-text="saving ? 'Saving…' : 'Create'"></span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

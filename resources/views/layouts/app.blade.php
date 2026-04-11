@@ -331,8 +331,8 @@
                          x-transition:leave-end="opacity-0 -translate-y-1"
                          style="display: none;"
                          class="pb-2 pl-6 mt-1 space-y-3">
-                        @if(isset($globalCategories))
-                            @foreach($globalCategories as $category)
+                        @if(isset($topSellingCategories))
+                            @foreach($topSellingCategories as $category)
                                 <a href="{{ route('categories.index', ['category' => $category->slug]) }}"
                                    @click="mobileMenuOpen = false"
                                    class="block text-sm font-medium text-gray-500 transition-colors hover:text-gray-900">
