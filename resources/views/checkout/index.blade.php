@@ -1,8 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $prefillName     = old('name',        auth()->user()->name  ?? $lastOrder->name     ?? '');
+    $prefillEmail    = old('email',       auth()->user()->email ?? $lastOrder->email    ?? '');
+    $prefillAddress  = old('address',     $lastOrder->address  ?? '');
+    $prefillDivision = old('division',    $lastOrder->division ?? 'Dhaka');
+    $prefillDistrict = old('district',    $lastOrder->district ?? '');
+    $prefillPostal   = old('postal_code', $lastOrder->postal_code ?? '');
+    $rawPhone        = $lastOrder->phone ?? '';
+    $prefillPhone    = old('phone', preg_replace('/^\+?880/', '', $rawPhone));
+@endphp
 <div class="container px-4 py-8 mx-auto" x-data="{
-    division: '{{ $prefillDivision ?? 'Dhaka' }}',
+    division: '{{ $prefillDivision }}',
     shippingInsideDhaka: {{ $insideDhakaRate }},
     shippingOutsideDhaka: {{ $outsideDhakaRate }},
     subtotal: {{ $subtotal }},
@@ -133,21 +143,9 @@
     <div class="grid grid-cols-1 gap-12 lg:grid-cols-12">
         
         <div class="lg:col-span-8">
-            <form action="{{ route('checkout.store') }}" method="POST">
+            <form id="checkout-form" action="{{ route('checkout.store') }}" method="POST">
                 @csrf
                 
-                @php
-                    $prefillName     = old('name',        auth()->user()->name  ?? $lastOrder->name     ?? '');
-                    $prefillEmail    = old('email',       auth()->user()->email ?? $lastOrder->email    ?? '');
-                    $prefillAddress  = old('address',     $lastOrder->address  ?? '');
-                    $prefillDivision = old('division',    $lastOrder->division ?? 'Dhaka');
-                    $prefillDistrict = old('district',    $lastOrder->district ?? '');
-                    $prefillPostal   = old('postal_code', $lastOrder->postal_code ?? '');
-                    // Strip the +880 prefix stored in DB so the input only shows the local part
-                    $rawPhone = $lastOrder->phone ?? '';
-                    $prefillPhone = old('phone', preg_replace('/^\+?880/', '', $rawPhone));
-                @endphp
-
                 <h2 class="mb-6 text-2xl font-bold text-foreground">Address Details</h2>
 
                 @auth
@@ -272,7 +270,7 @@
                     </div>
                     <div class="shrink-0 text-right">
                         <p class="text-lg font-bold text-foreground"
-                           x-text="shipping === 0 ? 'Free' : '৳ ' + shipping"></p>
+                           x-text="shipping === 0 ? 'Free' : '৳ ' + shipping">{{ $shipping === 0 ? 'Free' : '৳ ' . number_format($shipping, 0) }}</p>
                         <p x-show="division === 'Dhaka' && subtotal >= 1500"
                            class="text-xs font-semibold text-emerald-600 mt-0.5">
                             Free for orders ≥ ৳1,500 in Dhaka
@@ -405,7 +403,7 @@
                             <span>Shipping</span>
                             <span class="font-medium"
                                   :class="shipping === 0 ? 'text-emerald-600' : 'text-gray-700'"
-                                  x-text="shipping === 0 ? 'Free' : '+৳ ' + shipping"></span>
+                                  x-text="shipping === 0 ? 'Free' : '+৳ ' + shipping">{{ $shipping === 0 ? 'Free' : '+৳ ' . number_format($shipping, 0) }}</span>
                         </div>
 
                         {{-- Coupon discount row --}}
@@ -494,8 +492,14 @@
 
                         <div class="flex justify-between pt-4 mt-2 text-xl font-bold text-foreground border-t border-border">
                             <span>Total</span>
-                            <span class="text-gray-800">৳ <span x-text="grandTotal.toLocaleString()"></span></span>
+                            <span class="text-gray-800">৳ <span x-text="grandTotal.toLocaleString()">{{ number_format($total, 0) }}</span></span>
                         </div>
+
+                        {{-- Confirm Order button in summary panel --}}
+                        <button type="submit" form="checkout-form"
+                                class="w-full mt-4 px-6 py-4 font-bold transition bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90">
+                            Confirm Order
+                        </button>
                     </div>
                 @else
                     <div class="py-8 text-center">
