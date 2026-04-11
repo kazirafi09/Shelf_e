@@ -469,7 +469,8 @@
                         @endauth
                         {{-- ─────────────────────────────────────────────────── --}}
 
-                        {{-- Coin shipping reward toggle --}}
+                        {{-- Coin shipping reward toggle (authenticated users only) --}}
+                        @auth
                         <div x-show="activeReward" style="display:none;" class="pt-3 mt-1 border-t border-dashed border-border">
                             <label class="flex items-start gap-3 cursor-pointer group">
                                 <div class="relative mt-0.5 shrink-0">
