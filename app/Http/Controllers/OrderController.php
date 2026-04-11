@@ -11,9 +11,11 @@ use App\Models\Subscriber;
 use App\Models\UserAddress;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
+use App\Mail\OrderConfirmation;
 use App\Services\CoinService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class OrderController extends Controller
@@ -334,6 +336,9 @@ class OrderController extends Controller
         // Now $order exists outside the transaction!
         session()->forget('cart');
         session()->put('confirmation_order_id', $order->id);
+
+        // Send order confirmation email (queued so it doesn't delay the redirect)
+        Mail::to($order->email)->queue(new OrderConfirmation($order->load('items.product')));
 
         return redirect()->route('order.confirmation', $order->id)
                          ->with('success', 'Your order has been placed successfully!');
