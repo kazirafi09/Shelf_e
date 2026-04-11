@@ -337,9 +337,6 @@
                 {{-- Coupon code — bound to the shared Alpine couponCode variable --}}
                 <input type="hidden" name="coupon_code" :value="couponCode">
 
-                <button type="submit" class="w-full px-12 py-4 font-bold transition bg-primary text-primary-foreground rounded-lg shadow-sm hover:bg-primary/90 md:w-auto">
-                    Confirm Order
-                </button>
             </form>
         </div>
 

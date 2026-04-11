@@ -115,7 +115,7 @@
             </div>
             @if($order->discount_amount > 0)
             <div class="row">
-                <span class="label">Discount@if($order->coupon_code) ({{ $order->coupon_code }})@endif</span>
+                <span class="label">Discount{{ $order->coupon_code ? ' (' . $order->coupon_code . ')' : '' }}</span>
                 <span style="color:#16a34a;">−৳{{ number_format($order->discount_amount, 2) }}</span>
             </div>
             @endif
