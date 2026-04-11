@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\InsufficientCoinsException;
+use App\Models\CoinShippingReward;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -49,7 +50,16 @@ class OrderController extends Controller
 
         $bkashNumber = Setting::get('bkash_number', '');
 
-        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses', 'insideDhakaRate', 'outsideDhakaRate', 'bkashNumber'));
+        // Best unused shipping reward for this user (highest discount first)
+        $activeReward = null;
+        if (auth()->check()) {
+            $activeReward = CoinShippingReward::where('user_id', auth()->id())
+                ->where('used', false)
+                ->orderByDesc('shipping_discount')
+                ->first();
+        }
+
+        return view('checkout.index', compact('cartItems', 'subtotal', 'shipping', 'total', 'lastOrder', 'savedAddresses', 'insideDhakaRate', 'outsideDhakaRate', 'bkashNumber', 'activeReward'));
     }
 
     public function show($id)
@@ -102,6 +112,7 @@ class OrderController extends Controller
             'bkash_transaction_id' => 'required_if:payment,bkash|nullable|string|max:100',
             'redeem_coins' => 'nullable|boolean',
             'coupon_code'  => 'nullable|string|max:50',
+            'coin_reward_id' => 'nullable|integer|exists:coin_shipping_rewards,id',
         ]);
 
         $subtotal = collect($cart)->sum(fn ($item) => $item['price'] * $item['quantity']);
@@ -170,6 +181,25 @@ class OrderController extends Controller
         // ─────────────────────────────────────────────────────────────────────
 
         $user = auth()->user();
+
+        // ── Coin shipping reward ──────────────────────────────────────────────
+        $appliedReward          = null;
+        $rewardShippingDiscount = 0;
+
+        if ($user && $request->filled('coin_reward_id')) {
+            $reward = CoinShippingReward::where('id', $validatedData['coin_reward_id'])
+                ->where('user_id', $user->id)
+                ->where('used', false)
+                ->first();
+
+            if ($reward) {
+                $rewardShippingDiscount = min($reward->shipping_discount, $shipping);
+                $shipping              -= $rewardShippingDiscount;
+                $total                  = $subtotal + $shipping - $discountAmount;
+                $appliedReward          = $reward;
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
         $coinsToRedeem = 0;
         if ($request->boolean('redeem_coins') && $user && $user->coin_balance > 0) {
             $coinsToRedeem = min($user->coin_balance, (int) $total);
@@ -181,7 +211,7 @@ class OrderController extends Controller
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
         try {
-            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $appliedVoucher, $deliveryMethod) {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $appliedVoucher, $deliveryMethod, $appliedReward) {
 
                 // Re-verify stock for every cart item before committing
                 $productIds = array_keys($cart);
@@ -211,6 +241,7 @@ class OrderController extends Controller
                     'shipping_cost'   => $shipping,
                     'discount_amount' => $discountAmount,
                     'coupon_code'     => $couponCode ?: null,
+                    'coin_reward_id'  => $appliedReward?->id,
                     'total_amount'    => $finalTotal,
                     'status'          => 'pending',
                 ]);
@@ -249,6 +280,29 @@ class OrderController extends Controller
                 if ($coinsToRedeem > 0) {
                     $this->coinService->debit($user, $coinsToRedeem, "Coins redeemed on order #{$newOrder->id}");
                 }
+
+                // ── Mark shipping reward as used ──────────────────────────────
+                if ($appliedReward) {
+                    $appliedReward->update([
+                        'used'     => true,
+                        'order_id' => $newOrder->id,
+                    ]);
+                }
+                // ─────────────────────────────────────────────────────────────
+
+                // ── Credit coins earned for this purchase ─────────────────────
+                // Rule: 10 coins per ৳100 spent on books (based on subtotal)
+                if ($user) {
+                    $coinsEarned = (int) floor($subtotal / 10);
+                    if ($coinsEarned > 0) {
+                        $this->coinService->credit(
+                            $user,
+                            $coinsEarned,
+                            "Earned from order #{$newOrder->id} (৳{$subtotal} subtotal)"
+                        );
+                    }
+                }
+                // ─────────────────────────────────────────────────────────────
 
                 $cases = [];
                 $params = [];

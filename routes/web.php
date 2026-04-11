@@ -158,6 +158,7 @@ Route::middleware('auth')->group(function () {
 
     // Wallet
     Route::get('/wallet', [CoinController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/redeem', [CoinController::class, 'redeem'])->name('wallet.redeem')->middleware('throttle:10,1');
 
     // Saved Addresses
     Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');

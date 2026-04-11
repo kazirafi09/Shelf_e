@@ -28,6 +28,7 @@ class Order extends Model
         'shipping_cost',
         'discount_amount',
         'coupon_code',
+        'coin_reward_id',
         'total_amount',
         'status',
         'bkash_transaction_id',
@@ -42,5 +43,10 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function coinReward()
+    {
+        return $this->belongsTo(CoinShippingReward::class, 'coin_reward_id');
     }
 }

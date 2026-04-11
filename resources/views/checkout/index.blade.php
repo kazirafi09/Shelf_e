@@ -13,14 +13,20 @@
     couponValid: null,
     couponMessage: '',
     couponChecking: false,
+    activeReward: @json($activeReward ?? null),
+    applyReward: false,
     get shipping() {
         return this.division === 'Dhaka' ? this.shippingInsideDhaka : this.shippingOutsideDhaka;
     },
+    get rewardDiscount() {
+        if (!this.applyReward || !this.activeReward) return 0;
+        return Math.min(this.activeReward.shipping_discount, this.shipping);
+    },
     get coinsToApply() {
-        return Math.min(this.availableCoins, this.subtotal + this.shipping - this.couponDiscount);
+        return Math.min(this.availableCoins, this.subtotal + this.shipping - this.couponDiscount - this.rewardDiscount);
     },
     get grandTotal() {
-        return this.subtotal + this.shipping - this.couponDiscount - (this.redeemCoins ? this.coinsToApply : 0);
+        return this.subtotal + this.shipping - this.couponDiscount - this.rewardDiscount - (this.redeemCoins ? this.coinsToApply : 0);
     },
     async applyVoucher() {
         const code = this.couponCode.trim().toUpperCase();
@@ -327,6 +333,11 @@
                     <input type="hidden" name="redeem_coins" value="1">
                 </template>
 
+                {{-- Hidden coin_reward_id — only submitted when user applies a reward --}}
+                <template x-if="applyReward && activeReward">
+                    <input type="hidden" name="coin_reward_id" :value="activeReward.id">
+                </template>
+
                 {{-- Coupon code — bound to the shared Alpine couponCode variable --}}
                 <input type="hidden" name="coupon_code" :value="couponCode">
 
@@ -407,6 +418,19 @@
                         >
                             <span>Discount (<span x-text="couponCode.toUpperCase()"></span>)</span>
                             <span>−৳ <span x-text="couponDiscount.toLocaleString()"></span></span>
+                        </div>
+
+                        {{-- Coin shipping reward row --}}
+                        <div
+                            x-show="applyReward && rewardDiscount > 0"
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 -translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="flex justify-between text-sm font-semibold text-amber-700"
+                            style="display:none;"
+                        >
+                            <span>Shipping Reward (Coin Redemption)</span>
+                            <span>−৳ <span x-text="rewardDiscount.toLocaleString()"></span></span>
                         </div>
 
                         {{-- Discount code — logged-in users only ────────────── --}}
@@ -493,6 +517,27 @@
                                     <p class="text-xs text-muted-foreground">You have 0 coins. Earn coins by placing orders!</p>
                                 </div>
                             </div>
+                        </div>
+
+                        {{-- Coin shipping reward toggle --}}
+                        <div x-show="activeReward" style="display:none;" class="pt-3 mt-1 border-t border-dashed border-border">
+                            <label class="flex items-start gap-3 cursor-pointer group">
+                                <div class="relative mt-0.5 shrink-0">
+                                    <input type="checkbox" x-model="applyReward" class="sr-only peer">
+                                    <div class="w-10 h-6 bg-muted rounded-full transition-colors peer-checked:bg-emerald-500"></div>
+                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-foreground group-hover:text-emerald-700 transition-colors">
+                                        Apply Shipping Reward
+                                    </p>
+                                    <p class="text-xs text-muted-foreground">
+                                        You have a
+                                        <span class="font-bold text-emerald-600">৳<span x-text="activeReward ? activeReward.shipping_discount : 0"></span> off shipping</span>
+                                        reward ready to use.
+                                    </p>
+                                </div>
+                            </label>
                         </div>
                         @endauth
 

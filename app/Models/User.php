@@ -73,6 +73,11 @@ class User extends Authenticatable
         return $this->hasMany(CoinLedger::class);
     }
 
+    public function coinShippingRewards()
+    {
+        return $this->hasMany(CoinShippingReward::class);
+    }
+
     public function addresses()
     {
         return $this->hasMany(UserAddress::class);
