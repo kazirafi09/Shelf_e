@@ -16,12 +16,12 @@
     shippingInsideDhaka: {{ $insideDhakaRate }},
     shippingOutsideDhaka: {{ $outsideDhakaRate }},
     subtotal: {{ $subtotal }},
-    couponCode: '{{ old('coupon_code', '') }}',
+    couponCode: {{ json_encode(old('coupon_code', '')) }},
     couponDiscount: 0,
     couponValid: null,
     couponMessage: '',
     couponChecking: false,
-    activeReward: @json($activeReward ?? null),
+    activeReward: {{ json_encode($activeReward ?? null) }},
     applyReward: false,
     get shipping() {
         if (this.division === 'Dhaka' && this.subtotal >= 1500) return 0;
