@@ -6,8 +6,6 @@
     shippingInsideDhaka: {{ $insideDhakaRate }},
     shippingOutsideDhaka: {{ $outsideDhakaRate }},
     subtotal: {{ $subtotal }},
-    availableCoins: {{ auth()->check() ? auth()->user()->coin_balance : 0 }},
-    redeemCoins: false,
     couponCode: '{{ old('coupon_code', '') }}',
     couponDiscount: 0,
     couponValid: null,
@@ -16,17 +14,15 @@
     activeReward: @json($activeReward ?? null),
     applyReward: false,
     get shipping() {
+        if (this.division === 'Dhaka' && this.subtotal >= 1500) return 0;
         return this.division === 'Dhaka' ? this.shippingInsideDhaka : this.shippingOutsideDhaka;
     },
     get rewardDiscount() {
         if (!this.applyReward || !this.activeReward) return 0;
         return Math.min(this.activeReward.shipping_discount, this.shipping);
     },
-    get coinsToApply() {
-        return Math.min(this.availableCoins, this.subtotal + this.shipping - this.couponDiscount - this.rewardDiscount);
-    },
     get grandTotal() {
-        return this.subtotal + this.shipping - this.couponDiscount - this.rewardDiscount - (this.redeemCoins ? this.coinsToApply : 0);
+        return this.subtotal + this.shipping - this.couponDiscount - this.rewardDiscount;
     },
     async applyVoucher() {
         const code = this.couponCode.trim().toUpperCase();
@@ -274,7 +270,14 @@
                                x-text="division === 'Dhaka' ? '3–5 business days' : '5–7 business days'"></p>
                         </div>
                     </div>
-                    <p class="text-lg font-bold text-foreground shrink-0">৳ <span x-text="shipping"></span></p>
+                    <div class="shrink-0 text-right">
+                        <p class="text-lg font-bold text-foreground"
+                           x-text="shipping === 0 ? 'Free' : '৳ ' + shipping"></p>
+                        <p x-show="division === 'Dhaka' && subtotal >= 1500"
+                           class="text-xs font-semibold text-emerald-600 mt-0.5">
+                            Free for orders ≥ ৳1,500 in Dhaka
+                        </p>
+                    </div>
                 </div>
 
                 <h2 class="mb-6 text-2xl font-bold text-foreground">Payment Method</h2>
@@ -327,11 +330,6 @@
                     <input type="checkbox" id="terms" class="w-4 h-4 border-input rounded text-primary focus:ring-ring" required>
                     <label for="terms" class="text-sm text-muted-foreground">I accept the terms of <a href="#" class="underline text-gray-700">Privacy Policy</a></label>
                 </div>
-
-                {{-- Hidden redeem_coins flag — only submitted when the toggle is on --}}
-                <template x-if="redeemCoins">
-                    <input type="hidden" name="redeem_coins" value="1">
-                </template>
 
                 {{-- Hidden coin_reward_id — only submitted when user applies a reward --}}
                 <template x-if="applyReward && activeReward">
@@ -405,7 +403,9 @@
                         </div>
                         <div class="flex justify-between text-sm text-muted-foreground">
                             <span>Shipping</span>
-                            <span class="font-medium text-gray-700">+৳ <span x-text="shipping"></span></span>
+                            <span class="font-medium"
+                                  :class="shipping === 0 ? 'text-emerald-600' : 'text-gray-700'"
+                                  x-text="shipping === 0 ? 'Free' : '+৳ ' + shipping"></span>
                         </div>
 
                         {{-- Coupon discount row --}}
@@ -468,56 +468,6 @@
                         </div>
                         @endauth
                         {{-- ─────────────────────────────────────────────────── --}}
-
-                        {{-- Redeem Coins (authenticated users only) --}}
-                        @auth
-                        <div class="pt-3 mt-1 border-t border-dashed border-border">
-                            <div x-show="availableCoins > 0">
-                                <label class="flex items-start gap-3 cursor-pointer group">
-                                    <div class="relative mt-0.5 shrink-0">
-                                        <input type="checkbox" x-model="redeemCoins" class="sr-only peer">
-                                        <div class="w-10 h-6 bg-muted rounded-full transition-colors peer-checked:bg-amber-500"></div>
-                                        <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-4"></div>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm font-semibold text-foreground group-hover:text-amber-700 transition-colors">
-                                            Redeem Coins
-                                        </p>
-                                        <p class="text-xs text-muted-foreground">
-                                            You have
-                                            <span class="font-bold text-amber-600" x-text="availableCoins.toLocaleString()"></span>
-                                            coins &mdash; saves
-                                            <span class="font-bold text-amber-600" x-text="'৳ ' + coinsToApply.toLocaleString()"></span>
-                                        </p>
-                                    </div>
-                                </label>
-
-                                <div x-show="redeemCoins"
-                                     x-transition:enter="transition ease-out duration-150"
-                                     x-transition:enter-start="opacity-0 -translate-y-1"
-                                     x-transition:enter-end="opacity-100 translate-y-0"
-                                     class="flex justify-between mt-2 text-sm"
-                                     style="display: none;">
-                                    <span class="font-medium text-amber-700">Coin Discount</span>
-                                    <span class="font-bold text-amber-700">
-                                        −৳ <span x-text="coinsToApply.toLocaleString()"></span>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div x-show="availableCoins === 0"
-                                 class="flex items-start gap-3"
-                                 style="display: none;">
-                                <div class="relative mt-0.5 shrink-0 opacity-40 cursor-not-allowed">
-                                    <div class="w-10 h-6 bg-muted rounded-full"></div>
-                                    <div class="absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-semibold text-muted-foreground">Redeem Coins</p>
-                                    <p class="text-xs text-muted-foreground">You have 0 coins. Earn coins by placing orders!</p>
-                                </div>
-                            </div>
-                        </div>
 
                         {{-- Coin shipping reward toggle --}}
                         <div x-show="activeReward" style="display:none;" class="pt-3 mt-1 border-t border-dashed border-border">

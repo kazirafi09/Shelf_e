@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\InsufficientCoinsException;
 use App\Models\CoinShippingReward;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -32,8 +31,11 @@ class OrderController extends Controller
 
         $insideDhakaRate  = (int) Setting::get('shipping_inside_dhaka', 60);
         $outsideDhakaRate = (int) Setting::get('shipping_outside_dhaka', 150);
-        // Default preview uses inside-Dhaka rate (Dhaka is the pre-selected division)
-        $shipping = count($cartItems) > 0 ? $insideDhakaRate : 0;
+        // Default preview uses inside-Dhaka rate (Dhaka is pre-selected).
+        // Free shipping for Dhaka orders ≥ ৳1500.
+        $shipping = count($cartItems) > 0
+            ? ($subtotal >= 1500 ? 0 : $insideDhakaRate)
+            : 0;
         $total = $subtotal + $shipping;
 
         // Pre-fill from the user's most recent order (returning customers)
@@ -110,7 +112,6 @@ class OrderController extends Controller
             'postal_code' => 'nullable|string|max:10',
             'payment'      => 'required|in:cod,bkash',
             'bkash_transaction_id' => 'required_if:payment,bkash|nullable|string|max:100',
-            'redeem_coins' => 'nullable|boolean',
             'coupon_code'  => 'nullable|string|max:50',
             'coin_reward_id' => 'nullable|integer|exists:coin_shipping_rewards,id',
         ]);
@@ -119,8 +120,15 @@ class OrderController extends Controller
         $insideDhakaRate  = (int) Setting::get('shipping_inside_dhaka', 60);
         $outsideDhakaRate = (int) Setting::get('shipping_outside_dhaka', 150);
         $deliveryMethod   = $validatedData['division'] === 'Dhaka' ? 'inside_dhaka' : 'outside_dhaka';
-        $shipping         = $deliveryMethod === 'inside_dhaka' ? $insideDhakaRate : $outsideDhakaRate;
-        $total            = $subtotal + $shipping;
+
+        // Free shipping for Dhaka orders ≥ ৳1500
+        if ($deliveryMethod === 'inside_dhaka' && $subtotal >= 1500) {
+            $shipping = 0;
+        } else {
+            $shipping = $deliveryMethod === 'inside_dhaka' ? $insideDhakaRate : $outsideDhakaRate;
+        }
+
+        $total = $subtotal + $shipping;
 
         // ── Voucher validation ────────────────────────────────────────────────
         // Resolved outside the transaction so validation errors return early
@@ -200,18 +208,13 @@ class OrderController extends Controller
             }
         }
         // ─────────────────────────────────────────────────────────────────────
-        $coinsToRedeem = 0;
-        if ($request->boolean('redeem_coins') && $user && $user->coin_balance > 0) {
-            $coinsToRedeem = min($user->coin_balance, (int) $total);
-        }
-        $finalTotal = $total - $coinsToRedeem;
 
         $cleanPhone = preg_replace('/[^0-9]/', '', $validatedData['phone']);
         $standardizedPhone = '+880' . ltrim($cleanPhone, '0');
 
         // NOTICE THIS LINE: We are capturing the output of the transaction into the $order variable
         try {
-            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $coinsToRedeem, $finalTotal, $user, $discountAmount, $couponCode, $subscriberForCoupon, $appliedVoucher, $deliveryMethod, $appliedReward) {
+            $order = DB::transaction(function () use ($cart, $validatedData, $subtotal, $shipping, $total, $standardizedPhone, $user, $discountAmount, $couponCode, $subscriberForCoupon, $appliedVoucher, $deliveryMethod, $appliedReward) {
 
                 // Re-verify stock for every cart item before committing
                 $productIds = array_keys($cart);
@@ -242,7 +245,7 @@ class OrderController extends Controller
                     'discount_amount' => $discountAmount,
                     'coupon_code'     => $couponCode ?: null,
                     'coin_reward_id'  => $appliedReward?->id,
-                    'total_amount'    => $finalTotal,
+                    'total_amount'    => $total,
                     'status'          => 'pending',
                 ]);
 
@@ -276,10 +279,6 @@ class OrderController extends Controller
                     }
                 }
                 // ─────────────────────────────────────────────────────────────
-
-                if ($coinsToRedeem > 0) {
-                    $this->coinService->debit($user, $coinsToRedeem, "Coins redeemed on order #{$newOrder->id}");
-                }
 
                 // ── Mark shipping reward as used ──────────────────────────────
                 if ($appliedReward) {
@@ -324,8 +323,6 @@ class OrderController extends Controller
                 // NOTICE THIS LINE: We must return the newly created order out of the transaction
                 return $newOrder;
             });
-        } catch (InsufficientCoinsException $e) {
-            return back()->withErrors(['redeem_coins' => $e->getMessage()]);
         } catch (\Exception $e) {
             if ($e->getMessage() === 'stock_insufficient') {
                 return redirect()->route('home')

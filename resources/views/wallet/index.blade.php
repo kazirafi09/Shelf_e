@@ -32,7 +32,7 @@
         <span class="text-6xl font-extrabold tracking-tight">{{ number_format($coin_balance) }}</span>
         <span class="mb-2 text-xl font-semibold text-gray-300">coins</span>
     </div>
-    <p class="mt-3 text-sm text-gray-200 relative">Earn 10 coins for every ৳100 spent. Redeem for shipping discounts below.</p>
+    <p class="mt-3 text-sm text-gray-200 relative">Earn 10 coins for every ৳100 spent on books. Redeem for shipping discounts.</p>
 
     @if($coin_balance > 0)
         <a href="{{ route('checkout.index') }}"

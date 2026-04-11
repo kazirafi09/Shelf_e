@@ -113,7 +113,7 @@ class CheckoutTest extends TestCase
     {
         // Product A: 2 × 500 = 1 000
         // Product B: 3 × 200 = 600
-        // subtotal = 1 600, division = Dhaka → inside_dhaka shipping (default 60), total = 1 660
+        // subtotal = 1 600, division = Dhaka → free shipping (≥ ৳1500), total = 1 600
         $productA = Product::factory()->create(['paperback_price' => 500, 'stock_quantity' => 10]);
         $productB = Product::factory()->create(['paperback_price' => 200, 'stock_quantity' => 10]);
         $user     = User::factory()->create();
@@ -128,9 +128,10 @@ class CheckoutTest extends TestCase
              ->post(route('checkout.store'), $this->basePayload);
 
         $this->assertDatabaseHas('orders', [
-            'user_id'      => $user->id,
-            'subtotal'     => 1600,
-            'total_amount' => 1660,
+            'user_id'       => $user->id,
+            'subtotal'      => 1600,
+            'shipping_cost' => 0,
+            'total_amount'  => 1600,
         ]);
     }
 
