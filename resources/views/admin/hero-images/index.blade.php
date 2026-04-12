@@ -1,22 +1,36 @@
 @extends('layouts.admin')
 
 @section('title', 'Hero Images')
-@section('subtitle', 'Current images displayed in the bento-grid hero section on the homepage.')
+@section('subtitle', 'Upload or revert the five bento-grid images shown on the homepage hero section.')
 
 @section('admin-content')
+
+    {{-- Flash messages --}}
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+             class="flex items-center gap-3 p-4 mb-6 text-sm font-medium text-emerald-800 border border-emerald-200 rounded-xl bg-emerald-50">
+            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ session('success') }}
+        </div>
+    @endif
 
     {{-- Info banner --}}
     <div class="flex items-start gap-3 p-4 mb-8 text-sm text-blue-800 border border-blue-200 rounded-xl bg-blue-50">
         <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <p>These are the five bento-grid images shown on the homepage hero. Images marked <strong>Custom</strong> are served from storage; <strong>Default</strong> images are the original static files.</p>
+        <p>Upload a JPG, PNG, or WebP image (max 10 MB) to replace any slot. The image is automatically resized to three responsive sizes. <strong>Custom</strong> images are served from storage; <strong>Default</strong> images are the original static files.</p>
     </div>
 
     {{-- Image grid --}}
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         @foreach($slots as $slot => $info)
-            <div class="flex flex-col overflow-hidden bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+            <div
+                class="flex flex-col overflow-hidden bg-card text-card-foreground border border-border rounded-2xl shadow-sm"
+                x-data="{ preview: '{{ $info['previewUrl'] }}', uploading: false }"
+            >
 
                 {{-- Slot header --}}
                 <div class="flex items-center justify-between px-5 py-3 border-b border-border">
@@ -35,12 +49,76 @@
                 {{-- Preview --}}
                 <div class="relative bg-gray-100 aspect-video">
                     <img
-                        src="{{ $info['previewUrl'] }}?v={{ time() }}"
+                        :src="preview"
                         alt="Hero image {{ $slot }}"
                         class="object-cover w-full h-full"
                         loading="lazy"
                     >
+                    {{-- Upload overlay spinner --}}
+                    <div x-show="uploading" class="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+                        <svg class="w-8 h-8 animate-spin text-gray-500" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                    </div>
                 </div>
+
+                {{-- Upload form --}}
+                <form
+                    method="POST"
+                    action="{{ route('hero-images.store', $slot) }}"
+                    enctype="multipart/form-data"
+                    class="flex flex-col gap-3 p-4 border-t border-border"
+                    x-on:submit="uploading = true"
+                >
+                    @csrf
+
+                    <label class="flex flex-col gap-1">
+                        <span class="text-xs font-semibold text-muted-foreground">Replace image</span>
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/jpeg,image/png,image/webp"
+                            required
+                            class="block w-full text-sm text-gray-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 cursor-pointer"
+                            x-on:change="
+                                const f = $event.target.files[0];
+                                if (f) preview = URL.createObjectURL(f);
+                            "
+                        >
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="w-full py-2 text-sm font-semibold text-white bg-gray-900 rounded-lg hover:bg-gray-700 active:scale-95 transition-all duration-150"
+                    >
+                        Upload
+                    </button>
+                </form>
+
+                {{-- Revert button (only when custom image exists) --}}
+                @if($info['hasCustom'])
+                    <form
+                        method="POST"
+                        action="{{ route('hero-images.destroy', $slot) }}"
+                        class="px-4 pb-4"
+                        x-on:submit.prevent="
+                            if (confirm('Revert image {{ $slot }} to the default?')) {
+                                uploading = true;
+                                $el.submit();
+                            }
+                        "
+                    >
+                        @csrf
+                        @method('DELETE')
+                        <button
+                            type="submit"
+                            class="w-full py-2 text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg hover:bg-rose-100 active:scale-95 transition-all duration-150"
+                        >
+                            Revert to default
+                        </button>
+                    </form>
+                @endif
 
             </div>
         @endforeach

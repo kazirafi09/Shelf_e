@@ -232,8 +232,10 @@ Route::prefix('admin')
         Route::patch('/contacts/{message}/read', [AdminContactController::class, 'markRead'])->name('contacts.markRead');
         Route::delete('/contacts/{message}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
 
-        // Hero Images (display only — no uploads)
+        // Hero Images
         Route::get('/hero-images', [AdminHeroImageController::class, 'index'])->name('hero-images.index');
+        Route::post('/hero-images/{slot}', [AdminHeroImageController::class, 'store'])->name('hero-images.store');
+        Route::delete('/hero-images/{slot}', [AdminHeroImageController::class, 'destroy'])->name('hero-images.destroy');
 
         // Hero Books (Featured Slides)
         Route::get('/hero-books', [AdminHeroSlideController::class, 'index'])->name('hero-books.index');
