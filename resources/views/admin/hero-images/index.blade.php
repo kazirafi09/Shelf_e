@@ -16,6 +16,16 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show"
+             class="flex items-center gap-3 p-4 mb-6 text-sm font-medium text-rose-800 border border-rose-200 rounded-xl bg-rose-50">
+            <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+            {{ session('error') }}
+        </div>
+    @endif
+
     {{-- Info banner --}}
     <div class="flex items-start gap-3 p-4 mb-8 text-sm text-blue-800 border border-blue-200 rounded-xl bg-blue-50">
         <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,6 +96,9 @@
                                 if (f) preview = URL.createObjectURL(f);
                             "
                         >
+                        @error('image')
+                            <span class="text-xs font-medium text-rose-600">{{ $message }}</span>
+                        @enderror
                     </label>
 
                     <button

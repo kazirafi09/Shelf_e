@@ -20,9 +20,10 @@ class AdminHeroImageController extends Controller
         $slots = [];
 
         foreach (self::SLOTS as $slot) {
-            $hasCustom  = Storage::disk('public')->exists("hero/{$slot}_480.webp");
+            $key        = "hero/{$slot}_480.webp";
+            $hasCustom  = Storage::disk('public')->exists($key);
             $previewUrl = $hasCustom
-                ? asset("storage/hero/{$slot}_960.webp")
+                ? asset("storage/hero/{$slot}_960.webp") . '?v=' . Storage::disk('public')->lastModified($key)
                 : asset("images/hero/{$slot}.png");
 
             $slots[$slot] = [
@@ -44,15 +45,33 @@ class AdminHeroImageController extends Controller
         ]);
 
         $file    = $request->file('image');
-        $manager = new ImageManager(new Driver());
+        $disk    = Storage::disk('public');
 
-        foreach (self::WIDTHS as $width) {
-            $webp = $manager->read($file->getRealPath())->scaleDown(width: $width)->toWebp(quality: 85);
-            Storage::disk('public')->put("hero/{$slot}_{$width}.webp", $webp->toString());
+        try {
+            $manager = new ImageManager(new Driver());
+
+            foreach (self::WIDTHS as $width) {
+                $webp = $manager->read($file->getRealPath())
+                    ->scaleDown(width: $width)
+                    ->toWebp(quality: 85);
+
+                $path = "hero/{$slot}_{$width}.webp";
+                if (! $disk->put($path, $webp->toString())) {
+                    return back()->with('error', "Failed to save {$path}. Check storage permissions.");
+                }
+            }
+
+            $png = $manager->read($file->getRealPath())
+                ->scaleDown(width: 960)
+                ->toPng();
+
+            $path = "hero/{$slot}_fallback.png";
+            if (! $disk->put($path, $png->toString())) {
+                return back()->with('error', "Failed to save {$path}. Check storage permissions.");
+            }
+        } catch (\Exception $e) {
+            return back()->with('error', 'Image processing failed: ' . $e->getMessage());
         }
-
-        $png = $manager->read($file->getRealPath())->scaleDown(width: 960)->toPng();
-        Storage::disk('public')->put("hero/{$slot}_fallback.png", $png->toString());
 
         return back()->with('success', "Hero image {$slot} updated.");
     }

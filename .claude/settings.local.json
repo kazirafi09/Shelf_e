@@ -31,7 +31,9 @@
       "Bash(file /d/Shelf-e/shelf-e/public/images/hero/*.png)",
       "Bash(composer require:*)",
       "Bash(find /d/Shelf-e/shelf-e/resources/views -name \"*.blade.php\" -exec grep -l \"file\\\\|upload\\\\|image\" {} \\\\;)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist)"
     ]
   }
 }

@@ -7,12 +7,20 @@
      * honour the current request host/port (fixes APP_URL mismatch
      * when running php artisan serve on a non-default port).
      */
+    if (! function_exists('heroCacheBust')) {
+        function heroCacheBust(string $storageKey): string
+        {
+            $disk = \Illuminate\Support\Facades\Storage::disk('public');
+            return $disk->exists($storageKey) ? '?v=' . $disk->lastModified($storageKey) : '';
+        }
+    }
+
     if (! function_exists('heroSrc')) {
         function heroSrc(int $slot, int $width): string
         {
             $key = "hero/{$slot}_{$width}.webp";
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
-                return asset("storage/{$key}");
+                return asset("storage/{$key}") . heroCacheBust($key);
             }
             return asset("images/hero/{$slot}.png");
         }
@@ -23,7 +31,7 @@
         {
             $key = "hero/{$slot}_fallback.png";
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
-                return asset("storage/{$key}");
+                return asset("storage/{$key}") . heroCacheBust($key);
             }
             return asset("images/hero/{$slot}.png");
         }
