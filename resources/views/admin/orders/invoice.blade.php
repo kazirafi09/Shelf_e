@@ -218,7 +218,17 @@
             Queries? <span style="color:#06b6d4;font-weight:700;">info@shelfebd.com</span>
         </div>
         <div style="text-align:right;font-size:10px;color:#cbd5e1;">
-            <span style="font-size:14px;font-weight:900;color:#e2e8f0;letter-spacing:-.02em;"><span style="color:#a5f3fc;">Shelf</span>-E</span><br>
+            <div style="position:relative;display:inline-block;font-size:14px;font-weight:900;letter-spacing:-.02em;line-height:1;margin-bottom:4px;">
+                <span style="background:linear-gradient(to right,#F59E0B 0%,#F97316 50%,#E11D48 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">Shelf-E</span>
+                <svg style="position:absolute;left:0;bottom:-3px;width:100%;height:5px;" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-logo-invoice-footer)" stroke-width="6" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="grad-logo-invoice-footer" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div><br>
             Generated {{ now()->format('d M Y, H:i') }}
         </div>
     </div>
