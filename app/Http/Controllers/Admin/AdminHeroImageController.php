@@ -22,7 +22,7 @@ class AdminHeroImageController extends Controller
         foreach (self::SLOTS as $slot) {
             $hasCustom  = Storage::disk('public')->exists("hero/{$slot}_480.webp");
             $previewUrl = $hasCustom
-                ? Storage::disk('public')->url("hero/{$slot}_960.webp")
+                ? asset("storage/hero/{$slot}_960.webp")
                 : asset("images/hero/{$slot}.png");
 
             $slots[$slot] = [

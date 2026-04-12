@@ -2,28 +2,38 @@
     /**
      * Resolve the best image source for each hero slot.
      * Priority: admin-uploaded WebP (storage) → original static PNG.
+     *
+     * Uses asset() instead of Storage::url() so the generated URLs
+     * honour the current request host/port (fixes APP_URL mismatch
+     * when running php artisan serve on a non-default port).
      */
-    function heroSrc(int $slot, int $width): string
-    {
-        $key = "hero/{$slot}_{$width}.webp";
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url($key);
+    if (! function_exists('heroSrc')) {
+        function heroSrc(int $slot, int $width): string
+        {
+            $key = "hero/{$slot}_{$width}.webp";
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
+                return asset("storage/{$key}");
+            }
+            return asset("images/hero/{$slot}.png");
         }
-        return asset("images/hero/{$slot}.png");
     }
 
-    function heroFallbackSrc(int $slot): string
-    {
-        $key = "hero/{$slot}_fallback.png";
-        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
-            return \Illuminate\Support\Facades\Storage::disk('public')->url($key);
+    if (! function_exists('heroFallbackSrc')) {
+        function heroFallbackSrc(int $slot): string
+        {
+            $key = "hero/{$slot}_fallback.png";
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
+                return asset("storage/{$key}");
+            }
+            return asset("images/hero/{$slot}.png");
         }
-        return asset("images/hero/{$slot}.png");
     }
 
-    function heroHasWebp(int $slot): bool
-    {
-        return \Illuminate\Support\Facades\Storage::disk('public')->exists("hero/{$slot}_480.webp");
+    if (! function_exists('heroHasWebp')) {
+        function heroHasWebp(int $slot): bool
+        {
+            return \Illuminate\Support\Facades\Storage::disk('public')->exists("hero/{$slot}_480.webp");
+        }
     }
 @endphp
 
