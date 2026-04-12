@@ -90,8 +90,16 @@
     {{-- Header --}}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:10mm;border-bottom:2px solid #f1f5f9;margin-bottom:8mm;">
         <div>
-            <div style="font-size:28px;font-weight:900;letter-spacing:-.03em;color:#0f172a;line-height:1;">
-                <span class="accent">Shelf</span>-E
+            <div style="position:relative;display:inline-block;font-size:28px;font-weight:900;letter-spacing:-.03em;line-height:1;">
+                <span style="background:linear-gradient(to right,#F59E0B 0%,#F97316 50%,#E11D48 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">Shelf-E</span>
+                <svg style="position:absolute;left:0;bottom:-6px;width:100%;height:8px;" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-logo-invoice-header)" stroke-width="6" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="grad-logo-invoice-header" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
             <div style="margin-top:4px;font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;">Premium Bookstore</div>
         </div>
@@ -126,7 +134,17 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20mm;margin-bottom:8mm;">
         <div>
             <div class="label" style="margin-bottom:5px;">From</div>
-            <div style="font-size:13px;font-weight:800;color:#0f172a;">Shelf-E</div>
+            <div style="position:relative;display:inline-block;font-size:15px;font-weight:900;letter-spacing:-0.01em;line-height:1;">
+                <span style="background:linear-gradient(to right,#F59E0B 0%,#F97316 50%,#E11D48 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;">Shelf-E</span>
+                <svg style="position:absolute;left:0;bottom:-4px;width:100%;height:6px;" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-logo-invoice)" stroke-width="6" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="grad-logo-invoice" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
             <div style="margin-top:4px;font-size:11px;color:#64748b;line-height:1.7;">
 
 
