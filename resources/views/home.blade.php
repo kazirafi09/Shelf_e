@@ -72,7 +72,13 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <p class="text-[11px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Handpicked For You</p>
-                <h2 class="text-2xl font-black tracking-tight text-foreground">Featured Books</h2>
+                <h2 class="text-2xl font-black tracking-tight text-foreground">
+                    Featured
+                    <span class="relative inline-block">
+                        <span class="relative z-10 text-amber-600">Books</span>
+                        <span class="absolute bottom-0.5 left-0 w-full h-2.5 bg-amber-200/70 rounded-sm -z-0"></span>
+                    </span>
+                </h2>
             </div>
             <a href="{{ route('categories.index') }}"
                class="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-cyan-600 hover:text-cyan-800 transition-colors">
@@ -109,13 +115,15 @@
                     </div>
 
                     {{-- Info --}}
-                    <div class="mt-2.5 flex-1">
-                        <p class="text-sm font-bold text-foreground line-clamp-2 group-hover:text-cyan-700 transition-colors leading-snug">
+                    <div class="mt-3 flex-1 flex flex-col gap-1">
+                        <p class="text-[13px] font-bold text-foreground line-clamp-2 group-hover:text-amber-700 transition-colors leading-snug">
                             {{ $slide->title ?: $slide->product->title }}
                         </p>
-                        <p class="mt-0.5 text-xs text-muted-foreground truncate">{{ $slide->product->author }}</p>
-                        <p class="mt-1.5 text-sm font-black text-foreground">
-                            ৳ {{ number_format($slide->product->display_price, 0) }}
+                        <p class="text-[11px] font-medium text-muted-foreground/80 truncate italic">
+                            {{ $slide->product->author }}
+                        </p>
+                        <p class="mt-auto pt-1.5 text-sm font-black text-amber-600">
+                            ৳{{ number_format($slide->product->display_price, 0) }}
                         </p>
                     </div>
                 </a>
