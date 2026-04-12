@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # -----------------------------------------------------------------------
+    # 1. HTTPS Redirect (single hop — fixes "Avoid multiple page redirects")
+    # -----------------------------------------------------------------------
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -23,3 +29,47 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ---------------------------------------------------------------------------
+# 2. Gzip / Deflate Compression (fixes "Avoid enormous network payloads")
+# ---------------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml application/xhtml+xml
+    AddOutputFilterByType DEFLATE image/svg+xml application/font-woff application/font-woff2
+    AddOutputFilterByType DEFLATE font/woff font/woff2 font/ttf font/otf
+
+    # Do not compress already-compressed formats
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|jpg|png|webp|avif|zip|gz|bz2)$ no-gzip dont-vary
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 3. Browser Cache Headers (fixes "Use efficient cache lifetimes" Score: 0)
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Versioned assets (Vite appends content-hash — safe to cache 1 year)
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Font files
+    <FilesMatch "\.(woff2|woff|ttf|otf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Icons and SVG
+    <FilesMatch "\.(ico|svg)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Images — 30 days (not immutable since they can be replaced)
+    <FilesMatch "\.(jpg|jpeg|png|webp|avif|gif|bmp)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+
+    # Disable ETags for static assets (redundant when Cache-Control is set)
+    Header unset ETag
+</IfModule>
+
+FileETag None

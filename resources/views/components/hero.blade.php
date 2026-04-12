@@ -1,3 +1,32 @@
+@php
+    /**
+     * Resolve the best image source for each hero slot.
+     * Priority: admin-uploaded WebP (storage) → original static PNG.
+     */
+    function heroSrc(int $slot, int $width): string
+    {
+        $key = "hero/{$slot}_{$width}.webp";
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($key);
+        }
+        return asset("images/hero/{$slot}.png");
+    }
+
+    function heroFallbackSrc(int $slot): string
+    {
+        $key = "hero/{$slot}_fallback.png";
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($key)) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($key);
+        }
+        return asset("images/hero/{$slot}.png");
+    }
+
+    function heroHasWebp(int $slot): bool
+    {
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists("hero/{$slot}_480.webp");
+    }
+@endphp
+
 <section
     class="relative"
     x-data="{ mounted: false }"
@@ -66,7 +95,6 @@
                     </div>
                     <div class="hidden w-px bg-gray-200 h-9 sm:block"></div>
                     <div>
-                        
                         <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Nationwide Delivery</p>
                     </div>
                 </div>
@@ -92,30 +120,80 @@
                 <div class="grid gap-2 lg:hidden" style="grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; height: 340px;">
 
                     <div class="overflow-hidden shadow-md rounded-2xl group" style="grid-column: 1; grid-row: 1 / 3;">
-                        <img
-                            src="{{ asset('images/hero/1.png') }}"
-                            alt="A desk with a stack of classic books and an open journal"
-                            class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(1))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(1, 480) }} 480w, {{ heroSrc(1, 960) }} 960w"
+                                    sizes="(max-width: 1024px) 66vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(1) }}"
+                                    alt="A desk with a stack of classic books and an open journal"
+                                    class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                    fetchpriority="high"
+                                    loading="eager"
+                                    width="960" height="556"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/1.png') }}"
+                                alt="A desk with a stack of classic books and an open journal"
+                                class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                fetchpriority="high"
+                                loading="eager"
+                                width="960" height="556"
+                            >
+                        @endif
                     </div>
 
                     <div class="overflow-hidden shadow-md rounded-2xl group" style="grid-column: 2; grid-row: 1;">
-                        <img
-                            src="{{ asset('images/hero/2.png') }}"
-                            alt="A vibrant marble journal with a coffee cup and brass bookmark"
-                            class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(2))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(2, 480) }} 480w"
+                                    sizes="(max-width: 1024px) 33vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(2) }}"
+                                    alt="A vibrant marble journal with a coffee cup and brass bookmark"
+                                    class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                    loading="eager"
+                                    width="480" height="278"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/2.png') }}"
+                                alt="A vibrant marble journal with a coffee cup and brass bookmark"
+                                class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                loading="eager"
+                                width="480" height="278"
+                            >
+                        @endif
                     </div>
 
                     <div class="overflow-hidden shadow-md rounded-2xl group" style="grid-column: 2; grid-row: 2;">
-                        <img
-                            src="{{ asset('images/hero/3.png') }}"
-                            alt="A cozy blue armchair with a book and a mug"
-                            class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(3))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(3, 480) }} 480w"
+                                    sizes="(max-width: 1024px) 33vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(3) }}"
+                                    alt="A cozy blue armchair with a book and a mug"
+                                    class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                    loading="eager"
+                                    width="480" height="278"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/3.png') }}"
+                                alt="A cozy blue armchair with a book and a mug"
+                                class="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                loading="eager"
+                                width="480" height="278"
+                            >
+                        @endif
                     </div>
 
                 </div>
@@ -136,17 +214,35 @@
                     style="grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); height: 590px;"
                 >
 
-                    {{-- img1: large featured (col 1-2, row 1-2) --}}
+                    {{-- img1: large featured (col 1-2, row 1-2) — PRIMARY LCP ELEMENT --}}
                     <div
                         class="relative overflow-hidden shadow-lg rounded-2xl group"
                         style="grid-column: 1 / 3; grid-row: 1 / 3;"
                     >
-                        <img
-                            src="{{ asset('images/hero/1.png') }}"
-                            alt="A desk with a stack of classic books and an open journal"
-                            class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(1))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(1, 480) }} 480w, {{ heroSrc(1, 960) }} 960w, {{ heroSrc(1, 1440) }} 1440w"
+                                    sizes="(min-width: 1024px) 44vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(1) }}"
+                                    alt="A desk with a stack of classic books and an open journal"
+                                    class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                    fetchpriority="high"
+                                    loading="eager"
+                                    width="1440" height="836"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/1.png') }}"
+                                alt="A desk with a stack of classic books and an open journal"
+                                class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                fetchpriority="high"
+                                loading="eager"
+                                width="1440" height="836"
+                            >
+                        @endif
                         {{-- Subtle inner shadow for depth --}}
                         <div class="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.06)] rounded-2xl pointer-events-none"></div>
                     </div>
@@ -156,12 +252,28 @@
                         class="overflow-hidden shadow-md rounded-2xl group"
                         style="grid-column: 3; grid-row: 1;"
                     >
-                        <img
-                            src="{{ asset('images/hero/2.png') }}"
-                            alt="A vibrant marble journal with a coffee cup and brass bookmark"
-                            class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(2))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(2, 480) }} 480w, {{ heroSrc(2, 960) }} 960w"
+                                    sizes="(min-width: 1024px) 22vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(2) }}"
+                                    alt="A vibrant marble journal with a coffee cup and brass bookmark"
+                                    class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                    loading="eager"
+                                    width="960" height="556"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/2.png') }}"
+                                alt="A vibrant marble journal with a coffee cup and brass bookmark"
+                                class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="eager"
+                                width="960" height="556"
+                            >
+                        @endif
                     </div>
 
                     {{-- img3: middle-right (col 3, row 2) --}}
@@ -169,12 +281,28 @@
                         class="overflow-hidden shadow-md rounded-2xl group"
                         style="grid-column: 3; grid-row: 2;"
                     >
-                        <img
-                            src="{{ asset('images/hero/3.png') }}"
-                            alt="A cozy blue armchair draped with a knit blanket, book and mug"
-                            class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(3))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(3, 480) }} 480w, {{ heroSrc(3, 960) }} 960w"
+                                    sizes="(min-width: 1024px) 22vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(3) }}"
+                                    alt="A cozy blue armchair draped with a knit blanket, book and mug"
+                                    class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                    loading="eager"
+                                    width="960" height="556"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/3.png') }}"
+                                alt="A cozy blue armchair draped with a knit blanket, book and mug"
+                                class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="eager"
+                                width="960" height="556"
+                            >
+                        @endif
                     </div>
 
                     {{-- img4: bottom-left (col 1, row 3) --}}
@@ -182,12 +310,28 @@
                         class="overflow-hidden shadow-md rounded-2xl group"
                         style="grid-column: 1; grid-row: 3;"
                     >
-                        <img
-                            src="{{ asset('images/hero/4.png') }}"
-                            alt="Colorful vintage books on a wooden bookshelf"
-                            class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(4))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(4, 480) }} 480w"
+                                    sizes="(min-width: 1024px) 15vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(4) }}"
+                                    alt="Colorful vintage books on a wooden bookshelf"
+                                    class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                    loading="lazy"
+                                    width="480" height="278"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/4.png') }}"
+                                alt="Colorful vintage books on a wooden bookshelf"
+                                class="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="lazy"
+                                width="480" height="278"
+                            >
+                        @endif
                     </div>
 
                     {{-- img5: bottom-right (col 2-3, row 3) --}}
@@ -195,12 +339,28 @@
                         class="overflow-hidden shadow-md rounded-2xl group"
                         style="grid-column: 2 / 4; grid-row: 3;"
                     >
-                        <img
-                            src="{{ asset('images/hero/5.png') }}"
-                            alt="A person reading a teal book titled A Gathering of Stories"
-                            class="object-cover object-center w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
-                            loading="eager"
-                        >
+                        @if(heroHasWebp(5))
+                            <picture>
+                                <source type="image/webp"
+                                    srcset="{{ heroSrc(5, 480) }} 480w, {{ heroSrc(5, 960) }} 960w"
+                                    sizes="(min-width: 1024px) 30vw, 0">
+                                <img
+                                    src="{{ heroFallbackSrc(5) }}"
+                                    alt="A person reading a teal book titled A Gathering of Stories"
+                                    class="object-cover object-center w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                    loading="lazy"
+                                    width="960" height="278"
+                                >
+                            </picture>
+                        @else
+                            <img
+                                src="{{ asset('images/hero/5.png') }}"
+                                alt="A person reading a teal book titled A Gathering of Stories"
+                                class="object-cover object-center w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
+                                loading="lazy"
+                                width="960" height="278"
+                            >
+                        @endif
                     </div>
 
                 </div>

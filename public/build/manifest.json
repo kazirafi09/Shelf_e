@@ -1,6 +1,10 @@
 {
+  "_alpine-L4ggBBWN.js": {
+    "file": "assets/alpine-L4ggBBWN.js",
+    "name": "alpine"
+  },
   "resources/css/app.css": {
-    "file": "assets/app-B8x51y9j.css",
+    "file": "assets/app-DtIWonnp.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -9,9 +13,12 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BIJoUbyE.js",
+    "file": "assets/app-s77BwIha.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_alpine-L4ggBBWN.js"
+    ]
   }
 }

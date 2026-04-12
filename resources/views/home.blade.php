@@ -140,7 +140,7 @@
                 
                 <div class="w-24 h-24 overflow-hidden rounded-full shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:shadow-inner">
                     @if($item->photo_path)
-                        <img src="{{ asset('storage/' . $item->photo_path) }}" alt="{{ $item->author }}" class="object-cover w-full h-full">
+                        <img src="{{ asset('storage/' . $item->photo_path) }}" alt="{{ $item->author }}" class="object-cover w-full h-full" loading="lazy" width="96" height="96">
                     @else
                         <div class="flex items-center justify-center w-full h-full text-2xl font-black text-white bg-gray-900 group-hover:bg-gray-800">
                             {{ substr($item->author, 0, 1) }}

@@ -52,7 +52,7 @@ class CatalogController extends Controller
 
     public function home()
     {
-        $data = Cache::remember('homepage_data_v4', 300, function () {
+        $data = Cache::remember('homepage_data_v4', 3600, function () {
             return [
                 'topBooks' => Product::withAvg('approvedReviews', 'rating')
                                 ->withCount('approvedReviews')

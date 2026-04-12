@@ -17,8 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [
-            
-            \App\Http\Middleware\PreventBackHistory::class,
             \App\Http\Middleware\RedirectIfAdmin::class,
         ]);
 

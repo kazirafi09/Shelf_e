@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\AdminHeroImageController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -138,9 +139,9 @@ Route::get('/orders/{order}/confirmation', [OrderController::class, 'confirmatio
 | Authenticated User Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'verified', \App\Http\Middleware\PreventBackHistory::class])->get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\PreventBackHistory::class])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])
@@ -178,7 +179,7 @@ Route::middleware('auth')->group(function () {
 */
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', IsAdmin::class])
+    ->middleware(['auth', IsAdmin::class, \App\Http\Middleware\PreventBackHistory::class])
     ->group(function () {
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -228,6 +229,11 @@ Route::prefix('admin')
         Route::get('/contacts', [AdminContactController::class, 'index'])->name('contacts.index');
         Route::patch('/contacts/{message}/read', [AdminContactController::class, 'markRead'])->name('contacts.markRead');
         Route::delete('/contacts/{message}', [AdminContactController::class, 'destroy'])->name('contacts.destroy');
+
+        // Hero Images
+        Route::get('/hero-images', [AdminHeroImageController::class, 'index'])->name('hero-images.index');
+        Route::put('/hero-images/{slot}', [AdminHeroImageController::class, 'update'])->name('hero-images.update');
+        Route::delete('/hero-images/{slot}', [AdminHeroImageController::class, 'destroy'])->name('hero-images.destroy');
     });
 
 require __DIR__.'/auth.php';

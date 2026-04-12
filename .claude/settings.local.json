@@ -26,7 +26,10 @@
       "Bash(php D:/Shelf-e/shelf-e/artisan db:show)",
       "Bash(php:*)",
       "Bash(python3:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(find /d/Shelf-e/shelf-e/storage/app/public -type f -exec ls -lh {} \\\\;)",
+      "Bash(file /d/Shelf-e/shelf-e/public/images/hero/*.png)",
+      "Bash(composer require:*)"
     ]
   }
 }
