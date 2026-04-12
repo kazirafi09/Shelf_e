@@ -7,7 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\ImageManager;
 
 class AdminHeroImageController extends Controller
 {
@@ -42,14 +43,15 @@ class AdminHeroImageController extends Controller
             'image' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
         ]);
 
-        $file = $request->file('image');
+        $file    = $request->file('image');
+        $manager = new ImageManager(new Driver());
 
         foreach (self::WIDTHS as $width) {
-            $webp = Image::read($file)->scaleDown(width: $width)->toWebp(quality: 85);
+            $webp = $manager->read($file->getRealPath())->scaleDown(width: $width)->toWebp(quality: 85);
             Storage::disk('public')->put("hero/{$slot}_{$width}.webp", $webp->toString());
         }
 
-        $png = Image::read($file)->scaleDown(width: 960)->toPng();
+        $png = $manager->read($file->getRealPath())->scaleDown(width: 960)->toPng();
         Storage::disk('public')->put("hero/{$slot}_fallback.png", $png->toString());
 
         return back()->with('success', "Hero image {$slot} updated.");
