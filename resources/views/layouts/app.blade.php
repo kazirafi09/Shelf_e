@@ -538,8 +538,18 @@
         <div class="py-16 bg-white">
             <div class="container grid grid-cols-1 gap-12 px-4 mx-auto md:grid-cols-4">
                 <div class="md:col-span-1">
-                    <a href="/" class="inline-block mb-4 text-3xl font-extrabold tracking-tight text-gray-900 transition-transform hover:scale-105">
-                        Shelf-E
+                    <a href="/" class="inline-block mb-4 text-3xl font-black tracking-tight transition-transform hover:scale-105">
+                        <span class="relative whitespace-nowrap">
+                            <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Shelf-E</span>
+                            <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-logo-footer)" stroke-width="6" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="grad-logo-footer" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </span>
                     </a>
                     <p class="mb-6 text-sm leading-relaxed text-gray-500">Your premium destination for discovering worlds through words. Curated collections for the modern reader.</p>
                 </div>
