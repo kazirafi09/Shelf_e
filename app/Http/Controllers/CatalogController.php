@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\HeroSlide;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Quote;
@@ -92,6 +93,11 @@ class CatalogController extends Controller
                 ->orderBy('sale_ends_at', 'asc')   // soonest-expiring first
                 ->take(6)
                 ->get();
+        });
+
+        // Hero slides are not in the long cache — changes should show within 5 min
+        $data['heroBooks'] = Cache::remember('hero_slides_v1', 300, function () {
+            return HeroSlide::with('product')->orderBy('order')->orderBy('id')->get();
         });
 
         return view('home', $data);

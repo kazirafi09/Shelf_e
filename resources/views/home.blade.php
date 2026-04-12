@@ -64,6 +64,69 @@
 {{-- Hero Section — full-bleed, outside the centered container --}}
 <x-hero />
 
+{{-- Featured Hero Books --}}
+@if(isset($heroBooks) && $heroBooks->where('product_id', '!=', null)->isNotEmpty())
+<section class="border-b border-border bg-muted/30">
+    <div class="container px-4 mx-auto max-w-7xl py-10 sm:py-14">
+
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <p class="text-[11px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Handpicked For You</p>
+                <h2 class="text-2xl font-black tracking-tight text-foreground">Featured Books</h2>
+            </div>
+            <a href="{{ route('categories.index') }}"
+               class="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-cyan-600 hover:text-cyan-800 transition-colors">
+                Browse All
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            @foreach($heroBooks as $slide)
+                @if($slide->product)
+                <a href="{{ route('product.show', $slide->product->slug) }}"
+                   class="group flex flex-col">
+
+                    {{-- Cover --}}
+                    <div class="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm aspect-[2/3]">
+                        @if($slide->product->image_path)
+                            <img src="{{ asset('storage/' . $slide->product->image_path) }}"
+                                 alt="{{ $slide->product->title }}"
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                 loading="lazy">
+                        @else
+                            <div class="flex items-center justify-center w-full h-full text-xs font-bold text-gray-400 uppercase">No Cover</div>
+                        @endif
+
+                        {{-- Tag badge --}}
+                        @if($slide->tag)
+                            <span class="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider bg-amber-400 text-amber-900 rounded-md shadow-sm">
+                                {{ $slide->tag }}
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Info --}}
+                    <div class="mt-2.5 flex-1">
+                        <p class="text-sm font-bold text-foreground line-clamp-2 group-hover:text-cyan-700 transition-colors leading-snug">
+                            {{ $slide->title ?: $slide->product->title }}
+                        </p>
+                        <p class="mt-0.5 text-xs text-muted-foreground truncate">{{ $slide->product->author }}</p>
+                        <p class="mt-1.5 text-sm font-black text-foreground">
+                            ৳ {{ number_format($slide->product->display_price, 0) }}
+                        </p>
+                    </div>
+                </a>
+                @endif
+            @endforeach
+        </div>
+
+    </div>
+</section>
+@endif
+
 {{-- Main content container --}}
 <div class="container px-4 mx-auto max-w-7xl" x-data="{ mounted: false }" x-init="setTimeout(() => mounted = true, 100)">
 
