@@ -12,7 +12,6 @@ use App\Models\UserAddress;
 use App\Models\Voucher;
 use App\Models\VoucherUsage;
 use App\Mail\OrderConfirmation;
-use App\Services\CoinService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -20,8 +19,6 @@ use Carbon\Carbon;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly CoinService $coinService) {}
-
     public function index()
     {
         $cartItems = session()->get('cart', []);
@@ -288,20 +285,6 @@ class OrderController extends Controller
                         'used'     => true,
                         'order_id' => $newOrder->id,
                     ]);
-                }
-                // ─────────────────────────────────────────────────────────────
-
-                // ── Credit coins earned for this purchase ─────────────────────
-                // Rule: 10 coins per ৳100 spent on books (based on subtotal)
-                if ($user) {
-                    $coinsEarned = (int) floor($subtotal / 10);
-                    if ($coinsEarned > 0) {
-                        $this->coinService->credit(
-                            $user,
-                            $coinsEarned,
-                            "Earned from order #{$newOrder->id} (৳{$subtotal} subtotal)"
-                        );
-                    }
                 }
                 // ─────────────────────────────────────────────────────────────
 
