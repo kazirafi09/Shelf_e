@@ -103,8 +103,18 @@
             <div class="flex items-center justify-between">
 
                 <div class="flex-shrink-0 group">
-                    <a href="/" class="inline-block text-2xl font-bold text-gray-900 transition-transform duration-300 group-hover:scale-105">
-                        <span class="transition-colors duration-300 text-gray-900 group-hover:text-gray-700">Shelf</span>-E
+                    <a href="/" class="inline-block text-2xl font-black tracking-tight transition-transform duration-300 group-hover:scale-105">
+                        <span class="relative whitespace-nowrap">
+                            <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Shelf-E</span>
+                            <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-logo)" stroke-width="6" stroke-linecap="round"/>
+                                <defs>
+                                    <linearGradient id="grad-logo" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </span>
                     </a>
                 </div>
 
