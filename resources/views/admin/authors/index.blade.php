@@ -67,7 +67,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-semibold text-foreground">{{ $author->name }}</p>
-                            <p class="text-xs text-muted-foreground">{{ $author->products->count() }} book(s)</p>
+                            <p class="text-xs text-muted-foreground">{{ $author->book_count ?? 0 }} book(s)</p>
                         </div>
                     </div>
                 </td>

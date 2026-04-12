@@ -248,7 +248,7 @@ class CatalogController extends Controller
     public function authors(Request $request)
     {
         $authors = Product::select('products.author')
-            ->selectRaw('count(*) as book_count')
+            ->selectRaw('count(distinct products.id) as book_count')
             ->selectRaw('MAX(authors.photo_path) as photo_path')
             ->leftJoin('authors', 'products.author', '=', 'authors.name')
             ->whereNotNull('products.author')

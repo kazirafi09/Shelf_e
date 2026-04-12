@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Author;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -14,7 +15,13 @@ class AuthorController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Author::query();
+        $query = Author::addSelect([
+            'book_count' => DB::table('products')
+                ->selectRaw('count(*)')
+                ->whereColumn('products.author', 'authors.name')
+                ->whereNotNull('products.author')
+                ->where('products.author', '!=', ''),
+        ]);
 
         if ($request->filled('search')) {
             $query->where('name', 'LIKE', '%' . $request->search . '%');
