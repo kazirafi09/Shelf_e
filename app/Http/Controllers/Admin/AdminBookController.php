@@ -3,17 +3,35 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Category;
-use Illuminate\Validation\ValidationException; // Add this import
+use Illuminate\Validation\ValidationException;
 
 class AdminBookController extends Controller
 {
-    // 1. Show the Books List
+    // JSON search endpoint for hero-books autocomplete
+    public function search(Request $request): JsonResponse
+    {
+        $q = (string) $request->get('q', '');
+
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $books = Product::where('title', 'LIKE', "%{$q}%")
+            ->orWhere('author', 'LIKE', "%{$q}%")
+            ->orderBy('title')
+            ->limit(10)
+            ->get(['id', 'title', 'author', 'image_path']);
+
+        return response()->json($books);
+    }
+
     // 1. Show the Books List
     public function index(Request $request)
     {

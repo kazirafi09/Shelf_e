@@ -8,7 +8,21 @@
 
 @section('admin-content')
 <div class="max-w-4xl mx-auto">
-    
+
+    {{-- Flash messages --}}
+    @if(session('success'))
+        <div x-data="{ show: true }"
+             x-init="setTimeout(() => show = false, 3500)"
+             x-show="show"
+             x-transition
+             class="flex items-center gap-3 px-5 py-3 mb-6 text-sm font-semibold text-green-800 border border-green-200 rounded-xl bg-green-50">
+            <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
     {{-- Validation Errors --}}
     @if($errors->any())
         <div class="p-4 mb-6 text-sm text-red-700 border border-red-200 rounded-xl bg-red-50">
@@ -378,14 +392,23 @@
         </div>
 
         {{-- Footer Actions --}}
-        <div class="flex items-center justify-end gap-4 pt-6 mt-6 border-t border-border">
-            <a href="{{ route('admin.books.index') }}" class="text-sm font-bold transition-colors text-muted-foreground hover:text-foreground">
-                Cancel Changes
+        <div class="flex items-center justify-between gap-4 pt-6 mt-6 border-t border-border">
+            <a href="{{ route('product.show', $book->slug) }}" target="_blank"
+               class="inline-flex items-center gap-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+                View on Site
             </a>
-            <button type="submit" 
-                    class="px-8 py-3 text-sm font-bold text-white transition rounded-full shadow-lg bg-cyan-600 hover:bg-cyan-700 hover:shadow-cyan-600/30 active:scale-95">
-                Update Book Details
-            </button>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.books.index') }}" class="text-sm font-bold transition-colors text-muted-foreground hover:text-foreground">
+                    Cancel Changes
+                </a>
+                <button type="submit"
+                        class="px-8 py-3 text-sm font-bold text-white transition rounded-full shadow-lg bg-cyan-600 hover:bg-cyan-700 hover:shadow-cyan-600/30 active:scale-95">
+                    Update Book Details
+                </button>
+            </div>
         </div>
     </form>
 

@@ -30,6 +30,7 @@ use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
 use App\Http\Controllers\Admin\AdminContactController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\AdminHeroImageController;
+use App\Http\Controllers\Admin\AdminHeroSlideController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
 
@@ -194,6 +195,7 @@ Route::prefix('admin')
         Route::get('/books', [AdminBookController::class, 'index'])->name('books.index');
         Route::get('/books/create', [AdminBookController::class, 'create'])->name('books.create');
         Route::post('/books/create', [AdminBookController::class, 'store'])->name('books.store');
+        Route::get('/books/search', [AdminBookController::class, 'search'])->name('books.search');
         Route::get('/books/{id}/edit', [AdminBookController::class, 'edit'])->name('books.edit');
         Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
         Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
@@ -234,6 +236,12 @@ Route::prefix('admin')
         Route::get('/hero-images', [AdminHeroImageController::class, 'index'])->name('hero-images.index');
         Route::put('/hero-images/{slot}', [AdminHeroImageController::class, 'update'])->name('hero-images.update');
         Route::delete('/hero-images/{slot}', [AdminHeroImageController::class, 'destroy'])->name('hero-images.destroy');
+
+        // Hero Books (Featured Slides)
+        Route::get('/hero-books', [AdminHeroSlideController::class, 'index'])->name('hero-books.index');
+        Route::post('/hero-books', [AdminHeroSlideController::class, 'store'])->name('hero-books.store');
+        Route::put('/hero-books/{heroBook}', [AdminHeroSlideController::class, 'update'])->name('hero-books.update');
+        Route::delete('/hero-books/{heroBook}', [AdminHeroSlideController::class, 'destroy'])->name('hero-books.destroy');
     });
 
 require __DIR__.'/auth.php';

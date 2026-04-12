@@ -88,10 +88,18 @@
                         </td>
                         <td class="px-6 py-4 text-sm font-medium text-right">
                             <div class="flex items-center justify-end space-x-4">
+                                <a href="{{ route('product.show', $book->slug) }}" target="_blank"
+                                   title="Preview on site"
+                                   class="transition-colors text-muted-foreground hover:text-foreground">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                    </svg>
+                                </a>
+
                                 <a href="{{ route('admin.books.edit', $book->id) . '?page=' . $books->currentPage() }}"
                                    class="font-bold transition-colors text-cyan-600 hover:text-cyan-800">Edit</a>
-                                
-                                <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST" 
+
+                                <form action="{{ route('admin.books.destroy', $book->id) }}" method="POST"
                                       onsubmit="return confirm('Permanently delete this book?');">
                                     @csrf
                                     @method('DELETE')
