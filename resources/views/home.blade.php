@@ -71,12 +71,25 @@
 
         <div class="flex items-center justify-between mb-6">
             <div>
-                <p class="text-[11px] font-black tracking-[0.2em] uppercase text-amber-600 mb-1">Handpicked For You</p>
-                <h2 class="text-2xl font-black tracking-tight text-foreground">
+                <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 shadow-sm">
+                    <span class="relative flex w-2 h-2">
+                        <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-amber-400"></span>
+                        <span class="relative inline-flex w-2 h-2 rounded-full bg-amber-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-amber-700">Handpicked For You</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
                     Featured
-                    <span class="relative inline-block">
-                        <span class="relative z-10 text-amber-600">Books</span>
-                        <span class="absolute bottom-0.5 left-0 w-full h-2.5 bg-amber-200/70 rounded-sm -z-0"></span>
+                    <span class="relative whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Books</span>
+                        <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-featured)" stroke-width="5" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="grad-featured" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
                     </span>
                 </h2>
             </div>
@@ -170,8 +183,29 @@
     </div>
 
     <div class="mt-20 transition-all duration-700 ease-out delay-700 transform" :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Shop By Format</h2>
+        <div class="mb-8">
+            <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 shadow-sm">
+                <span class="relative flex w-2 h-2">
+                    <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-amber-400"></span>
+                    <span class="relative inline-flex w-2 h-2 rounded-full bg-amber-500"></span>
+                </span>
+                <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-amber-700">Pick Your Style</span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
+                Shop By
+                <span class="relative whitespace-nowrap">
+                    <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Format</span>
+                    <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-format)" stroke-width="5" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="grad-format" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </span>
+            </h2>
+            <p class="mt-3 text-sm text-muted-foreground">Choose how you love to read — in print, pixels, or sound.</p>
         </div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             <a href="{{ route('categories.index') }}" class="relative p-8 overflow-hidden transition-colors border shadow-sm bg-card text-card-foreground border-border rounded-3xl group hover:border-gray-900 hover:shadow-lg">
@@ -200,8 +234,28 @@
     <div class="mt-20 transition-all duration-700 ease-out delay-700 transform" :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Popular Authors</h2>
-                <p class="mt-1 text-sm text-muted-foreground">Discover the minds behind the masterpieces.</p>
+                <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 shadow-sm">
+                    <span class="relative flex w-2 h-2">
+                        <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-amber-400"></span>
+                        <span class="relative inline-flex w-2 h-2 rounded-full bg-amber-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-amber-700">Beloved Voices</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
+                    Popular
+                    <span class="relative whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Authors</span>
+                        <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-authors)" stroke-width="5" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="grad-authors" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h2>
+                <p class="mt-3 text-sm text-muted-foreground">Discover the minds behind the masterpieces.</p>
             </div>
         </div>
         
@@ -235,8 +289,28 @@
          :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Top Rated Books</h2>
-                <p class="mt-1 text-sm text-muted-foreground">Handpicked favorites loved by our community.</p>
+                <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 shadow-sm">
+                    <span class="relative flex w-2 h-2">
+                        <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-amber-400"></span>
+                        <span class="relative inline-flex w-2 h-2 rounded-full bg-amber-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-amber-700">Reader Favorites</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
+                    <span class="relative whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Top Rated</span>
+                        <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-toprated)" stroke-width="5" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="grad-toprated" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                    Books
+                </h2>
+                <p class="mt-3 text-sm text-muted-foreground">Handpicked favorites loved by our community.</p>
             </div>
             <a href="/categories" class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">See All Collection &rarr;</a>
         </div>
@@ -312,8 +386,27 @@
          :class="mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'">
         <div class="flex items-end justify-between mb-8">
             <div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Bestsellers</h2>
-                <p class="mt-1 text-sm text-muted-foreground">The most purchased books by our readers.</p>
+                <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-amber-50 border border-amber-200/80 shadow-sm">
+                    <span class="relative flex w-2 h-2">
+                        <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-amber-400"></span>
+                        <span class="relative inline-flex w-2 h-2 rounded-full bg-amber-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-amber-700">Flying Off The Shelves</span>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
+                    <span class="relative whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-amber-600 via-orange-500 to-rose-500 bg-clip-text text-transparent">Bestsellers</span>
+                        <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-bestsellers)" stroke-width="5" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="grad-bestsellers" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#F59E0B"/><stop offset="0.5" stop-color="#F97316"/><stop offset="1" stop-color="#E11D48"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                </h2>
+                <p class="mt-3 text-sm text-muted-foreground">The most purchased books by our readers.</p>
             </div>
             <a href="{{ route('bestsellers.index') }}" class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">See All Bestsellers &rarr;</a>
         </div>
@@ -457,12 +550,28 @@
         {{-- ── Section heading ─────────────────────────────────────── --}}
         <div class="flex items-end justify-between mb-8">
             <div>
-                <div class="inline-flex items-center gap-2.5 mb-2">
-                    <span class="w-8 h-px bg-red-400"></span>
-                    <span class="text-[10px] font-black tracking-[0.2em] uppercase text-red-500">Hot offers</span>
+                <div class="inline-flex items-center gap-2 mb-3 px-3.5 py-1 rounded-full bg-rose-50 border border-rose-200/80 shadow-sm">
+                    <span class="relative flex w-2 h-2">
+                        <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-rose-400"></span>
+                        <span class="relative inline-flex w-2 h-2 rounded-full bg-rose-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold tracking-[0.18em] uppercase text-rose-700">Hot Offers</span>
                 </div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">Deals of the Week</h2>
-                <p class="mt-1 text-sm text-muted-foreground">Limited-time prices — grab them before the clock runs out.</p>
+                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-foreground leading-tight">
+                    <span class="relative whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 bg-clip-text text-transparent">Deals</span>
+                        <svg class="absolute left-0 w-full -bottom-1" viewBox="0 0 320 12" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M2 9 C60 3, 150 3, 318 7" stroke="url(#grad-deals)" stroke-width="5" stroke-linecap="round"/>
+                            <defs>
+                                <linearGradient id="grad-deals" x1="0" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#E11D48"/><stop offset="0.5" stop-color="#EF4444"/><stop offset="1" stop-color="#F97316"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </span>
+                    of the Week
+                </h2>
+                <p class="mt-3 text-sm text-muted-foreground">Limited-time prices — grab them before the clock runs out.</p>
             </div>
             <a href="{{ route('categories.index', ['on_sale' => 1]) }}"
                class="hidden text-sm font-bold tracking-wider text-gray-700 uppercase transition-colors hover:text-gray-900 md:inline-block">
