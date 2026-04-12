@@ -66,7 +66,7 @@
                 {{-- Upload form --}}
                 <form
                     method="POST"
-                    action="{{ route('hero-images.store', $slot) }}"
+                    action="{{ route('admin.hero-images.store', $slot) }}"
                     enctype="multipart/form-data"
                     class="flex flex-col gap-3 p-4 border-t border-border"
                     x-on:submit="uploading = true"
@@ -100,7 +100,7 @@
                 @if($info['hasCustom'])
                     <form
                         method="POST"
-                        action="{{ route('hero-images.destroy', $slot) }}"
+                        action="{{ route('admin.hero-images.destroy', $slot) }}"
                         class="px-4 pb-4"
                         x-on:submit.prevent="
                             if (confirm('Revert image {{ $slot }} to the default?')) {
