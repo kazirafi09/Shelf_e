@@ -182,7 +182,6 @@
 
             <div class="flex items-center mb-6 space-x-4">
                 <div class="flex items-center text-muted-foreground">
-                    @php $authorModel = $product->authors->first(); @endphp
                     <div class="w-11 h-11 mr-3 overflow-hidden bg-muted rounded-full shrink-0">
                         @if($authorModel && $authorModel->photo_path)
                             <img src="{{ asset('storage/' . $authorModel->photo_path) }}" alt="{{ $product->author }}" class="object-cover w-full h-full">

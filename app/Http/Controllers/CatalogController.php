@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\HeroSlide;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Author;
 use App\Models\Quote;
 use Illuminate\Support\Facades\Cache;
 
@@ -325,17 +326,21 @@ class CatalogController extends Controller
     // 3. Load Single Product Page
     public function show($slug)
     {
-        $product = Product::with(['category', 'previews', 'approvedReviews.user', 'authors'])
+        $product = Product::with(['category', 'previews', 'approvedReviews.user'])
             ->withCount('approvedReviews')
             ->withAvg('approvedReviews', 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
+
+        $authorModel = $product->author
+            ? Author::where('name', $product->author)->first()
+            : null;
 
         $relatedProducts = Product::where('id', '!=', $product->id)
                                   ->inRandomOrder()
                                   ->take(3)
                                   ->get();
 
-        return view('products.show', compact('product', 'relatedProducts'));
+        return view('products.show', compact('product', 'relatedProducts', 'authorModel'));
     }
 }
