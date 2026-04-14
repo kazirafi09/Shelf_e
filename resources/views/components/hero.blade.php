@@ -123,18 +123,18 @@
                 {{-- Stats row — glassmorphism card --}}
                 <div class="inline-flex flex-wrap items-center gap-x-7 gap-y-3 px-6 py-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-gray-100 shadow-sm">
                     <div>
-                        <p class="text-xl font-black text-gray-900 tabular-nums">1,000+</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Titles</p>
+                        <p class="text-xl font-black text-gray-900">Handpicked</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Every Title</p>
                     </div>
                     <div class="hidden w-px bg-gray-200 h-9 sm:block"></div>
                     <div>
-                        <p class="text-xl font-black text-gray-900">5.0</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Reader Rated</p>
+                        <p class="text-xl font-black text-gray-900">Cash on</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Delivery</p>
                     </div>
                     <div class="hidden w-px bg-gray-200 h-9 sm:block"></div>
                     <div>
-                        <p class="text-xl font-black text-gray-900">Free</p>
-                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Nationwide Delivery</p>
+                        <p class="text-xl font-black text-gray-900 tabular-nums">24h</p>
+                        <p class="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mt-0.5">Fast Dispatch</p>
                     </div>
                 </div>
 
