@@ -359,7 +359,7 @@
                                 <h4 class="text-sm font-bold text-foreground line-clamp-1" title="{{ $item['title'] }}">{{ $item['title'] }}</h4>
                                 
                                 <div class="flex items-center mt-1 space-x-2">
-                                    <form action="{{ route('cart.decrement', $id) }}" method="POST">
+                                    <form action="{{ route('cart.decrement', $id) }}" method="POST" class="js-keep-scroll">
                                         @csrf
                                         <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-gray-700">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
@@ -368,7 +368,7 @@
 
                                     <span class="text-xs font-bold text-foreground">{{ $item['quantity'] }}</span>
 
-                                    <form action="{{ route('cart.increment', $id) }}" method="POST">
+                                    <form action="{{ route('cart.increment', $id) }}" method="POST" class="js-keep-scroll">
                                         @csrf
                                         <button type="submit" class="flex items-center justify-center w-5 h-5 text-muted-foreground transition bg-muted rounded hover:bg-muted hover:opacity-80 hover:text-gray-500">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -380,7 +380,7 @@
                             <div class="flex items-center ml-4 space-x-3">
                                 <span class="text-sm font-bold text-foreground">৳ {{ number_format($item['price'] * $item['quantity'], 0) }}</span>
                                 
-                                <form action="{{ route('cart.remove', $id) }}" method="POST">
+                                <form action="{{ route('cart.remove', $id) }}" method="POST" class="js-keep-scroll">
                                     @csrf
                                     <button type="submit" class="text-muted-foreground transition hover:text-destructive">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -509,4 +509,25 @@
         
     </div>
 </div>
+
+<script>
+    (function () {
+        const KEY = 'checkoutScrollY';
+
+        document.addEventListener('submit', function (e) {
+            if (e.target.classList && e.target.classList.contains('js-keep-scroll')) {
+                try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (_) {}
+            }
+        });
+
+        const stored = sessionStorage.getItem(KEY);
+        if (stored !== null) {
+            sessionStorage.removeItem(KEY);
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            const y = parseInt(stored, 10) || 0;
+            window.scrollTo(0, y);
+            requestAnimationFrame(() => window.scrollTo(0, y));
+        }
+    })();
+</script>
 @endsection
