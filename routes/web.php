@@ -100,10 +100,6 @@ Route::get('/series', [CatalogController::class, 'series'])->name('series.index'
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
-Route::get('/returns-policy', function () {
-    return view('pages.returns-policy', ['content' => \App\Models\Setting::get('returns_policy', '')]);
-})->name('returns-policy');
-
 Route::get('/faq', function () {
     return view('pages.faq', ['content' => \App\Models\Setting::get('faq_content', '')]);
 })->name('faq');

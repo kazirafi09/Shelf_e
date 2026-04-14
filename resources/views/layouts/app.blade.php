@@ -566,7 +566,6 @@
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Support</h4>
                     <ul class="space-y-3 text-sm text-gray-500">
                         <li><a href="{{ auth()->check() ? route('dashboard') : route('login') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Track Order</a></li>
-                        <li><a href="{{ route('returns-policy') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> Returns Policy</a></li>
                         <li><a href="{{ route('faq') }}" class="flex items-center transition-colors duration-200 hover:text-gray-900 group"><span class="w-2 h-px mr-2 transition-opacity opacity-0 bg-gray-900 group-hover:opacity-100"></span> FAQ</a></li>
                     </ul>
                 </div>
@@ -581,12 +580,6 @@
                 </div>
             </div>
 
-            <div class="container flex flex-col items-center justify-between px-4 pt-8 mx-auto mt-12 text-xs text-center text-gray-400 border-t border-gray-200 md:flex-row">
-                <p>&copy; {{ date('Y') }} Shelf-E. All rights reserved.</p>
-                <div class="flex mt-4 space-x-6 md:mt-0">
-                    <a href="{{ route('contact') }}" class="transition-colors hover:text-gray-900">Contact Us</a>
-                </div>
-            </div>
         </div>
     </footer>
 

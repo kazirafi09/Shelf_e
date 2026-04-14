@@ -113,27 +113,6 @@
                 <p class="mt-1.5 text-xs text-muted-foreground">This number will be displayed to the customer when they select Bkash at checkout.</p>
             </div>
 
-            {{-- Returns Policy --}}
-            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
-                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Returns Policy</h2>
-                <p class="mb-5 text-sm text-muted-foreground">This content is shown on the public Returns Policy page.</p>
-
-                <label for="returns_policy" class="block mb-2 text-sm font-semibold text-foreground">
-                    Policy Content
-                </label>
-                <textarea
-                    id="returns_policy"
-                    name="returns_policy"
-                    rows="8"
-                    maxlength="5000"
-                    class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition resize-y"
-                    placeholder="Describe your returns and refund policy…"
-                >{{ old('returns_policy', $returnsPolicy) }}</textarea>
-                @error('returns_policy')
-                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
             {{-- FAQ --}}
             <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
                 <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">FAQ</h2>
