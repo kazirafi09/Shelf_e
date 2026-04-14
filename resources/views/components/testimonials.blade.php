@@ -26,7 +26,7 @@ $testimonials = [
         'role' => 'Literature Student',
     ],
     [
-        'text' => "The checkout process is seamless and secure. I also appreciate the 7-day return policy, though the books are always perfect.",
+        'text' => "The checkout process is seamless and secure. Ordering is straightforward and my books always arrive exactly as described.",
         'name' => 'Ayman Chowdhury',
         'role' => 'Freelancer',
     ],
