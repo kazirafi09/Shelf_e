@@ -71,11 +71,15 @@ class CartController extends Controller
 
     public function remove(Request $request, $id)
     {
-        $cart = $request->session()->get('cart');
+        $cart = $request->session()->get('cart', []);
 
         if (isset($cart[$id])) {
             unset($cart[$id]);
             $request->session()->put('cart', $cart);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return $this->cartJson($cart, 'Book removed from order.');
         }
 
         return back()->with('success', 'Book removed from order.');
@@ -83,13 +87,19 @@ class CartController extends Controller
 
     public function increment(Request $request, $id)
     {
-        $cart = $request->session()->get('cart');
+        $cart = $request->session()->get('cart', []);
 
         if (isset($cart[$id])) {
             $product = Product::findOrFail($id);
             $newQuantity = $cart[$id]['quantity'] + 1;
 
             if ($newQuantity > $product->stock_quantity) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json([
+                        'ok' => false,
+                        'error' => 'Sorry, not enough stock available.',
+                    ] + $this->cartPayload($cart), 422);
+                }
                 return back()->with('error', 'Sorry, not enough stock available.');
             }
 
@@ -97,12 +107,16 @@ class CartController extends Controller
             $request->session()->put('cart', $cart);
         }
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return $this->cartJson($cart);
+        }
+
         return back();
     }
 
     public function decrement(Request $request, $id)
     {
-        $cart = $request->session()->get('cart');
+        $cart = $request->session()->get('cart', []);
 
         if (isset($cart[$id])) {
             if ($cart[$id]['quantity'] > 1) {
@@ -113,6 +127,41 @@ class CartController extends Controller
             $request->session()->put('cart', $cart);
         }
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return $this->cartJson($cart);
+        }
+
         return back();
+    }
+
+    private function cartJson(array $cart, ?string $message = null)
+    {
+        return response()->json([
+            'ok' => true,
+            'message' => $message,
+        ] + $this->cartPayload($cart));
+    }
+
+    private function cartPayload(array $cart): array
+    {
+        $items = [];
+        $subtotal = 0;
+        foreach ($cart as $id => $item) {
+            $qty = (int) ($item['quantity'] ?? 0);
+            $price = (float) ($item['price'] ?? 0);
+            $lineTotal = $qty * $price;
+            $subtotal += $lineTotal;
+            $items[(string) $id] = [
+                'quantity' => $qty,
+                'price' => $price,
+                'line_total' => $lineTotal,
+            ];
+        }
+
+        return [
+            'items' => $items,
+            'subtotal' => $subtotal,
+            'count' => count($items),
+        ];
     }
 }

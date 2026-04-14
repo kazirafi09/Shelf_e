@@ -65,6 +65,12 @@
         }
         this.couponChecking = false;
     },
+    onCartUpdated(detail) {
+        this.subtotal = detail.subtotal;
+        if (this.couponValid === true && this.couponCode.trim()) {
+            this.applyVoucher();
+        }
+    },
     fillAddress(addr) {
         this.$refs.fieldName.value      = addr.name;
         this.$refs.fieldEmail.value     = addr.email;
@@ -75,7 +81,7 @@
         this.$refs.fieldPhone.value     = addr.phone;
         this.$refs.fieldPhone.dispatchEvent(new Event('input'));
     }
-}">
+}" @cart-updated.window="onCartUpdated($event.detail)">
     
     <div class="mb-8 text-sm text-muted-foreground">
         <a href="/" class="hover:text-gray-700">Home</a> <span class="mx-2">></span>
@@ -345,9 +351,9 @@
                 <h3 class="mb-6 text-xl font-bold text-foreground">Order Summary</h3>
                 
                 @if(isset($cartItems) && count($cartItems) > 0)
-                    <div class="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="space-y-4 mb-6 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar" id="checkout-items">
                         @foreach($cartItems as $id => $item)
-                        <div class="flex items-center p-3 bg-background border border-border rounded-lg shadow-sm">
+                        <div class="flex items-center p-3 bg-background border border-border rounded-lg shadow-sm" data-cart-row="{{ $id }}">
                             <div class="flex items-center justify-center w-12 h-16 overflow-hidden bg-muted rounded shrink-0">
                                 @if(isset($item['image_path']) && $item['image_path'])
                                     <img src="{{ asset('storage/' . $item['image_path']) }}" class="object-cover w-full h-full">
@@ -366,7 +372,7 @@
                                         </button>
                                     </form>
 
-                                    <span class="text-xs font-bold text-foreground">{{ $item['quantity'] }}</span>
+                                    <span class="text-xs font-bold text-foreground" data-cart-qty>{{ $item['quantity'] }}</span>
 
                                     <form action="{{ route('cart.increment', $id) }}" method="POST" class="js-keep-scroll">
                                         @csrf
@@ -378,7 +384,7 @@
                             </div>
                             
                             <div class="flex items-center ml-4 space-x-3">
-                                <span class="text-sm font-bold text-foreground">৳ {{ number_format($item['price'] * $item['quantity'], 0) }}</span>
+                                <span class="text-sm font-bold text-foreground" data-cart-line-total>৳ {{ number_format($item['price'] * $item['quantity'], 0) }}</span>
                                 
                                 <form action="{{ route('cart.remove', $id) }}" method="POST" class="js-keep-scroll">
                                     @csrf
@@ -394,7 +400,7 @@
                     <div class="pt-4 space-y-3 border-t border-border">
                         <div class="flex justify-between text-sm text-muted-foreground">
                             <span>Subtotal</span>
-                            <span class="font-medium text-foreground">৳ {{ number_format($subtotal, 0) }}</span>
+                            <span class="font-medium text-foreground" data-cart-subtotal>৳ {{ number_format($subtotal, 0) }}</span>
                         </div>
                         <div class="flex justify-between text-sm text-muted-foreground">
                             <span>Shipping</span>
@@ -512,22 +518,64 @@
 
 <script>
     (function () {
-        const KEY = 'checkoutScrollY';
+        const formatBDT = n => '৳ ' + Math.round(n).toLocaleString();
 
-        document.addEventListener('submit', function (e) {
-            if (e.target.classList && e.target.classList.contains('js-keep-scroll')) {
-                try { sessionStorage.setItem(KEY, String(window.scrollY)); } catch (_) {}
+        function applyUpdate(data) {
+            const container = document.getElementById('checkout-items');
+            if (!container) return;
+
+            Object.entries(data.items || {}).forEach(([id, info]) => {
+                const row = container.querySelector(`[data-cart-row="${CSS.escape(id)}"]`);
+                if (!row) return;
+                const qtyEl = row.querySelector('[data-cart-qty]');
+                const lineEl = row.querySelector('[data-cart-line-total]');
+                if (qtyEl) qtyEl.textContent = info.quantity;
+                if (lineEl) lineEl.textContent = formatBDT(info.line_total);
+            });
+
+            container.querySelectorAll('[data-cart-row]').forEach(row => {
+                const id = row.getAttribute('data-cart-row');
+                if (!(data.items || {})[id]) row.remove();
+            });
+
+            const subtotalEl = document.querySelector('[data-cart-subtotal]');
+            if (subtotalEl) subtotalEl.textContent = formatBDT(data.subtotal);
+
+            window.dispatchEvent(new CustomEvent('cart-updated', {
+                detail: { subtotal: data.subtotal, count: data.count }
+            }));
+
+            if (data.count === 0) window.location.reload();
+        }
+
+        document.addEventListener('submit', async function (e) {
+            const form = e.target;
+            if (!form.classList || !form.classList.contains('js-keep-scroll')) return;
+
+            e.preventDefault();
+
+            const buttons = form.querySelectorAll('button');
+            buttons.forEach(b => b.disabled = true);
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                });
+                const data = await res.json().catch(() => null);
+                if (data) applyUpdate(data);
+                if (data && data.ok === false && data.error) alert(data.error);
+            } catch (err) {
+                window.location.reload();
+            } finally {
+                buttons.forEach(b => b.disabled = false);
             }
         });
-
-        const stored = sessionStorage.getItem(KEY);
-        if (stored !== null) {
-            sessionStorage.removeItem(KEY);
-            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-            const y = parseInt(stored, 10) || 0;
-            window.scrollTo(0, y);
-            requestAnimationFrame(() => window.scrollTo(0, y));
-        }
     })();
 </script>
 @endsection
