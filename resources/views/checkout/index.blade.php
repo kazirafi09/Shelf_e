@@ -94,20 +94,19 @@
         class="flex flex-wrap items-center justify-between gap-3 px-5 py-6 mb-8 bg-gray-900 text-white rounded-xl overflow-hidden relative"
         x-data="{
             end: null,
-            hours: '00', mins: '00', secs: '00',
+            mins: '00', secs: '00',
             expired: false,
             init() {
-                const randomHours = 16 + Math.floor(Math.random() * 9); // 16–24
-                this.end = new Date(Date.now() + randomHours * 3600 * 1000);
+                const randomMinutes = 10 + Math.floor(Math.random() * 6); // 10–15
+                this.end = new Date(Date.now() + randomMinutes * 60 * 1000);
                 this.tick();
                 setInterval(() => this.tick(), 1000);
             },
             tick() {
                 const diff = this.end - new Date();
                 if (diff <= 0) { this.expired = true; return; }
-                this.hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
-                this.mins  = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-                this.secs  = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+                this.mins = String(Math.floor(diff / 60000)).padStart(2, '0');
+                this.secs = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
             }
         }"
         x-init="init()"
@@ -124,11 +123,11 @@
         </div>
 
         <div x-show="!expired" class="flex items-center gap-1.5 relative z-10 shrink-0">
-            <template x-for="(val, i) in [hours, mins, secs]" :key="i">
+            <template x-for="(val, i) in [mins, secs]" :key="i">
                 <div class="flex items-center gap-1.5">
                     <span x-text="val"
                           class="inline-flex items-center justify-center w-10 h-9 text-base font-black tabular-nums bg-white/10 rounded-lg"></span>
-                    <span x-show="i < 2" class="text-gray-400 font-bold text-sm">:</span>
+                    <span x-show="i < 1" class="text-gray-400 font-bold text-sm">:</span>
                 </div>
             </template>
             <span class="ml-1 text-xs font-semibold uppercase tracking-widest text-gray-400">remaining</span>
