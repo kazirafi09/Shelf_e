@@ -1,2 +1,23 @@
 User-agent: *
-Disallow:
+Disallow: /product/
+Disallow: /categories
+Disallow: /bestsellers
+Disallow: /series
+Disallow: /authors
+Disallow: /api/
+Disallow: /cart/
+Disallow: /checkout
+Disallow: /admin/
+Crawl-delay: 10
+
+User-agent: Googlebot
+Disallow: /api/
+Disallow: /cart/
+Disallow: /checkout
+Disallow: /admin/
+
+User-agent: Bingbot
+Disallow: /api/
+Disallow: /cart/
+Disallow: /checkout
+Disallow: /admin/

@@ -85,17 +85,23 @@ RateLimiter::for('cart', function (Request $request) {
     return Limit::perMinute(30)->by($request->ip());
 });
 
+RateLimiter::for('catalog', function (Request $request) {
+    return Limit::perMinute(40)->by($request->ip());
+});
+
 /*
 |------------------------------------------------------------------f--------
 | Public Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/', [CatalogController::class, 'home'])->name('home');
-Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
-Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('product.show');
-Route::get('/authors', [CatalogController::class, 'authors'])->name('authors.index');
-Route::get('/bestsellers', [CatalogController::class, 'bestsellers'])->name('bestsellers.index');
-Route::get('/series', [CatalogController::class, 'series'])->name('series.index');
+Route::middleware('throttle:catalog')->group(function () {
+    Route::get('/', [CatalogController::class, 'home'])->name('home');
+    Route::get('/categories', [CatalogController::class, 'categories'])->name('categories.index');
+    Route::get('/product/{slug}', [CatalogController::class, 'show'])->name('product.show');
+    Route::get('/authors', [CatalogController::class, 'authors'])->name('authors.index');
+    Route::get('/bestsellers', [CatalogController::class, 'bestsellers'])->name('bestsellers.index');
+    Route::get('/series', [CatalogController::class, 'series'])->name('series.index');
+});
 
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
