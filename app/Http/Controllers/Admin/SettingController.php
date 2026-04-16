@@ -16,6 +16,7 @@ class SettingController extends Controller
             'shippingOutsideDhaka' => Setting::get('shipping_outside_dhaka', 150),
             'bkashNumber'      => Setting::get('bkash_number', ''),
             'faqContent'       => Setting::get('faq_content', ''),
+            'aboutUs'          => Setting::get('about_us', ''),
         ]);
     }
 
@@ -27,6 +28,7 @@ class SettingController extends Controller
             'shipping_outside_dhaka' => ['required', 'integer', 'min:0'],
             'bkash_number'      => ['nullable', 'string', 'max:20'],
             'faq_content'       => ['nullable', 'string', 'max:10000'],
+            'about_us'          => ['nullable', 'string', 'max:1000'],
         ]);
 
         Setting::set('announcement_text', $data['announcement_text']);
@@ -34,6 +36,7 @@ class SettingController extends Controller
         Setting::set('shipping_outside_dhaka', (int) $data['shipping_outside_dhaka']);
         Setting::set('bkash_number', $data['bkash_number'] ?? '');
         Setting::set('faq_content', $data['faq_content'] ?? '');
+        Setting::set('about_us', $data['about_us'] ?? '');
 
         return back()->with('success', 'Store settings saved.');
     }

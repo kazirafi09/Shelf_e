@@ -137,20 +137,16 @@
         </aside>
 
         <div class="flex-1">
-            <div class="flex items-center justify-between p-4 mb-6 bg-card text-card-foreground border border-border rounded-lg">
-                <div class="text-sm font-medium text-muted-foreground">
-                    Showing <span class="font-bold text-foreground">{{ $products->total() }}</span>
-                    @if(isset($isBestsellers) && $isBestsellers) books sorted by most sold @else results @endif
+            @if(isset($isBestsellers) && $isBestsellers)
+            <div class="flex items-center justify-end p-4 mb-6 bg-card text-card-foreground border border-border rounded-lg">
+                <div class="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                    Most sold first
                 </div>
-                @if(isset($isBestsellers) && $isBestsellers)
-                    <div class="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                        </svg>
-                        Most sold first
-                    </div>
-                @endif
             </div>
+            @endif
 
             <div class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 @forelse ($products as $product)
@@ -192,7 +188,7 @@
                                 @if($product->image_path)
                                     <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}"
                                          class="object-cover w-full h-full transition-transform duration-300"
-                                         :class="{ 'scale-125 z-10': zoomed }">
+                                         :class="{ 'scale-105 z-10': zoomed }">
                                 @else
                                     Cover Image
                                 @endif

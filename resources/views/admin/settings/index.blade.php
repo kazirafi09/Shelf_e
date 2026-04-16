@@ -134,6 +134,28 @@
                 @enderror
             </div>
 
+            {{-- About Us --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">About Us</h2>
+                <p class="mb-5 text-sm text-muted-foreground">This text appears in the footer's "About Us" section on every public page.</p>
+
+                <label for="about_us" class="block mb-2 text-sm font-semibold text-foreground">
+                    About Us Text
+                </label>
+                <textarea
+                    id="about_us"
+                    name="about_us"
+                    rows="5"
+                    maxlength="1000"
+                    class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition resize-y"
+                    placeholder="Write a short description about your store…"
+                >{{ old('about_us', $aboutUs) }}</textarea>
+                @error('about_us')
+                    <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1.5 text-xs text-muted-foreground">Maximum 1,000 characters.</p>
+            </div>
+
             <div class="flex justify-end">
                 <button type="submit"
                         class="px-8 py-2.5 text-sm font-bold text-white transition bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-sm">

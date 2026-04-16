@@ -187,7 +187,7 @@
                             <img src="{{ asset('storage/' . $authorModel->photo_path) }}" alt="{{ $product->author }}" class="object-cover w-full h-full">
                         @endif
                     </div>
-                    <span>By <span class="font-bold text-foreground">{{ $product->author }}</span></span>
+                    <span>By <a href="{{ route('categories.index', ['authors' => [$product->author]]) }}" class="font-bold text-foreground hover:underline transition-colors">{{ $product->author }}</a></span>
                 </div>
             </div>
 

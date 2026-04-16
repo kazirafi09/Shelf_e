@@ -552,7 +552,9 @@
                             </svg>
                         </span>
                     </a>
-                    <p class="mb-6 text-sm leading-relaxed text-gray-500">Your premium destination for discovering worlds through words. Curated collections for the modern reader.</p>
+                    @php $aboutUsText = \App\Models\Setting::get('about_us', 'Your premium destination for discovering worlds through words. Curated collections for the modern reader.'); @endphp
+                    <h4 class="mb-3 text-sm font-bold tracking-wider text-gray-900 uppercase">About Us</h4>
+                    <p class="mb-6 text-sm leading-relaxed text-gray-500">{{ $aboutUsText }}</p>
                 </div>
                 <div>
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Shop</h4>
