@@ -48,7 +48,10 @@
                 </button>
             </div>
 
-            <form action="/categories" method="GET">
+            <form action="/categories" method="GET"
+                  x-data="{ timer: null }"
+                  @change.capture="$event.target.type !== 'number' && $el.submit()"
+                  @input.capture="$event.target.type === 'number' && (clearTimeout(timer), timer = setTimeout(() => $el.submit(), 700))">
                 <div class="pb-4 mb-4 border-b border-border" x-data="{ open: true }">
                     <button type="button" @click="open = !open" class="flex items-center justify-between w-full font-bold text-left text-foreground focus:outline-none">
                         Genres
@@ -128,7 +131,6 @@
                     </div>
                 </div>
                 <div class="flex flex-col space-y-3">
-                    <button type="submit" class="w-full py-3 font-medium text-white transition bg-gray-700 rounded-md hover:bg-gray-800">Apply Changes</button>
                     <a href="/categories" class="w-full py-3 font-medium text-center text-gray-700 transition bg-white border border-gray-700 rounded-md hover:bg-gray-50">Clear Filters</a>
                 </div>
 
