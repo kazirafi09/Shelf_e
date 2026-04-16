@@ -384,6 +384,10 @@ Cart (30/min), checkout (5/min), search (60/min), and voucher validation (30/min
 
 ---
 
-## License
+## License & Ownership
 
-This project is open-sourced under the [MIT license](https://opensource.org/licenses/MIT).
+**Copyright © 2025 Kazi Rafiul Kader. All rights reserved.**
+
+This project and all of its source code, assets, and documentation are the exclusive property of Kazi Rafiul Kader. No part of this codebase may be copied, modified, distributed, sublicensed, or used in any form — in whole or in part — without the express written permission of the owner.
+
+This is **not** an open-source project. Unauthorized use, reproduction, or distribution of any portion of this codebase is strictly prohibited.
