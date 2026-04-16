@@ -10,7 +10,7 @@
 @endphp
 
 <div
-    class="relative flex gap-4 p-4 transition-shadow duration-300 border border-border bg-card text-card-foreground rounded-xl hover:shadow-lg overflow-hidden"
+    class="relative flex gap-4 p-4 transition-shadow duration-300 border border-border bg-card text-card-foreground rounded-xl hover:shadow-lg overflow-hidden group"
     x-data="{
         saleEndsAt: new Date({{ Js::from($endsAt) }}),
         seg: ['00','00','00','00'],
@@ -42,7 +42,7 @@
                 <img src="{{ asset('storage/' . $book->image_path) }}"
                      alt="{{ $book->title }}"
                      loading="lazy"
-                     class="object-cover w-full h-full transition-transform duration-300 hover:scale-105">
+                     class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105">
             @else
                 <div class="flex items-center justify-center w-full h-full text-xs font-medium tracking-widest uppercase text-muted-foreground">
                     Cover

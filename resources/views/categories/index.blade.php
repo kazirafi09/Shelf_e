@@ -181,16 +181,10 @@
                         @endauth
                         
                         <a href="/product/{{ $product->slug }}" class="block grow">
-                            <div
-                                x-data="{ zoomed: false }"
-                                @mouseenter="zoomed = true"
-                                @mouseleave="zoomed = false"
-                                class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden"
-                            >
+                            <div class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
                                 @if($product->image_path)
                                     <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->title }}"
-                                         class="object-cover w-full h-full transition-transform duration-300"
-                                         :class="{ 'scale-105 z-10': zoomed }">
+                                         class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105">
                                 @else
                                     Cover Image
                                 @endif

@@ -336,12 +336,10 @@
                 @endauth
 
                 <a href="/product/{{ $book->slug }}" class="block grow">
-                    <div x-data="{ zoomed: false }" @mouseenter="zoomed = true" @mouseleave="zoomed = false"
-                         class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
+                    <div class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
                         @if($book->image_path)
                             <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
-                                 class="object-cover w-full h-full transition-transform duration-300"
-                                 :class="{ 'scale-125 z-10': zoomed }">
+                                 class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105">
                         @else
                             <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
                         @endif
@@ -376,7 +374,7 @@
             </div>
             @endforeach
         </div>
-        
+
         <div class="mt-8 text-center md:hidden">
             <a href="/categories" class="inline-block px-8 py-3 text-sm font-bold text-gray-700 transition-colors border-2 border-gray-200 rounded-full hover:bg-gray-100">See All Books</a>
         </div>
@@ -439,12 +437,10 @@
                 @endauth
 
                 <a href="/product/{{ $book->slug }}" class="block grow">
-                    <div x-data="{ zoomed: false }" @mouseenter="zoomed = true" @mouseleave="zoomed = false"
-                         class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
+                    <div class="relative w-full aspect-[2/3] bg-muted rounded-md mb-3 flex items-center justify-center text-muted-foreground overflow-hidden">
                         @if($book->image_path)
                             <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" loading="lazy"
-                                 class="object-cover w-full h-full transition-transform duration-300"
-                                 :class="{ 'scale-125 z-10': zoomed }">
+                                 class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105">
                         @else
                             <span class="text-xs font-medium tracking-widest uppercase">Cover</span>
                         @endif
