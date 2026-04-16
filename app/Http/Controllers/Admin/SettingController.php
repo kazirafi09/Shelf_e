@@ -28,7 +28,7 @@ class SettingController extends Controller
             'shipping_outside_dhaka' => ['required', 'integer', 'min:0'],
             'bkash_number'      => ['nullable', 'string', 'max:20'],
             'faq_content'       => ['nullable', 'string', 'max:10000'],
-            'about_us'          => ['nullable', 'string', 'max:1000'],
+            'about_us'          => ['nullable', 'string', 'max:2000'],
         ]);
 
         Setting::set('announcement_text', $data['announcement_text']);

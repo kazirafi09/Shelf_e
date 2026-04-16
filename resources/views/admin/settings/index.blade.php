@@ -135,25 +135,33 @@
             </div>
 
             {{-- About Us --}}
-            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm"
+                 x-data="{ aboutUs: {{ Js::from(old('about_us', $aboutUs)) }}, maxLen: 2000 }">
                 <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">About Us</h2>
-                <p class="mb-5 text-sm text-muted-foreground">This text appears in the footer's "About Us" section on every public page.</p>
+                <p class="mb-5 text-sm text-muted-foreground">This text appears in the footer's "About Us" section on every public page. Long text will show a "Read more" toggle in the footer.</p>
 
-                <label for="about_us" class="block mb-2 text-sm font-semibold text-foreground">
-                    About Us Text
-                </label>
+                <div class="flex items-center justify-between mb-2">
+                    <label for="about_us" class="text-sm font-semibold text-foreground">
+                        About Us Text
+                    </label>
+                    <span class="text-xs tabular-nums"
+                          :class="aboutUs.length > maxLen ? 'text-red-600 font-semibold' : 'text-muted-foreground'">
+                        <span x-text="aboutUs.length"></span> / <span x-text="maxLen"></span>
+                    </span>
+                </div>
                 <textarea
                     id="about_us"
                     name="about_us"
-                    rows="5"
-                    maxlength="1000"
+                    rows="10"
+                    maxlength="2000"
+                    x-model="aboutUs"
                     class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition resize-y"
-                    placeholder="Write a short description about your store…"
-                >{{ old('about_us', $aboutUs) }}</textarea>
+                    placeholder="Write a description about your store…"
+                ></textarea>
                 @error('about_us')
                     <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
                 @enderror
-                <p class="mt-1.5 text-xs text-muted-foreground">Maximum 1,000 characters.</p>
+                <p class="mt-1.5 text-xs text-muted-foreground">Maximum 2,000 characters. Separate paragraphs with a blank line.</p>
             </div>
 
             <div class="flex justify-end">

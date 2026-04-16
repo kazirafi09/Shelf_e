@@ -552,9 +552,36 @@
                             </svg>
                         </span>
                     </a>
-                    @php $aboutUsText = \App\Models\Setting::get('about_us', 'Your premium destination for discovering worlds through words. Curated collections for the modern reader.'); @endphp
+                    @php
+                        $aboutUsText  = \App\Models\Setting::get('about_us', 'Your premium destination for discovering worlds through words. Curated collections for the modern reader.');
+                        $aboutPreview = Str::limit($aboutUsText, 280, '');
+                        $isLong       = mb_strlen($aboutUsText) > 280;
+                    @endphp
                     <h4 class="mb-3 text-sm font-bold tracking-wider text-gray-900 uppercase">About Us</h4>
-                    <p class="mb-6 text-sm leading-relaxed text-gray-500">{{ $aboutUsText }}</p>
+                    @if($isLong)
+                        <div x-data="{ expanded: false }">
+                            <div class="mb-3 text-sm leading-relaxed text-gray-500 space-y-2">
+                                {{-- Always-visible preview --}}
+                                <p>
+                                    {{ $aboutPreview }}<span x-show="!expanded" class="text-gray-400">…</span>
+                                </p>
+                                {{-- Remaining text, revealed on expand --}}
+                                <div x-show="expanded" x-collapse>
+                                    @foreach(explode("\n", ltrim(mb_substr($aboutUsText, mb_strlen($aboutPreview)))) as $line)
+                                        @if(trim($line) !== '')
+                                            <p>{{ trim($line) }}</p>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                            <button @click="expanded = !expanded"
+                                    class="text-xs font-semibold text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 mb-6">
+                                <span x-text="expanded ? 'Read less ↑' : 'Read more →'"></span>
+                            </button>
+                        </div>
+                    @else
+                        <p class="mb-6 text-sm leading-relaxed text-gray-500">{{ $aboutUsText }}</p>
+                    @endif
                 </div>
                 <div>
                     <h4 class="mb-5 text-sm font-bold tracking-wider text-gray-900 uppercase">Shop</h4>
