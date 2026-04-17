@@ -33,7 +33,8 @@
       "Bash(find /d/Shelf-e/shelf-e/resources/views -name \"*.blade.php\" -exec grep -l \"file\\\\|upload\\\\|image\" {} \\\\;)",
       "Bash(find:*)",
       "Bash(netstat -ano)",
-      "Bash(tasklist)"
+      "Bash(tasklist)",
+      "Bash(npx tailwindcss *)"
     ]
   }
 }

@@ -559,7 +559,8 @@
                     @endphp
                     <h4 class="mb-3 text-sm font-bold tracking-wider text-gray-900 uppercase">About Us</h4>
                     @if($isLong)
-                        <div x-data="{ open: false }">
+                        <div x-data="{ open: false }"
+                             x-effect="document.body.style.overflow = open ? 'hidden' : ''">
                             <p class="mb-3 text-sm leading-relaxed text-gray-500">{{ $aboutPreview }}…</p>
                             <button @click="open = true"
                                     class="text-xs font-semibold text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 mb-6">
@@ -576,7 +577,8 @@
                                      x-transition:leave="transition ease-in duration-200"
                                      x-transition:leave-start="opacity-100"
                                      x-transition:leave-end="opacity-0"
-                                     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                                     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60"
+                                     style="touch-action: none;"
                                      @click.self="open = false"
                                      @keydown.escape.window="open = false">
 
@@ -587,13 +589,14 @@
                                          x-transition:leave="transition ease-in duration-200"
                                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                          x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                                         class="relative w-full max-w-2xl max-h-[85dvh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden mx-4">
+                                         class="relative w-[calc(100%-2rem)] max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                                         @click.stop>
 
                                         {{-- Modal header --}}
-                                        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+                                        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0 sm:px-6">
                                             <h3 class="text-lg font-extrabold tracking-tight text-gray-900">About Us</h3>
                                             <button @click="open = false"
-                                                    class="p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+                                                    class="p-2 -mr-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                 </svg>
@@ -601,7 +604,8 @@
                                         </div>
 
                                         {{-- Modal body --}}
-                                        <div class="px-6 py-5 overflow-y-auto text-sm leading-relaxed text-gray-600 space-y-4">
+                                        <div class="px-5 py-5 overflow-y-auto text-sm leading-relaxed text-gray-600 overscroll-contain space-y-4 sm:px-6"
+                                             style="-webkit-overflow-scrolling: touch;">
                                             @foreach(array_filter(array_map('trim', explode("\n", $aboutUsText))) as $line)
                                                 <p>{{ $line }}</p>
                                             @endforeach
