@@ -559,25 +559,54 @@
                     @endphp
                     <h4 class="mb-3 text-sm font-bold tracking-wider text-gray-900 uppercase">About Us</h4>
                     @if($isLong)
-                        <div x-data="{ expanded: false }">
-                            <div class="mb-3 text-sm leading-relaxed text-gray-500 space-y-2">
-                                {{-- Always-visible preview --}}
-                                <p>
-                                    {{ $aboutPreview }}<span x-show="!expanded" class="text-gray-400">…</span>
-                                </p>
-                                {{-- Remaining text, revealed on expand --}}
-                                <div x-show="expanded" x-collapse>
-                                    @foreach(explode("\n", ltrim(mb_substr($aboutUsText, mb_strlen($aboutPreview)))) as $line)
-                                        @if(trim($line) !== '')
-                                            <p>{{ trim($line) }}</p>
-                                        @endif
-                                    @endforeach
+                        <div x-data="{ open: false }">
+                            <p class="mb-3 text-sm leading-relaxed text-gray-500">{{ $aboutPreview }}…</p>
+                            <button @click="open = true"
+                                    class="text-xs font-semibold text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 mb-6">
+                                Read more →
+                            </button>
+
+                            {{-- About Us Modal --}}
+                            <div x-show="open"
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0"
+                                 x-transition:enter-end="opacity-100"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100"
+                                 x-transition:leave-end="opacity-0"
+                                 class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                                 @click.self="open = false"
+                                 @keydown.escape.window="open = false">
+
+                                <div x-show="open"
+                                     x-transition:enter="transition ease-out duration-300"
+                                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-200"
+                                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                                     class="relative w-full max-w-2xl max-h-[80vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+
+                                    {{-- Modal header --}}
+                                    <div class="flex items-center justify-between px-8 py-5 border-b border-gray-100 shrink-0">
+                                        <h3 class="text-lg font-extrabold tracking-tight text-gray-900">About Us</h3>
+                                        <button @click="open = false"
+                                                class="p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    {{-- Modal body --}}
+                                    <div class="px-8 py-6 overflow-y-auto text-sm leading-relaxed text-gray-600 space-y-4">
+                                        @foreach(array_filter(array_map('trim', explode("\n", $aboutUsText))) as $line)
+                                            <p>{{ $line }}</p>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                            <button @click="expanded = !expanded"
-                                    class="text-xs font-semibold text-gray-700 hover:text-gray-900 transition-colors underline underline-offset-2 mb-6">
-                                <span x-text="expanded ? 'Read less ↑' : 'Read more →'"></span>
-                            </button>
                         </div>
                     @else
                         <p class="mb-6 text-sm leading-relaxed text-gray-500">{{ $aboutUsText }}</p>
