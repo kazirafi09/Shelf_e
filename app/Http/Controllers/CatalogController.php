@@ -12,42 +12,107 @@ use Illuminate\Support\Facades\Cache;
 
 class CatalogController extends Controller
 {
-    // 1. Load the Homepage (FIX 2.1: Cached for 5 minutes to prevent N+1 and slow loads)
-    // ADD THIS TO THE BOTTOM OF CatalogController
+    /**
+     * Escape LIKE wildcards (% and _) from user input so the pattern behaves
+     * like a plain substring match rather than a wildcard expression.
+     */
+    private function escapeLike(string $value): string
+    {
+        return addcslashes($value, '%_\\');
+    }
+
+    /**
+     * Split the raw user query into searchable tokens (lowercased, trimmed,
+     * min 2 chars) plus a normalized full-term version for phrase boosts.
+     *
+     * @return array{term: string, words: array<int, string>}
+     */
+    private function tokenizeSearch(string $raw): array
+    {
+        $term = mb_strtolower(trim($raw));
+        $words = array_values(array_filter(
+            preg_split('/\s+/u', $term) ?: [],
+            fn ($w) => mb_strlen($w) >= 2
+        ));
+
+        if (empty($words) && $term !== '') {
+            $words = [$term];
+        }
+
+        return ['term' => $term, 'words' => $words];
+    }
+
+    /**
+     * Build a relevance scoring SQL fragment plus its bindings for a search.
+     * Heavier weights on title/author so on-topic books bubble to the top.
+     *
+     * @param  array<int, string>  $words
+     * @return array{sql: string, bindings: array<int, string>}
+     */
+    private function buildRelevanceScore(string $term, array $words): array
+    {
+        $escTerm = $this->escapeLike($term);
+        $parts = [];
+        $bindings = [];
+
+        // Whole-phrase boosts
+        $parts[] = '(CASE WHEN LOWER(title) = ? THEN 100 ELSE 0 END)';
+        $bindings[] = $term;
+        $parts[] = '(CASE WHEN LOWER(title) LIKE ? THEN 60 ELSE 0 END)';
+        $bindings[] = $escTerm . '%';
+        $parts[] = '(CASE WHEN LOWER(title) LIKE ? THEN 35 ELSE 0 END)';
+        $bindings[] = '%' . $escTerm . '%';
+        $parts[] = '(CASE WHEN LOWER(author) = ? THEN 45 ELSE 0 END)';
+        $bindings[] = $term;
+        $parts[] = '(CASE WHEN LOWER(author) LIKE ? THEN 25 ELSE 0 END)';
+        $bindings[] = '%' . $escTerm . '%';
+
+        // Per-word boosts (so multi-word queries still rank well)
+        foreach ($words as $word) {
+            $escWord = $this->escapeLike($word);
+            $parts[] = '(CASE WHEN LOWER(title) LIKE ? THEN 8 ELSE 0 END)';
+            $bindings[] = '%' . $escWord . '%';
+            $parts[] = '(CASE WHEN LOWER(author) LIKE ? THEN 5 ELSE 0 END)';
+            $bindings[] = '%' . $escWord . '%';
+        }
+
+        return ['sql' => implode(' + ', $parts), 'bindings' => $bindings];
+    }
+
+    // Live autocomplete endpoint for the navbar dropdown.
     public function liveSearch(Request $request)
     {
         $request->validate(['q' => 'nullable|string|max:100']);
 
-        $term = $request->query('q');
+        ['term' => $term, 'words' => $words] = $this->tokenizeSearch((string) $request->query('q', ''));
 
-        if (!$term || strlen($term) < 2) {
+        if ($term === '' || mb_strlen($term) < 2 || empty($words)) {
             return response()->json([]);
         }
 
-        // Split the search term into individual words
-        $words = explode(' ', $term);
         $query = Product::query();
 
+        // Every token must match title, author, or category (AND across words).
+        // Description/synopsis intentionally excluded here to keep the dropdown
+        // focused on title/author matches users expect from autocomplete.
         foreach ($words as $word) {
-            // Create a fuzzy string for typos (e.g., "poter" becomes "%p%o%t%e%r%")
-            $fuzzyWord = '%' . implode('%', str_split($word)) . '%';
-
-            $query->where(function ($q) use ($word, $fuzzyWord) {
-                $q->where('title', 'LIKE', "%{$word}%")
-                  ->orWhere('title', 'LIKE', $fuzzyWord) // Typo tolerance
-                  ->orWhere('author', 'LIKE', "%{$word}%")
-                  ->orWhere('description', 'LIKE', "%{$word}%")
-                  ->orWhere('synopsis', 'LIKE', "%{$word}%")
-                  ->orWhereHas('category', function ($cq) use ($word) {
-                      $cq->where('name', 'LIKE', "%{$word}%");
-                  });
+            $like = '%' . $this->escapeLike($word) . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('title', 'LIKE', $like)
+                  ->orWhere('author', 'LIKE', $like)
+                  ->orWhereHas('category', fn ($cq) => $cq->where('name', 'LIKE', $like));
             });
         }
 
-        // Only grab the columns we actually need for the dropdown to keep it blazing fast
-        $results = $query->select('id', 'title', 'author', 'slug', 'image_path')
-                         ->take(5) // Limit to 5 results so the dropdown isn't massive
-                         ->get();
+        $score = $this->buildRelevanceScore($term, $words);
+
+        $results = $query
+            ->select('id', 'title', 'author', 'slug', 'image_path')
+            ->selectRaw($score['sql'] . ' AS relevance', $score['bindings'])
+            ->orderByDesc('relevance')
+            ->orderBy('title')
+            ->limit(8)
+            ->get();
 
         return response()->json($results);
     }
@@ -111,26 +176,33 @@ class CatalogController extends Controller
 
         $pageTitle = 'All Books';
         $currentCategory = null;
+        $searchActive = false;
 
-        // A. GLOBAL SEARCH (FIX 2.5 & D-001: Upgraded Scope & Fuzzy Match)
+        // A. GLOBAL SEARCH — relevance-ranked, tokenized, wildcard-escaped.
         if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $words = explode(' ', $searchTerm);
+            ['term' => $searchTerm, 'words' => $searchWords] = $this->tokenizeSearch((string) $request->search);
 
-            foreach ($words as $word) {
-                $fuzzyWord = '%' . implode('%', str_split($word)) . '%';
+            if ($searchTerm !== '' && ! empty($searchWords)) {
+                $searchActive = true;
 
-                $query->where(function ($q) use ($word, $fuzzyWord) {
-                    $q->where('title', 'LIKE', "%{$word}%")
-                      ->orWhere('title', 'LIKE', $fuzzyWord)
-                      ->orWhere('author', 'LIKE', "%{$word}%")
-                      ->orWhere('description', 'LIKE', "%{$word}%")
-                      ->orWhere('synopsis', 'LIKE', "%{$word}%")
-                      ->orWhereHas('category', function ($cq) use ($word) {
-                          $cq->where('name', 'LIKE', "%{$word}%");
-                      });
-                });
+                foreach ($searchWords as $word) {
+                    $like = '%' . $this->escapeLike($word) . '%';
+                    $query->where(function ($q) use ($like) {
+                        $q->where('title', 'LIKE', $like)
+                          ->orWhere('author', 'LIKE', $like)
+                          ->orWhere('description', 'LIKE', $like)
+                          ->orWhere('synopsis', 'LIKE', $like)
+                          ->orWhereHas('category', function ($cq) use ($like) {
+                              $cq->where('name', 'LIKE', $like);
+                          });
+                    });
+                }
+
+                $score = $this->buildRelevanceScore($searchTerm, $searchWords);
+                $query->selectRaw('products.*')
+                      ->selectRaw('(' . $score['sql'] . ') AS relevance', $score['bindings']);
             }
+
             $pageTitle = 'Search Results';
         }
 
@@ -222,6 +294,10 @@ class CatalogController extends Controller
             if ($pageTitle === 'All Books') {
                 $pageTitle = 'New Arrivals';
             }
+        } elseif ($searchActive) {
+            // Default sort for search results is relevance (highest match score first),
+            // then most recent so ties break toward fresh stock.
+            $query->orderByDesc('relevance')->orderByDesc('created_at');
         }
 
         // I. NEW ARRIVALS — books added in the last 7 days

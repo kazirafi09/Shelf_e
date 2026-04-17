@@ -119,34 +119,57 @@
                     </a>
                 </div>
 
-                <div class="relative flex-1 hidden max-w-xl mx-8 md:block" x-data="liveSearch()">
-                    <form action="{{ route('categories.index') }}" method="GET" class="relative w-full group">
-                        <input type="text" name="search" placeholder="Search by Titles or Authors..."
+                <div class="relative flex-1 hidden max-w-xl mx-8 md:block" x-data="liveSearch()" @keydown.escape.window="close()">
+                    <form :action="formAction" method="GET" class="relative w-full group" @submit="onSubmit($event)">
+                        <input type="text" name="search" placeholder="Search by titles, authors or genres..."
                                x-model="query"
-                               @input.debounce.300ms="fetchResults"
-                               @focus="if(query.length >= 2) showDropdown = true"
-                               @click.away="showDropdown = false"
+                               x-ref="input"
+                               @input.debounce.200ms="fetchResults"
+                               @focus="onFocus"
+                               @click.away="close()"
+                               @keydown.arrow-down.prevent="move(1)"
+                               @keydown.arrow-up.prevent="move(-1)"
+                               @keydown.enter="selectActive($event)"
+                               @keydown.escape.prevent="close()"
                                autocomplete="off"
+                               role="combobox"
+                               aria-autocomplete="list"
+                               :aria-expanded="showDropdown"
+                               aria-controls="live-search-results-desktop"
                                class="w-full px-5 py-2.5 transition-all duration-300 border border-gray-300 rounded-full focus:outline-none focus:border-gray-500 focus:ring-4 focus:ring-gray-500/10 bg-gray-50 focus:bg-white text-sm">
-                        <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-700">
+                        <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-700" aria-label="Search">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
                     </form>
 
-                    <div x-show="showDropdown" x-transition style="display: none;" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-96">
-                        <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching...</div>
-                        <div x-show="!loading && results.length === 0 && query.length >= 2" class="p-4 text-sm text-center text-gray-500">No books found matching "<span x-text="query"></span>"</div>
+                    <div x-show="showDropdown" x-transition style="display: none;" id="live-search-results-desktop" role="listbox" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-[28rem]">
+                        <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching…</div>
+                        <div x-show="!loading && trimmedQuery.length < 2" class="p-4 text-xs text-center text-gray-400">Type at least 2 characters to search</div>
+                        <div x-show="!loading && trimmedQuery.length >= 2 && results.length === 0" class="p-4 text-sm text-center text-gray-500">No books found matching “<span class="font-semibold text-gray-700" x-text="trimmedQuery"></span>”</div>
 
-                        <template x-for="book in results" :key="book.id">
-                            <a :href="'/product/' + book.slug" class="flex items-center p-3 transition-colors border-b hover:bg-gray-50 border-gray-100 last:border-b-0">
+                        <template x-for="(book, idx) in results" :key="book.id">
+                            <a :href="'/product/' + book.slug"
+                               :class="idx === activeIndex ? 'bg-amber-50' : ''"
+                               @mouseenter="activeIndex = idx"
+                               role="option"
+                               :aria-selected="idx === activeIndex"
+                               class="flex items-center p-3 transition-colors border-b hover:bg-amber-50 border-gray-100 last:border-b-0">
                                 <div class="w-10 overflow-hidden bg-gray-200 rounded h-14 shrink-0">
-                                    <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full">
+                                    <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full" :alt="book.title">
                                     <div x-show="!book.image_path" class="flex items-center justify-center w-full h-full text-[8px] text-gray-400 uppercase">Cover</div>
                                 </div>
-                                <div class="ml-3">
-                                    <h4 class="text-sm font-bold text-gray-900" x-text="book.title"></h4>
-                                    <p class="text-xs text-gray-500" x-text="book.author"></p>
+                                <div class="min-w-0 ml-3">
+                                    <h4 class="text-sm font-bold text-gray-900 truncate" x-html="highlight(book.title)"></h4>
+                                    <p class="text-xs text-gray-500 truncate" x-html="highlight(book.author || '')"></p>
                                 </div>
+                            </a>
+                        </template>
+
+                        <template x-if="!loading && results.length > 0 && trimmedQuery.length >= 2">
+                            <a :href="formAction + '?search=' + encodeURIComponent(trimmedQuery)"
+                               class="flex items-center justify-center px-4 py-3 text-xs font-bold tracking-wide text-gray-700 uppercase transition-colors border-t border-gray-100 bg-gray-50 hover:bg-gray-100">
+                                See all results for “<span class="ml-1 text-amber-600 normal-case" x-text="trimmedQuery"></span>”
+                                <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                             </a>
                         </template>
                     </div>
@@ -203,33 +226,55 @@
 
             {{-- MOBILE SEARCH --}}
             <div class="relative mt-4 md:hidden" x-data="liveSearch()">
-                <form action="{{ route('categories.index') }}" method="GET" class="relative w-full">
-                    <input type="text" name="search" placeholder="Search books..."
+                <form :action="formAction" method="GET" class="relative w-full" @submit="onSubmit($event)">
+                    <input type="text" name="search" placeholder="Search books, authors, genres..."
                            x-model="query"
-                           @input.debounce.300ms="fetchResults"
-                           @focus="if(query.length >= 2) showDropdown = true"
-                           @click.away="showDropdown = false"
+                           @input.debounce.200ms="fetchResults"
+                           @focus="onFocus"
+                           @click.away="close()"
+                           @keydown.arrow-down.prevent="move(1)"
+                           @keydown.arrow-up.prevent="move(-1)"
+                           @keydown.enter="selectActive($event)"
+                           @keydown.escape.prevent="close()"
                            autocomplete="off"
+                           role="combobox"
+                           aria-autocomplete="list"
+                           :aria-expanded="showDropdown"
+                           aria-controls="live-search-results-mobile"
                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-500/20 bg-gray-50">
-                    <button type="submit" class="absolute text-gray-400 right-3 top-2">
+                    <button type="submit" class="absolute text-gray-400 right-3 top-2" aria-label="Search">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </button>
                 </form>
 
-                <div x-show="showDropdown" x-transition style="display: none;" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-80">
-                    <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching...</div>
-                    <div x-show="!loading && results.length === 0 && query.length >= 2" class="p-4 text-sm text-center text-gray-500">No books found matching "<span x-text="query"></span>"</div>
+                <div x-show="showDropdown" x-transition style="display: none;" id="live-search-results-mobile" role="listbox" class="absolute z-50 w-full mt-2 overflow-hidden overflow-y-auto bg-white border border-gray-100 shadow-2xl rounded-xl max-h-80">
+                    <div x-show="loading" class="p-4 text-sm text-center text-gray-500">Searching…</div>
+                    <div x-show="!loading && trimmedQuery.length < 2" class="p-4 text-xs text-center text-gray-400">Type at least 2 characters to search</div>
+                    <div x-show="!loading && trimmedQuery.length >= 2 && results.length === 0" class="p-4 text-sm text-center text-gray-500">No books found matching “<span class="font-semibold text-gray-700" x-text="trimmedQuery"></span>”</div>
 
-                    <template x-for="book in results" :key="book.id">
-                        <a :href="'/product/' + book.slug" class="flex items-center p-3 transition-colors border-b hover:bg-gray-50 border-gray-100 last:border-b-0">
+                    <template x-for="(book, idx) in results" :key="book.id">
+                        <a :href="'/product/' + book.slug"
+                           :class="idx === activeIndex ? 'bg-amber-50' : ''"
+                           @mouseenter="activeIndex = idx"
+                           role="option"
+                           :aria-selected="idx === activeIndex"
+                           class="flex items-center p-3 transition-colors border-b hover:bg-amber-50 border-gray-100 last:border-b-0">
                             <div class="w-10 overflow-hidden bg-gray-200 rounded h-14 shrink-0">
-                                <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full">
+                                <img x-show="book.image_path" :src="'/storage/' + book.image_path" class="object-cover w-full h-full" :alt="book.title">
                                 <div x-show="!book.image_path" class="flex items-center justify-center w-full h-full text-[8px] text-gray-400 uppercase">Cover</div>
                             </div>
-                            <div class="ml-3">
-                                <h4 class="text-sm font-bold text-gray-900" x-text="book.title"></h4>
-                                <p class="text-xs text-gray-500" x-text="book.author"></p>
+                            <div class="min-w-0 ml-3">
+                                <h4 class="text-sm font-bold text-gray-900 truncate" x-html="highlight(book.title)"></h4>
+                                <p class="text-xs text-gray-500 truncate" x-html="highlight(book.author || '')"></p>
                             </div>
+                        </a>
+                    </template>
+
+                    <template x-if="!loading && results.length > 0 && trimmedQuery.length >= 2">
+                        <a :href="formAction + '?search=' + encodeURIComponent(trimmedQuery)"
+                           class="flex items-center justify-center px-4 py-3 text-xs font-bold tracking-wide text-gray-700 uppercase transition-colors border-t border-gray-100 bg-gray-50 hover:bg-gray-100">
+                            See all results
+                            <svg class="w-3.5 h-3.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                         </a>
                     </template>
                 </div>
@@ -672,28 +717,119 @@
                 results: [],
                 loading: false,
                 showDropdown: false,
+                activeIndex: -1,
+                abortController: null,
+                formAction: @json(route('categories.index')),
+
+                get trimmedQuery() {
+                    return (this.query || '').trim();
+                },
+
+                onFocus() {
+                    if (this.trimmedQuery.length >= 2) {
+                        this.showDropdown = true;
+                    }
+                },
+
+                onSubmit(event) {
+                    if (this.trimmedQuery.length === 0) {
+                        event.preventDefault();
+                        return;
+                    }
+                    this.close();
+                },
 
                 async fetchResults() {
-                    if (this.query.length < 2) {
+                    const q = this.trimmedQuery;
+
+                    // Cancel any in-flight request so slow responses can't overwrite newer ones.
+                    if (this.abortController) {
+                        this.abortController.abort();
+                        this.abortController = null;
+                    }
+
+                    if (q.length < 2) {
                         this.results = [];
+                        this.activeIndex = -1;
                         this.showDropdown = false;
+                        this.loading = false;
                         return;
                     }
 
                     this.loading = true;
                     this.showDropdown = true;
+                    this.activeIndex = -1;
+
+                    const controller = new AbortController();
+                    this.abortController = controller;
 
                     try {
-                        const response = await fetch(`/api/search-books?q=${encodeURIComponent(this.query)}`);
+                        const response = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`, {
+                            signal: controller.signal,
+                            headers: { 'Accept': 'application/json' },
+                        });
+                        if (!response.ok) throw new Error(`Search responded ${response.status}`);
                         const data = await response.json();
-                        this.results = data;
+                        // Ignore if a newer request has taken over.
+                        if (controller.signal.aborted) return;
+                        this.results = Array.isArray(data) ? data : [];
                     } catch (error) {
+                        if (error.name === 'AbortError') return;
                         console.error('Search failed:', error);
                         this.results = [];
                     } finally {
-                        this.loading = false;
+                        if (this.abortController === controller) {
+                            this.loading = false;
+                            this.abortController = null;
+                        }
                     }
-                }
+                },
+
+                move(direction) {
+                    if (!this.showDropdown || this.results.length === 0) return;
+                    const len = this.results.length;
+                    if (this.activeIndex === -1) {
+                        this.activeIndex = direction > 0 ? 0 : len - 1;
+                    } else {
+                        this.activeIndex = (this.activeIndex + direction + len) % len;
+                    }
+                },
+
+                selectActive(event) {
+                    if (this.activeIndex >= 0 && this.results[this.activeIndex]) {
+                        event.preventDefault();
+                        window.location.href = '/product/' + this.results[this.activeIndex].slug;
+                    }
+                    // Otherwise the form submits naturally → full results page.
+                },
+
+                close() {
+                    this.showDropdown = false;
+                    this.activeIndex = -1;
+                },
+
+                // Escape HTML then wrap matched substrings (words >= 2 chars) in <mark>.
+                highlight(text) {
+                    const raw = String(text ?? '');
+                    const escaped = raw
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
+                    const q = this.trimmedQuery;
+                    if (q.length < 2) return escaped;
+
+                    const terms = q.split(/\s+/).filter(w => w.length >= 2);
+                    if (terms.length === 0) return escaped;
+
+                    const pattern = terms
+                        .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+                        .join('|');
+                    const regex = new RegExp(`(${pattern})`, 'gi');
+                    return escaped.replace(regex, '<mark class="bg-amber-100 text-amber-900 rounded px-0.5">$1</mark>');
+                },
             }));
         });
     </script>
