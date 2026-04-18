@@ -427,6 +427,12 @@
         @yield('content')
     </main>
 
+    @php
+        $footerNv = \App\Models\Voucher::where('code', 'FIRST15')->first();
+        $footerNvPercent = $footerNv ? (int) $footerNv->discount_value : 15;
+        $footerNvCap     = $footerNv && $footerNv->max_discount_amount ? (int) $footerNv->max_discount_amount : null;
+        $footerNvLabel   = $footerNvPercent . '% off' . ($footerNvCap ? ' (up to ৳' . $footerNvCap . ')' : '');
+    @endphp
     <footer class="mt-auto bg-white border-t border-gray-200">
         {{-- Newsletter --}}
         <div id="newsletter" class="relative py-16 overflow-hidden bg-gray-900"
@@ -480,7 +486,7 @@
 
             <div class="container relative z-10 px-4 mx-auto text-center">
                 <h2 class="mb-3 text-3xl font-extrabold tracking-tight text-white">Get your first discount!</h2>
-                <p class="mb-8 font-medium text-gray-300">Subscribe to our newsletter and get a 15% discount code</p>
+                <p class="mb-8 font-medium text-gray-300">Subscribe to our newsletter and get a {{ $footerNvLabel }} discount code</p>
 
                 {{-- Guest state --}}
                 <div x-show="state === 'guest'" x-cloak class="max-w-md mx-auto">
@@ -507,7 +513,7 @@
                 {{-- Already subscribed state --}}
                 <div x-show="state === 'already'" x-cloak class="max-w-md mx-auto text-gray-300">
                     <p class="text-base font-semibold text-white">You're already subscribed!</p>
-                    <p class="mt-1 text-sm">Use code <span class="font-bold text-white">FIRST15</span> at checkout for 15% off.</p>
+                    <p class="mt-1 text-sm">Use code <span class="font-bold text-white">FIRST15</span> at checkout for {{ $footerNvLabel }}.</p>
                 </div>
 
                 {{-- Done state --}}

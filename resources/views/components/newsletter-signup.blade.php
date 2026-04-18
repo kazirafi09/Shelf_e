@@ -15,6 +15,7 @@
 --}}
 @php
     use App\Models\Subscriber;
+    use App\Models\Voucher;
 
     $isGuest    = auth()->guest();
     $userEmail  = $isGuest ? '' : auth()->user()->email;
@@ -35,6 +36,11 @@
     } else {
         $initialState = 'form';
     }
+
+    $nv = Voucher::where('code', 'FIRST15')->first();
+    $nvPercent = $nv ? (int) $nv->discount_value : 15;
+    $nvCap     = $nv && $nv->max_discount_amount ? (int) $nv->max_discount_amount : null;
+    $nvLabel   = $nvPercent . '% off' . ($nvCap ? ' (up to ৳' . $nvCap . ')' : '');
 @endphp
 
 <section
@@ -99,7 +105,7 @@
         </h2>
         <p class="mb-10 text-base text-gray-500">
             Subscribe to our newsletter and get a
-            <span class="font-semibold text-gray-700">15% discount code</span>
+            <span class="font-semibold text-gray-700">{{ $nvLabel }} discount code</span>
             for your first order.
         </p>
 
@@ -201,7 +207,7 @@
                 is already on our newsletter list.
             </p>
             <p class="mt-3 text-xs text-gray-400">
-                If you haven't used your <span class="font-semibold">FIRST15</span> discount yet, apply it at checkout.
+                If you haven't used your <span class="font-semibold">FIRST15</span> discount ({{ $nvLabel }}) yet, apply it at checkout.
             </p>
         </div>
 
@@ -251,7 +257,7 @@
                 </div>
                 <p class="mt-4 text-xs text-gray-500">
                     Apply this code at checkout to receive
-                    <span class="font-semibold text-gray-700">15% off</span>
+                    <span class="font-semibold text-gray-700">{{ $nvLabel }}</span>
                     your first order. Valid for one use only.
                 </p>
             </div>

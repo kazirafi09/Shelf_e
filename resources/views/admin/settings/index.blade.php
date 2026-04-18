@@ -134,6 +134,51 @@
                 @enderror
             </div>
 
+            {{-- Newsletter Discount --}}
+            <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm">
+                <h2 class="mb-1 text-base font-bold tracking-tight text-foreground">Newsletter Discount (FIRST15)</h2>
+                <p class="mb-5 text-sm text-muted-foreground">Configure the welcome discount given to new newsletter subscribers. The cap limits the maximum taka value of the discount (0 = no cap).</p>
+
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="newsletter_discount_percent" class="block mb-2 text-sm font-semibold text-foreground">
+                            Discount Percentage (%)
+                        </label>
+                        <input
+                            type="number"
+                            id="newsletter_discount_percent"
+                            name="newsletter_discount_percent"
+                            value="{{ old('newsletter_discount_percent', $newsletterDiscountPercent) }}"
+                            min="1"
+                            max="100"
+                            class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
+                        >
+                        @error('newsletter_discount_percent')
+                            <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1.5 text-xs text-muted-foreground">Percentage off the order subtotal (1–100).</p>
+                    </div>
+
+                    <div>
+                        <label for="newsletter_discount_cap" class="block mb-2 text-sm font-semibold text-foreground">
+                            Maximum Discount (৳)
+                        </label>
+                        <input
+                            type="number"
+                            id="newsletter_discount_cap"
+                            name="newsletter_discount_cap"
+                            value="{{ old('newsletter_discount_cap', $newsletterDiscountCap) }}"
+                            min="0"
+                            class="w-full px-4 py-2.5 text-sm border border-border rounded-xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-400 transition"
+                        >
+                        @error('newsletter_discount_cap')
+                            <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1.5 text-xs text-muted-foreground">The discount will not exceed this amount in taka. Set to 0 for no cap.</p>
+                    </div>
+                </div>
+            </div>
+
             {{-- About Us --}}
             <div class="p-6 bg-card text-card-foreground border border-border rounded-2xl shadow-sm"
                  x-data="{ aboutUs: {{ Js::from(old('about_us', $aboutUs)) }}, maxLen: 2000 }">
