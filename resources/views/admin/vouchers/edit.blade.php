@@ -70,6 +70,18 @@
                 </div>
             </div>
 
+            {{-- Max discount (upto) — percentage only --}}
+            <div x-show="discountType === 'percentage'" x-cloak>
+                <label for="max_discount_amount" class="block mb-1 text-sm font-bold text-foreground">Max Discount (Upto) (৳)</label>
+                <div class="relative">
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-muted-foreground pointer-events-none">৳</span>
+                    <input type="number" id="max_discount_amount" name="max_discount_amount"
+                           value="{{ old('max_discount_amount', $voucher->max_discount_amount) }}" min="1" step="1" placeholder="No cap"
+                           class="block w-full px-4 py-3 pr-10 text-sm bg-background border border-input text-foreground focus:ring-2 focus:ring-ring focus:outline-none rounded-[var(--radius)] shadow-sm">
+                </div>
+                <p class="mt-1 text-xs text-muted-foreground">Leave blank for no cap. E.g. 15% off upto ৳100.</p>
+            </div>
+
             {{-- Min order amount --}}
             <div>
                 <label for="min_order_amount" class="block mb-1 text-sm font-bold text-foreground">Minimum Order Amount (৳)</label>

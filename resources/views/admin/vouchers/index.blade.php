@@ -48,6 +48,9 @@
                 <td class="px-6 py-4 text-sm font-semibold text-foreground">
                     @if($voucher->discount_type === 'percentage')
                         {{ $voucher->discount_value }}% off
+                        @if($voucher->max_discount_amount)
+                            <span class="text-xs font-normal text-muted-foreground">upto ৳{{ number_format($voucher->max_discount_amount, 0) }}</span>
+                        @endif
                     @else
                         ৳{{ number_format($voucher->discount_value, 0) }} off
                     @endif
