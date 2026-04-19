@@ -47,7 +47,11 @@
             const data = await res.json();
             if (data.valid) {
                 if (data.discount_type === 'percentage') {
-                    this.couponDiscount = Math.round(this.subtotal * (data.discount_value / 100));
+                    let d = this.subtotal * (data.discount_value / 100);
+                    if (data.max_discount_amount !== null && data.max_discount_amount !== undefined) {
+                        d = Math.min(d, Number(data.max_discount_amount));
+                    }
+                    this.couponDiscount = Math.round(d);
                 } else {
                     this.couponDiscount = Math.min(data.discount_value, this.subtotal);
                 }

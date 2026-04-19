@@ -69,10 +69,11 @@ Route::get('/api/voucher/validate', function (Request $request) {
     }
 
     return response()->json([
-        'valid'          => true,
-        'discount_type'  => $voucher->discount_type,
-        'discount_value' => $voucher->discount_value,
-        'description'    => $voucher->description,
+        'valid'               => true,
+        'discount_type'       => $voucher->discount_type,
+        'discount_value'      => $voucher->discount_value,
+        'max_discount_amount' => $voucher->max_discount_amount,
+        'description'         => $voucher->description,
     ]);
 })->middleware(['auth', 'throttle:30,1'])->name('api.voucher.validate');
 
