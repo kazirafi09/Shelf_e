@@ -1,23 +1,15 @@
 User-agent: *
-Disallow: /product/
-Disallow: /categories
-Disallow: /bestsellers
-Disallow: /series
-Disallow: /authors
+Disallow: /admin/
 Disallow: /api/
 Disallow: /cart/
 Disallow: /checkout
-Disallow: /admin/
-Crawl-delay: 10
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /wishlist
+Disallow: /wallet
+Disallow: /addresses
+Disallow: /account/
+Disallow: /orders/
+Allow: /
 
-User-agent: Googlebot
-Disallow: /api/
-Disallow: /cart/
-Disallow: /checkout
-Disallow: /admin/
-
-User-agent: Bingbot
-Disallow: /api/
-Disallow: /cart/
-Disallow: /checkout
-Disallow: /admin/
+Sitemap: /sitemap.xml

@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'FAQ — Shipping, Returns & Orders | Shelf-E')
+@section('description', 'Answers to common questions about ordering books from Shelf-E — shipping rates across Bangladesh, returns, payment options, and account help.')
+
 @section('content')
 <div class="container px-4 py-12 mx-auto max-w-3xl">
     <h1 class="mb-6 text-4xl font-extrabold text-foreground">Frequently Asked Questions</h1>

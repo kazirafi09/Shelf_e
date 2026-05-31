@@ -1,5 +1,117 @@
 @extends('layouts.app')
 
+@php
+    // ---- Authors (schema + meta) ---------------------------------------
+    $authorNames = $product->authors->pluck('name')->filter()->values();
+    if ($authorNames->isEmpty() && ! empty($product->author)) {
+        $authorNames = collect([$product->author]);
+    }
+    $seoAuthorName = $authorNames->first();
+    $authorLabel   = $authorNames->join(', ');
+
+    // ---- Description (schema + meta) -----------------------------------
+    $longDescription   = trim(strip_tags($product->synopsis ?: $product->description ?: ''));
+    $schemaDescription = \Illuminate\Support\Str::limit($longDescription, 300);
+    $metaDescription   = \Illuminate\Support\Str::limit($longDescription, 155);
+    if ($metaDescription === '') {
+        $metaDescription = $product->title
+            . ($seoAuthorName ? ' by ' . $seoAuthorName : '')
+            . ' — buy online in Bangladesh at Shelf-E.';
+    }
+    if ($schemaDescription === '') {
+        $schemaDescription = $metaDescription;
+    }
+
+    // ---- Image ---------------------------------------------------------
+    $seoImageUrl = $product->image_path
+        ? asset('storage/' . $product->image_path)
+        : asset('favicon.svg');
+
+    // ---- Reviews -------------------------------------------------------
+    $approvedReviews = $product->approvedReviews;
+    $ratingCount     = $approvedReviews->count();
+    $ratingAverage   = $ratingCount > 0 ? round($approvedReviews->avg('rating'), 1) : null;
+
+    // ---- Offers (one per available format) -----------------------------
+    $inStock      = ($product->stock_quantity ?? 0) > 0;
+    $availability = $inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+    $saleActive   = $product->active_sale_price !== null;
+
+    $formatOffers = collect([
+        ['name' => 'Paperback', 'price' => $product->paperback_price],
+        ['name' => 'Hardcover', 'price' => $product->hardcover_price],
+    ])->filter(fn ($f) => $f['price'] !== null && (float) $f['price'] > 0)->values();
+
+    // If a sale is active, override the cheaper format with the sale price
+    // (matches Product::display_price which picks the minimum).
+    if ($saleActive && $formatOffers->isNotEmpty()) {
+        $minIdx = $formatOffers->search(fn ($f) => (float) $f['price'] === (float) $formatOffers->min('price'));
+        if ($minIdx !== false) {
+            $formatOffers[$minIdx]['price'] = $product->active_sale_price;
+        }
+    }
+
+    $offerNodes = $formatOffers->map(fn ($f) => [
+        '@type'         => 'Offer',
+        'name'          => $f['name'],
+        'price'         => number_format((float) $f['price'], 2, '.', ''),
+        'priceCurrency' => 'BDT',
+        'availability'  => $availability,
+        'url'           => url()->current(),
+    ])->all();
+
+    // ---- Book schema ---------------------------------------------------
+    $schema = [
+        '@context'    => 'https://schema.org',
+        '@type'       => 'Book',
+        'name'        => $product->title,
+        'description' => $schemaDescription,
+        'image'       => $seoImageUrl,
+        'url'         => url()->current(),
+    ];
+
+    if ($authorNames->isNotEmpty()) {
+        $schema['author'] = $authorNames->map(fn ($n) => [
+            '@type' => 'Person',
+            'name'  => $n,
+        ])->all();
+    }
+
+    if (count($offerNodes) > 1) {
+        $prices = $formatOffers->pluck('price')->map(fn ($p) => (float) $p);
+        $schema['offers'] = [
+            '@type'         => 'AggregateOffer',
+            'priceCurrency' => 'BDT',
+            'lowPrice'      => number_format($prices->min(), 2, '.', ''),
+            'highPrice'     => number_format($prices->max(), 2, '.', ''),
+            'offerCount'    => count($offerNodes),
+            'availability'  => $availability,
+            'offers'        => $offerNodes,
+        ];
+    } elseif (count($offerNodes) === 1) {
+        $schema['offers'] = $offerNodes[0];
+    }
+
+    if ($ratingAverage !== null) {
+        $schema['aggregateRating'] = [
+            '@type'       => 'AggregateRating',
+            'ratingValue' => $ratingAverage,
+            'reviewCount' => $ratingCount,
+        ];
+    }
+@endphp
+
+@section('title', $product->title . ($seoAuthorName ? ' by ' . $seoAuthorName : '') . ' — Buy Online in BD | Shelf-E')
+@section('description', $metaDescription)
+@section('og_image', $seoImageUrl)
+@section('og_type', 'product')
+
+@push('head')
+    <script type="application/ld+json">
+        {!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+@endpush
+
 @section('content')
 <div class="container px-4 py-8 mx-auto">
 
@@ -36,7 +148,7 @@
                 <x-image-magnifier
                     :src="$product->image_path ? asset('storage/' . $product->image_path) : null"
                     :zoom-src="$product->image_path ? asset('storage/' . $product->image_path) : null"
-                    :alt="$product->title"
+                    :alt="$product->title . ($authorLabel ? ' by ' . $authorLabel : '') . ' — book cover'"
                 />
             </div>
 

@@ -1,5 +1,25 @@
 @extends('layouts.app')
 
+@section('title', 'Authors — All Books by Top Authors | Shelf-E')
+@section('description', 'Discover the authors featured at Shelf-E. Browse biographies, photos, and the full list of books available by each author with home delivery in Bangladesh.')
+
+@php
+    $authorsBreadcrumb = [
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home',    'item' => url('/')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Authors', 'item' => url()->current()],
+        ],
+    ];
+@endphp
+
+@push('head')
+    <script type="application/ld+json">
+        {!! json_encode($authorsBreadcrumb, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+@endpush
+
 @section('content')
 <div class="container px-4 py-12 mx-auto max-w-7xl">
 

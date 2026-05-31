@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('title', 'Shelf-E — Buy Books Online in Bangladesh')
+@section('description', 'Shop bestsellers, new arrivals, and curated paperbacks & hardcovers at Shelf-E. Cash on delivery across Bangladesh.')
+
 @section('content')
 
 {{-- Rotating Quote — sits above the hero --}}

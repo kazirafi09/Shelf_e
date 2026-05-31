@@ -4,9 +4,73 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Shelf-E | Your Favorite Books</title>
+
+    @php
+        $seoTitle       = trim($__env->yieldContent('title')) ?: 'Shelf-E | Your Favorite Books, Delivered';
+        $seoDescription = trim($__env->yieldContent('description'))
+            ?: 'Shop a curated selection of paperbacks and hardcovers at Shelf-E. Bestsellers, new arrivals, and exclusive deals delivered across Bangladesh.';
+        $seoImage       = trim($__env->yieldContent('og_image')) ?: asset('favicon.svg');
+        $seoUrl         = url()->current();
+    @endphp
+
+    <title>{{ $seoTitle }}</title>
+    <meta name="description" content="{{ $seoDescription }}">
+    <link rel="canonical" href="{{ $seoUrl }}">
+
+    {{-- Open Graph --}}
+    <meta property="og:site_name" content="Shelf-E">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:url" content="{{ $seoUrl }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+
+    {{-- Twitter --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+
+    {{-- Locale + geo signals (Bangladesh) --}}
+    <meta property="og:locale" content="en_US">
+    <meta name="geo.region" content="BD">
+    <meta name="geo.placename" content="Dhaka">
+
+    {{-- Sitewide structured data: OnlineStore + WebSite/SearchAction --}}
+    @php
+        $orgSchema = [
+            '@context'    => 'https://schema.org',
+            '@type'       => 'OnlineStore',
+            'name'        => 'Shelf-E',
+            'url'         => url('/'),
+            'logo'        => asset('favicon.svg'),
+            'description' => 'Curated online bookstore delivering paperbacks and hardcovers across Bangladesh.',
+            'areaServed'  => ['@type' => 'Country', 'name' => 'Bangladesh'],
+            'sameAs'      => [],
+        ];
+
+        $websiteSchema = [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'WebSite',
+            'url'             => url('/'),
+            'name'            => 'Shelf-E',
+            'potentialAction' => [
+                '@type'       => 'SearchAction',
+                'target'      => route('categories.index') . '?search={search_term_string}',
+                'query-input' => 'required name=search_term_string',
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">
+        {!! json_encode($orgSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+    <script type="application/ld+json">
+        {!! json_encode($websiteSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('head')
     @stack('styles')
     <style>
         /* Custom Scrollbar */

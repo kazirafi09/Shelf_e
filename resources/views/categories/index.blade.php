@@ -1,5 +1,39 @@
 @extends('layouts.app')
 
+@php
+    $crumbLabel = $pageTitle ?? 'All Books';
+    $isBest     = ! empty($isBestsellers);
+
+    if ($isBest) {
+        $seoPageTitle       = 'Bestselling Books in Bangladesh 2026 | Shelf-E';
+        $seoPageDescription = 'Top-selling paperbacks and hardcovers right now at Shelf-E — bestsellers ranked by units sold, with cash on delivery across Bangladesh.';
+    } elseif ($crumbLabel !== 'All Books') {
+        $seoPageTitle       = $crumbLabel . ' Books Online — Home Delivery in Bangladesh | Shelf-E';
+        $seoPageDescription = 'Buy ' . $crumbLabel . ' books online at Shelf-E with home delivery across Bangladesh. Filter by author, price, and rating.';
+    } else {
+        $seoPageTitle       = 'All Books — Buy Online in Bangladesh | Shelf-E';
+        $seoPageDescription = 'Browse the full Shelf-E catalogue — bestsellers, new arrivals, and curated picks delivered across Bangladesh.';
+    }
+
+    $breadcrumbSchema = [
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => url('/')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $crumbLabel, 'item' => url()->current()],
+        ],
+    ];
+@endphp
+
+@section('title', $seoPageTitle)
+@section('description', $seoPageDescription)
+
+@push('head')
+    <script type="application/ld+json">
+        {!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+    </script>
+@endpush
+
 @section('content')
 <div class="container px-4 py-8 mx-auto" x-data="{ mobileFiltersOpen: false }">
     

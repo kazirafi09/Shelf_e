@@ -5,7 +5,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Shelf-E') }}</title>
+        @php
+            $seoTitle       = trim($__env->yieldContent('title')) ?: config('app.name', 'Shelf-E');
+            $seoDescription = trim($__env->yieldContent('description'))
+                ?: 'Shelf-E — your favorite books, delivered to your doorstep.';
+        @endphp
+        <title>{{ $seoTitle }}</title>
+        <meta name="description" content="{{ $seoDescription }}">
+        <link rel="canonical" href="{{ url()->current() }}">
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
         <link rel="preconnect" href="https://fonts.bunny.net">

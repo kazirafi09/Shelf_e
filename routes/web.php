@@ -7,6 +7,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use App\Models\Quote;
 // Controllers
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
@@ -33,6 +34,9 @@ use App\Http\Controllers\Admin\AdminHeroImageController;
 use App\Http\Controllers\Admin\AdminHeroSlideController;
 // Middleware
 use App\Http\Middleware\IsAdmin;
+
+// SEO: sitemap.xml (cached for 6 hours; safe for crawlers, no rate limit)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/random-quote', function () {
     $quote = Quote::inRandomOrder()->first(['quote', 'author']);
